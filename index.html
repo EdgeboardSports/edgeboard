@@ -85,6 +85,25 @@ loadPlayerLeaders();
 
     not betting predictions.</p>
 
+    
+    <div style="margin:16px 0">
+      <label for="edge-search">Search NHL players</label>
+      <input id="edge-search" type="search"
+        placeholder="Enter player name"
+        autocomplete="off"
+        style="display:block;width:100%;max-width:360px;
+        box-sizing:border-box;padding:12px;margin-top:8px;
+        background:#101827;color:white;
+        border:1px solid #60728b;border-radius:8px">
+      <button id="edge-search-btn" type="button"
+        style="padding:12px;margin-top:8px;
+        background:#75d8b1;color:#101827;
+        border:0;border-radius:8px">
+        Search players
+      </button>
+      <p id="edge-search-status" aria-live="polite"></p>
+    </div>
+
     <label for="edge-player">Player</label>
 
     <select id="edge-player"
@@ -143,7 +162,84 @@ loadPlayerLeaders();
 
   const results = section.querySelector('#edge-results');
 
-  async function analyze() {
+  
+// EDGEBOARD V11 - NHL PLAYER SEARCH
+const searchInput = section.querySelector('#edge-search');
+const searchButton = section.querySelector('#edge-search-btn');
+const searchStatus = section.querySelector('#edge-search-status');
+
+async function searchPlayers() {
+  const query = searchInput.value.trim();
+
+  if (query.length < 2) {
+    searchStatus.textContent = 'Enter at least 2 characters.';
+    return;
+  }
+
+  searchButton.disabled = true;
+  searchStatus.textContent = 'Searching NHL players...';
+
+  try {
+    const response = await fetch(
+      '/.netlify/functions/nhl-player-search?q=' +
+      encodeURIComponent(query)
+    );
+
+    if (!response.ok) {
+      throw new Error('Search HTTP ' + response.status);
+    }
+
+    const data = await response.json();
+    const playersFound = data.players || [];
+
+    if (!playersFound.length) {
+      searchStatus.textContent = 'No players found.';
+      return;
+    }
+
+    // Keep Aho and McDavid as quick selections.
+    // Add matching NHL players to the existing dropdown.
+    const existingIds = new Set(
+      Array.from(playerSelect.options, o => o.value)
+    );
+
+    for (const player of playersFound) {
+      if (existingIds.has(player.id)) continue;
+
+      const option = document.createElement('option');
+      option.value = player.id;
+      option.textContent = player.name +
+        (player.team ? ' (' + player.team + ')' : '');
+
+      playerSelect.appendChild(option);
+      existingIds.add(player.id);
+    }
+
+    // Select the first matching result automatically.
+    playerSelect.value = playersFound[0].id;
+
+    searchStatus.textContent =
+      'Found ' + playersFound.length +
+      ' players. Check the Player dropdown to choose one.';
+
+  } catch (error) {
+    searchStatus.textContent =
+      'Search failed: ' + error.message;
+  } finally {
+    searchButton.disabled = false;
+  }
+}
+
+searchButton.addEventListener('click', searchPlayers);
+
+searchInput.addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    searchPlayers();
+  }
+});
+
+ async function analyze() {
 
     results.textContent = 'Loading NHL game logs...';
 
