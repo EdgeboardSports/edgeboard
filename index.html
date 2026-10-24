@@ -140,7 +140,7 @@ loadPlayerLeaders();
 
       color:white;border:1px solid #60728b;border-radius:8px">
 
-      
+      <option value="0.5">Over 0.5</option>
       <option value="1.5">Over 1.5</option>
 
       <option value="2.5" selected>Over 2.5</option>
@@ -309,7 +309,8 @@ searchInput.addEventListener('keydown', event => {
 
       summary.textContent =
 
-        `${statSelect.options[statSelect.selectedIndex].text} over ${line} | Last 5: over ${line} | Last 5: ${summarize(5)} | ` +
+
+`${statSelect.options[statSelect.selectedIndex].text} over ${line} | Last 5: ${summarize(5)} | ` +
 
         `Last 10: ${summarize(10)} | ` +
 
