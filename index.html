@@ -356,12 +356,20 @@ chartGames.forEach(g => {
   const hit = value > Number(line);
 
   const bar = document.createElement('div');
+
   bar.style.cssText =
     'flex:1;min-width:9px;border-radius:4px 4px 0 0;' +
     'background:' + (hit ? '#75d8b1' : '#e87979') + ';' +
     'height:' + Math.max(4, value / chartMax * 150) + 'px;';
 
-  bar.title = `${g.date || ''} vs ${g.opponent || ''}: ${value}`;
+   bar.textContent = String(value);
+bar.style.display = 'flex';
+bar.style.alignItems = 'flex-end';
+bar.style.justifyContent = 'center';
+bar.style.fontSize = '11px';
+bar.style.fontWeight = 'bold';
+bar.style.color = '#101827';
+ bar.title = `${g.date || ''} vs ${g.opponent || ''}: ${value}`;
   chartBars.appendChild(bar);
 });
 
