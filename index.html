@@ -42,7 +42,7 @@ function gameCard(g){const card=node('article','nhl-game');const state=g.gameSta
 async function testNHL(){
  const status=document.getElementById('nhl-status'),container=document.getElementById('nhl-games'),button=document.getElementById('nhl-load');
  const day=document.getElementById('nhl-date').value||nhlDay();status.textContent='Loading games for '+day+'…';container.replaceChildren();button.disabled=true;
- try{const response=await fetch('/.netlify/functions/nhl-schedule?date='+encodeURIComponent(day),{headers:{Accept:'application/json'}});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();const games=Array.isArray(data.games)?data.games:[];status.textContent=games.length+' NHL game'+(games.length===1?'':'s')+' · '+day+' · Times shown in Eastern Time';if(!games.length)container.append(node('p','nhl-empty','No NHL games scheduled for this date. Try another day.'));else games.forEach(g=>container.append(gameCard(g)));edgeGames=games;edgeRender();}
+ try{const response=await fetch('/api/nhl-schedule?date='+encodeURIComponent(day),{headers:{Accept:'application/json'}});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();const games=Array.isArray(data.games)?data.games:[];status.textContent=games.length+' NHL game'+(games.length===1?'':'s')+' · '+day+' · Times shown in Eastern Time';if(!games.length)container.append(node('p','nhl-empty','No NHL games scheduled for this date. Try another day.'));else games.forEach(g=>container.append(gameCard(g)));edgeGames=games;edgeRender();}
  catch(err){status.textContent='Could not load live NHL data.';container.append(node('p','nhl-empty','Connection error: '+String(err.message||err)+'. Please retry.'));}
  finally{button.disabled=false;}
 }
