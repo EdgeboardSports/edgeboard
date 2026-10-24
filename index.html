@@ -321,8 +321,56 @@ searchInput.addEventListener('keydown', event => {
       note.textContent =
 
         'Historical hit rates only. Not predicted probabilities.';
+const chart = document.createElement('div');
+chart.style.cssText = 'margin-top:24px;overflow-x:auto;';
 
-      results.replaceChildren(heading, summary, note);
+const chartTitle = document.createElement('h3');
+chartTitle.textContent = 'Game-by-game performance';
+
+const chartBars = document.createElement('div');
+chartBars.style.cssText =
+  'display:flex;align-items:flex-end;gap:5px;' +
+  'height:180px;min-width:320px;padding:12px 0;' +
+  'border-bottom:1px solid #60728b;';
+
+const chartGames = games.slice(0, 20).reverse();
+const statKey = statSelect.value;
+const chartMax = Math.max(
+  Number(line) + 1,
+  ...chartGames.map(g => Number(g[statKey] || 0)),
+  1
+);
+chartBars.style.position = 'relative';
+
+const threshold = document.createElement('div');
+threshold.style.cssText =
+  'position:absolute;left:0;right:0;' +
+  'border-top:2px dashed #facc15;' +
+  'pointer-events:none;z-index:2;' +
+  'bottom:' + (12 + Number(line) / chartMax * 150) + 'px;';
+
+threshold.title = 'Selected prop line: ' + line;
+chartBars.appendChild(threshold);
+chartGames.forEach(g => {
+  const value = Number(g[statKey] || 0);
+  const hit = value > Number(line);
+
+  const bar = document.createElement('div');
+  bar.style.cssText =
+    'flex:1;min-width:9px;border-radius:4px 4px 0 0;' +
+    'background:' + (hit ? '#75d8b1' : '#e87979') + ';' +
+    'height:' + Math.max(4, value / chartMax * 150) + 'px;';
+
+  bar.title = `${g.date || ''} vs ${g.opponent || ''}: ${value}`;
+  chartBars.appendChild(bar);
+});
+
+const chartNote = document.createElement('p');
+chartNote.textContent =
+  'Green = over the selected line. Red = under or equal. Oldest game on left.';
+
+chart.append(chartTitle, chartBars, chartNote);
+results.replaceChildren(heading, summary, note, chart);
 
     } catch (error) {
 
