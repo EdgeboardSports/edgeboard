@@ -91,6 +91,37 @@ exports.handler = async (event) => {
       };
     };
 
+    const hitRate = (key, line, count = 10) => {
+      const recent = games.slice(0, count);
+      if (!recent.length) return null;
+
+      const hits = recent.filter(
+        (game) => game[key] > line
+      ).length;
+
+      return {
+        line,
+        games: recent.length,
+        hits,
+        percentage: Number(
+          ((hits / recent.length) * 100).toFixed(1)
+        )
+      };
+    };
+
+    const propHitRates = {
+      shotsOver2_5: {
+        last5: hitRate('shots', 2.5, 5),
+        last10: hitRate('shots', 2.5, 10),
+        last20: hitRate('shots', 2.5, 20)
+      },
+      pointsOver0_5: {
+        last5: hitRate('points', 0.5, 5),
+        last10: hitRate('points', 0.5, 10),
+        last20: hitRate('points', 0.5, 20)
+      }
+    };
+  
     return {
       statusCode: 200,
       headers: {
@@ -108,7 +139,8 @@ exports.handler = async (event) => {
         last5: summarize(5),
         last10: summarize(10),
         last20: summarize(20),
-        games
+        propHitRates,
+games
       })
     };
   } catch (error) {
