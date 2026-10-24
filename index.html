@@ -120,6 +120,18 @@ loadPlayerLeaders();
 
     </select>
 
+    
+    <label for="edge-stat">Stat Type</label>
+    <select id="edge-stat"
+      style="padding:12px;margin:8px;
+      background:#101827;color:white;
+      border:1px solid #60728b;border-radius:8px">
+      <option value="shots">Shots on Goal</option>
+      <option value="goals">Goals</option>
+      <option value="assists">Assists</option>
+      <option value="points">Points</option>
+    </select>
+
     <label for="edge-line">Shots line</label>
 
     <select id="edge-line"
@@ -128,6 +140,7 @@ loadPlayerLeaders();
 
       color:white;border:1px solid #60728b;border-radius:8px">
 
+      
       <option value="1.5">Over 1.5</option>
 
       <option value="2.5" selected>Over 2.5</option>
@@ -158,8 +171,15 @@ loadPlayerLeaders();
 
   const playerSelect = section.querySelector('#edge-player');
 
-  const lineSelect = section.querySelector('#edge-line');
+const statSelect = section.querySelector('#edge-stat');  
+ const lineSelect = section.querySelector('#edge-line');
 
+
+statSelect.addEventListener('change', () => {
+
+  lineSelect.value = statSelect.value === 'shots' ? '2.5' : '0.5';
+
+});
   const results = section.querySelector('#edge-results');
 
   
@@ -269,7 +289,7 @@ searchInput.addEventListener('keydown', event => {
 
         const recent = games.slice(0, count);
 
-        const hits = recent.filter(g => g.shots > line).length;
+        const hits = recent.filter(g => Number(g[statSelect.value] || 0) > line).length;
 
         const rate = recent.length
 
@@ -289,7 +309,7 @@ searchInput.addEventListener('keydown', event => {
 
       summary.textContent =
 
-        `Shots over ${line} | Last 5: ${summarize(5)} | ` +
+        `${statSelect.options[statSelect.selectedIndex].text} over ${line} | Last 5: over ${line} | Last 5: ${summarize(5)} | ` +
 
         `Last 10: ${summarize(10)} | ` +
 
