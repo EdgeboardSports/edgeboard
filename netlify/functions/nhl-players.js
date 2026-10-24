@@ -1,7 +1,7 @@
 
 // Netlify Function: NHL player statistics leaders
 exports.handler = async () => {
-  const categories = ['points', 'goals', 'assists', 'shots'];
+const categories = ['points', 'goals', 'assists'];
   const result = {};
 
   try {
