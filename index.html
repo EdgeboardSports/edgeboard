@@ -55,4 +55,169 @@ function playerCount(p,key){const candidates=key==='shots'?['shots','shotsOnGoal
 async function loadPlayerLeaders(){const status=document.getElementById('player-status'),target=document.getElementById('player-leaders');if(!status||!target)return;status.textContent='Loading…';target.replaceChildren();try{const r=await fetch('/.netlify/functions/nhl-players',{headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status);const data=await r.json();let total=0;for(const [key,title] of playerCategories){const list=Array.isArray(data[key])?data[key]:[];if(!list.length)continue;total+=list.length;const group=node('details','card leader-category');const heading=node('summary','',title+' · Top '+list.length);group.append(heading);for(const p of list){const line=node('div','leader-row');const who=node('div');who.append(node('strong','',playerName(p)));who.append(node('small','muted',p.teamAbbrev||p.team||''));line.append(who);line.append(node('span','leader-value',playerCount(p,key)??'—'));group.append(line);}target.append(group);}if(!total)throw Error('NHL returned no player leaders');status.textContent='Live NHL player totals loaded';}catch(e){status.textContent='Player stats unavailable';target.append(node('p','notice','Could not load NHL player leaders: '+e.message+'. Existing team stats and schedules are unaffected.'));}}
 document.getElementById('player-refresh')?.addEventListener('click',loadPlayerLeaders);
 loadPlayerLeaders();
+
+
+// EDGEBOARD V10 — NHL PLAYER PROP ANALYZER
+
+(function () {
+
+  const players = [
+
+    { name: 'Sebastian Aho', id: '8478427' },
+
+    { name: 'Connor McDavid', id: '8478402' }
+
+  ];
+
+  const section = document.createElement('section');
+
+  section.style.cssText =
+
+    'margin:24px auto;padding:20px;max-width:900px;' +
+
+    'background:#1b283d;color:#e9f1fa;border-radius:18px;';
+
+  section.innerHTML = `
+
+    <h2>NHL Player Prop Analyzer</h2>
+
+    <p>Official NHL game logs. Historical statistics,
+
+    not betting predictions.</p>
+
+    <label for="edge-player">Player</label>
+
+    <select id="edge-player"
+
+      style="padding:12px;margin:8px;background:#101827;
+
+      color:white;border:1px solid #60728b;border-radius:8px">
+
+      ${players.map(p =>
+
+        `<option value="${p.id}">${p.name}</option>`
+
+      ).join('')}
+
+    </select>
+
+    <label for="edge-line">Shots line</label>
+
+    <select id="edge-line"
+
+      style="padding:12px;margin:8px;background:#101827;
+
+      color:white;border:1px solid #60728b;border-radius:8px">
+
+      <option value="1.5">Over 1.5</option>
+
+      <option value="2.5" selected>Over 2.5</option>
+
+      <option value="3.5">Over 3.5</option>
+
+      <option value="4.5">Over 4.5</option>
+
+    </select>
+
+    <button id="edge-analyze"
+
+      style="padding:12px;background:#75d8b1;
+
+      color:#101827;border:0;border-radius:8px">
+
+      Analyze player
+
+    </button>
+
+    <div id="edge-results" aria-live="polite"
+
+      style="margin-top:18px">Select Analyze player.</div>
+
+  `;
+
+  document.body.appendChild(section);
+
+  const playerSelect = section.querySelector('#edge-player');
+
+  const lineSelect = section.querySelector('#edge-line');
+
+  const results = section.querySelector('#edge-results');
+
+  async function analyze() {
+
+    results.textContent = 'Loading NHL game logs...';
+
+    try {
+
+      const id = playerSelect.value;
+
+      const response = await fetch(
+
+        '/.netlify/functions/nhl-game-log?playerId=' + id
+
+      );
+
+      if (!response.ok) {
+
+        throw new Error('Game log HTTP ' + response.status);
+
+      }
+
+      const data = await response.json();
+
+      const line = Number(lineSelect.value);
+
+      const games = data.games || [];
+
+      function summarize(count) {
+
+        const recent = games.slice(0, count);
+
+        const hits = recent.filter(g => g.shots > line).length;
+
+        const rate = recent.length
+
+          ? Math.round(hits / recent.length * 100)
+
+          : 0;
+
+        return `${hits}/${recent.length} (${rate}%)`;
+
+      }
+
+      const heading = document.createElement('h3');
+
+      heading.textContent = data.playerName || 'NHL Player';
+
+      const summary = document.createElement('p');
+
+      summary.textContent =
+
+        `Shots over ${line} | Last 5: ${summarize(5)} | ` +
+
+        `Last 10: ${summarize(10)} | ` +
+
+        `Last 20: ${summarize(20)}`;
+
+      const note = document.createElement('p');
+
+      note.textContent =
+
+        'Historical hit rates only. Not predicted probabilities.';
+
+      results.replaceChildren(heading, summary, note);
+
+    } catch (error) {
+
+      results.textContent = 'Unable to load: ' + error.message;
+
+    }
+
+  }
+
+  section.querySelector('#edge-analyze')
+
+    .addEventListener('click', analyze);
+
+})();
 </script></body></html>
