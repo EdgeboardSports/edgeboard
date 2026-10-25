@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": null,
-  "lastRunAt": null,
-  "remainingCredits": null,
+  "updatedAt": "2026-10-25T21:40:40.992Z",
+  "lastRunAt": "2026-10-25T21:40:40.992Z",
+  "remainingCredits": 489,
   "policy": {
     "maxGamesPerDay": 2,
     "captureMinutesBeforeStart": [
@@ -17,5 +17,17 @@
     "audience": "Public model paper predictions; no personal wagers or account data."
   },
   "events": [],
-  "runs": []
+  "runs": [
+    {
+      "at": "2026-10-25T21:40:40.992Z",
+      "sourceCommit": "e36761bcb2e12fa3df353930482385ca9b137de8",
+      "errors": [
+        "Schedule 9c1309e10d95a3f6eb6b6b9105c565eb: HTTP 502 for /api/nhl-schedule",
+        "Schedule cd9f65faa44f221a72638e49afb134fb: HTTP 502 for /api/nhl-schedule",
+        "Schedule 61198113cc96cb987aad067a15911db8: HTTP 502 for /api/nhl-schedule"
+      ],
+      "notes": [],
+      "capturedGames": 0
+    }
+  ]
 }
