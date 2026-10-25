@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {onRequestGet} from '../functions/api/nhl-player-profile.js';
+let calls=0,cacheKey;globalThis.caches={default:{match:async()=>undefined,put:async key=>{cacheKey=key.url}}};
+globalThis.fetch=async()=>{calls++;return new Response(JSON.stringify({playerId:8477500,firstName:{default:'Bo'},lastName:{default:'Horvat'},currentTeamAbbrev:'NYI',sweaterNumber:14,headshot:'https://assets.nhle.com/mugs/nhl/20262027/NYI/8477500.png',teamLogo:'https://assets.nhle.com/logos/nhl/svg/NYI_light.svg'}))};
+let r=await onRequestGet({request:new Request('https://app/api/nhl-player-profile?id=bad')});assert.equal(r.status,400);assert.equal(calls,0);
+r=await onRequestGet({request:new Request('https://app/api/nhl-player-profile?id=8477500&extra=x')});const p=await r.json();assert.equal(p.name,'Bo Horvat');assert.equal(p.team,'NYI');assert(p.headshot.startsWith('https://assets.nhle.com/'));assert.equal(cacheKey,'https://app/api/nhl-player-profile?id=8477500');
+globalThis.fetch=async()=>new Response(JSON.stringify({playerId:8477500,headshot:'https://example.com/not-nhl.png',teamLogo:'javascript:alert(1)'}));
+r=await onRequestGet({request:new Request('https://app/api/nhl-player-profile?id=8477500')});assert.equal((await r.json()).headshot,null);
+globalThis.fetch=async()=>new Response(JSON.stringify({playerId:1234567}));r=await onRequestGet({request:new Request('https://app/api/nhl-player-profile?id=8477500')});assert.equal(r.status,502);
+globalThis.fetch=async()=>{throw Error('offline')};r=await onRequestGet({request:new Request('https://app/api/nhl-player-profile?id=8477500')});assert.equal(r.status,503);
+console.log('Passed portrait ID validation, official asset allowlist, identity mismatch, canonical cache and unavailable-photo handling.');

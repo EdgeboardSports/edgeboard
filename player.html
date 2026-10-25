@@ -1,0 +1,475 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090f19"><title>Edgeboard · Player analysis</title><link rel="stylesheet" href="/assets/ui.css?v=19"></head><body data-page="player"><header class="page-header"><span class="eyebrow">PLAYER LAB</span><h1>Know the player.</h1><p>Search NHL players and inspect their results at the line you choose.</p></header><main><section class="card" id="selected-player"></section><div id="player-tools"></div></main><footer>Official NHL regular-season game logs. Historical hit rates are not predicted probabilities.</footer><script type="module">import {el,playerIdentity} from '/assets/ui.js?v=19';
+// EDGEBOARD V10 — NHL PLAYER PROP ANALYZER
+
+(function () {
+
+  const players = [
+
+    { name: 'Sebastian Aho', id: '8478427' },
+
+    { name: 'Connor McDavid', id: '8478402' }
+
+  ];
+
+  const section = document.createElement('section');
+  section.id = 'player-analyzer';
+
+  section.style.cssText =
+
+    'margin:24px auto;padding:20px;max-width:900px;' +
+
+    'background:#1b283d;color:#e9f1fa;border-radius:18px;';
+
+  section.innerHTML = `
+
+    <h2>NHL Player Prop Analyzer</h2>
+
+    <p>Official NHL game logs. Historical statistics,
+
+    not betting predictions.</p>
+
+    
+    <div style="margin:16px 0">
+      <label for="edge-search">Search NHL players</label>
+      <input id="edge-search" type="search"
+        placeholder="Enter player name"
+        autocomplete="off"
+        style="display:block;width:100%;max-width:360px;
+        box-sizing:border-box;padding:12px;margin-top:8px;
+        background:#101827;color:white;
+        border:1px solid #60728b;border-radius:8px">
+      <button id="edge-search-btn" type="button"
+        style="padding:12px;margin-top:8px;
+        background:#75d8b1;color:#101827;
+        border:0;border-radius:8px">
+        Search players
+      </button>
+      <p id="edge-search-status" aria-live="polite"></p>
+    </div>
+
+    <label for="edge-season">NHL Season</label>
+
+<select id="edge-season"
+
+  style="padding:12px;margin:8px;background:#101827;color:white;border:1px solid #60728b;border-radius:8px">
+
+  <option value="20262027">2026–27 (Current)</option>
+
+  <option value="20252026">2025–26</option>
+
+  <option value="20242025">2024–25</option>
+
+  <option value="20232024">2023–24</option>
+
+</select>
+    <label for="edge-player">Player</label>
+
+    <select id="edge-player"
+
+      style="padding:12px;margin:8px;background:#101827;
+
+      color:white;border:1px solid #60728b;border-radius:8px">
+
+      ${players.map(p =>
+
+        `<option value="${p.id}">${p.name}</option>`
+
+      ).join('')}
+
+    </select>
+
+    
+    <label for="edge-stat">Stat Type</label>
+    <select id="edge-stat"
+      style="padding:12px;margin:8px;
+      background:#101827;color:white;
+      border:1px solid #60728b;border-radius:8px">
+      <option value="shots">Shots on Goal</option>
+      <option value="goals">Goals</option>
+      <option value="assists">Assists</option>
+      <option value="points">Points</option>
+    </select>
+
+    <label for="edge-line">Prop line</label>
+
+    <select id="edge-line"
+
+      style="padding:12px;margin:8px;background:#101827;
+
+      color:white;border:1px solid #60728b;border-radius:8px">
+
+      <option value="0.5">Over 0.5</option>
+      <option value="1.5">Over 1.5</option>
+
+      <option value="2.5" selected>Over 2.5</option>
+
+      <option value="3.5">Over 3.5</option>
+
+      <option value="4.5">Over 4.5</option>
+
+    </select>
+    <button id="edge-analyze"
+
+      style="padding:12px;background:#75d8b1;
+
+      color:#101827;border:0;border-radius:8px">
+
+      Analyze player
+
+    </button>
+
+    <div id="edge-results" aria-live="polite"
+
+      style="margin-top:18px">Select Analyze player.</div>
+
+  `;
+
+  document.getElementById('player-tools').appendChild(section);
+  section.classList.add('player-analysis');
+  const controlGrid=el('div',null,'control-grid');
+  for(const id of ['edge-season','edge-player','edge-stat','edge-line']){const field=section.querySelector('#'+id),label=section.querySelector('label[for="'+id+'"]'),wrap=el('div');wrap.append(label,field);controlGrid.append(wrap);}
+  section.insertBefore(controlGrid,section.querySelector('#edge-analyze'));
+
+  const playerSelect = section.querySelector('#edge-player');
+
+const statSelect = section.querySelector('#edge-stat');  
+ const lineSelect = section.querySelector('#edge-line');
+const seasonSelect = section.querySelector('#edge-season');
+
+statSelect.addEventListener('change', () => {
+
+  lineSelect.value = statSelect.value === 'shots' ? '2.5' : '0.5';
+
+});
+  const results = section.querySelector('#edge-results');
+
+  
+// EDGEBOARD V11 - NHL PLAYER SEARCH
+const searchInput = section.querySelector('#edge-search');
+const searchButton = section.querySelector('#edge-search-btn');
+const searchStatus = section.querySelector('#edge-search-status');
+
+async function searchPlayers() {
+  const query = searchInput.value.trim();
+
+  if (query.length < 2) {
+    searchStatus.textContent = 'Enter at least 2 characters.';
+    return;
+  }
+
+  searchButton.disabled = true;
+  searchStatus.textContent = 'Searching NHL players...';
+
+  try {
+    const response = await fetch(
+      '/api/nhl-player-search?q=' +
+      encodeURIComponent(query)
+    );
+
+    if (!response.ok) {
+      throw new Error('Search HTTP ' + response.status);
+    }
+
+    const data = await response.json();
+    const playersFound = data.players || [];
+
+    if (!playersFound.length) {
+      searchStatus.textContent = 'No players found.';
+      return;
+    }
+
+    // Keep Aho and McDavid as quick selections.
+    // Add matching NHL players to the existing dropdown.
+    const existingIds = new Set(
+      Array.from(playerSelect.options, o => o.value)
+    );
+
+    for (const player of playersFound) {
+      if (existingIds.has(player.id)) continue;
+
+      const option = document.createElement('option');
+      option.value = player.id;
+      option.textContent = player.name +
+        (player.team ? ' (' + player.team + ')' : '');
+
+      playerSelect.appendChild(option);
+      existingIds.add(player.id);
+    }
+
+    // Select the first matching result automatically.
+    playerSelect.value = playersFound[0].id;
+
+    searchStatus.textContent =
+      'Found ' + playersFound.length +
+      ' players. Check the Player dropdown to choose one.';
+
+  } catch (error) {
+    searchStatus.textContent =
+      'Search failed: ' + error.message;
+  } finally {
+    searchButton.disabled = false;
+  }
+}
+
+searchButton.addEventListener('click', searchPlayers);
+
+searchInput.addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    searchPlayers();
+  }
+});
+
+ async function analyze() {
+    renderSelected();
+
+    results.textContent = 'Loading NHL game logs...';
+
+    try {
+
+      const id = playerSelect.value;
+const season = seasonSelect.value;
+      const response = await fetch(
+
+       '/api/nhl-game-log?playerId=' + id + '&season=' + season
+
+      );
+
+      if (!response.ok) {
+
+        throw new Error('Game log HTTP ' + response.status);
+
+      }
+
+      const data = await response.json();
+
+      const line = Number(lineSelect.value);
+
+      const games = data.games || [];
+// EDGEBOARD V12 - HOME/AWAY AND OPPONENT ANALYTICS
+
+const selectedStat = statSelect.value;
+
+function getHitRate(gameList) {
+  const total = gameList.length;
+  const hits = gameList.filter(
+    g => Number(g[selectedStat]) > line
+  ).length;
+
+  return {
+    games: total,
+    hits: hits,
+    rate: total
+      ? Math.round((hits / total) * 100)
+      : 0
+  };
+}
+
+const homeGames = games.filter(
+  g => g.homeRoadFlag === 'H'
+);
+
+const awayGames = games.filter(
+  g => g.homeRoadFlag === 'R'
+);
+
+const homeStats = getHitRate(homeGames);
+const awayStats = getHitRate(awayGames);
+
+const opponentStats = {};
+
+games.forEach(game => {
+  const opponent = game.opponentAbbrev;
+  if (!opponent) return;
+
+  if (!opponentStats[opponent]) {
+    opponentStats[opponent] = [];
+  }
+
+  opponentStats[opponent].push(game);
+});
+
+const opponentResults = Object.entries(opponentStats)
+  .map(([team, teamGames]) => ({
+    team,
+    ...getHitRate(teamGames)
+  }))
+  .sort((a, b) => b.rate - a.rate);
+      function summarize(count) {
+
+        const recent = games.slice(0, count);
+
+        const hits = recent.filter(g => Number(g[statSelect.value] || 0) > line).length;
+
+        const rate = recent.length
+
+          ? Math.round(hits / recent.length * 100)
+
+          : 0;
+
+        return `${hits}/${recent.length} (${rate}%)`;
+
+      }
+
+      const heading = document.createElement('h3');
+
+      
+heading.textContent = playerSelect.options[playerSelect.selectedIndex]?.textContent || 'NHL Player';
+
+
+      const summary = document.createElement('p');
+
+      summary.textContent =
+
+
+`${statSelect.options[statSelect.selectedIndex].text} over ${line} | Last 5: ${summarize(5)} | ` +
+
+        `Last 10: ${summarize(10)} | ` +
+
+        `Last 20: ${summarize(20)}`;
+
+      const note = document.createElement('p');
+
+      note.textContent =
+
+        'Historical hit rates only. Not predicted probabilities.';
+     const breakdown = document.createElement('p');
+
+const totalHits = games.filter(
+  g => Number(g[statSelect.value]) > line
+).length;
+
+breakdown.textContent =
+  `Season sample: ${totalHits}/${games.length} games ` +
+  `(${games.length ? Math.round(totalHits / games.length * 100) : 0}% hit rate)`;
+
+breakdown.style.cssText =
+  'padding:12px;background:#101827;border-radius:8px;margin-top:16px;';
+const chart = document.createElement('div');
+chart.style.cssText = 'margin-top:24px;overflow-x:auto;';
+
+const chartTitle = document.createElement('h3');
+chartTitle.textContent = 'Game-by-game performance';
+
+const chartBars = document.createElement('div');
+chartBars.style.cssText =
+  'display:flex;align-items:flex-end;gap:5px;' +
+  'height:180px;min-width:320px;padding:12px 0;' +
+  'border-bottom:1px solid #60728b;';
+
+const chartGames = games.slice(0, 20).reverse();
+const statKey = statSelect.value;
+const chartMax = Math.max(
+  Number(line) + 1,
+  ...chartGames.map(g => Number(g[statKey] || 0)),
+  1
+);
+chartBars.style.position = 'relative';
+
+const threshold = document.createElement('div');
+threshold.style.cssText =
+  'position:absolute;left:0;right:0;' +
+  'border-top:2px dashed #facc15;' +
+  'pointer-events:none;z-index:2;' +
+  'bottom:' + (12 + Number(line) / chartMax * 150) + 'px;';
+
+threshold.title = 'Selected prop line: ' + line;
+chartBars.appendChild(threshold);
+chartGames.forEach(g => {
+  const value = Number(g[statKey] || 0);
+  const hit = value > Number(line);
+
+  const bar = document.createElement('div');
+
+  bar.style.cssText =
+    'flex:1;min-width:9px;border-radius:4px 4px 0 0;' +
+    'background:' + (hit ? '#75d8b1' : '#e87979') + ';' +
+    'height:' + Math.max(4, value / chartMax * 150) + 'px;';
+
+   bar.textContent = String(value);
+bar.style.display = 'flex';
+bar.style.alignItems = 'flex-end';
+bar.style.justifyContent = 'center';
+bar.style.fontSize = '11px';
+bar.style.fontWeight = 'bold';
+bar.style.color = '#101827';
+ bar.title = `${g.gameDate || g.date || ''} vs ${g.opponentAbbrev || g.opponent || ''}: ${value}`;
+  chartBars.appendChild(bar);
+});
+
+const chartNote = document.createElement('p');
+chartNote.textContent =
+  'Green = over the selected line. Red = under or equal. Oldest game on left.';
+
+chart.append(chartTitle, chartBars, chartNote);
+// EDGEBOARD V12 - HOME/AWAY AND OPPONENT DISPLAY
+
+const splits = document.createElement('div');
+splits.style.cssText =
+  'margin-top:24px;padding:16px;background:#101827;' +
+  'border-radius:12px;';
+
+const splitsTitle = document.createElement('h3');
+splitsTitle.textContent = 'Home vs Away Performance';
+splits.appendChild(splitsTitle);
+
+function addSplit(label, stats) {
+  const row = document.createElement('p');
+  row.textContent =
+    `${label}: ${stats.hits}/${stats.games} games ` +
+    `(${stats.rate}% hit rate)`;
+  splits.appendChild(row);
+}
+
+addSplit('Home', homeStats);
+addSplit('Away', awayStats);
+
+const opponentTitle = document.createElement('h3');
+opponentTitle.textContent = 'Performance by Opponent';
+opponentTitle.style.marginTop = '24px';
+splits.appendChild(opponentTitle);
+
+opponentResults.forEach(item => {
+  const row = document.createElement('p');
+  row.textContent =
+    `${item.team}: ${item.hits}/${item.games} ` +
+    `(${item.rate}% hit rate)`;
+  splits.appendChild(row);
+});results.replaceChildren(heading, summary, note, breakdown, chart, splits);
+    } catch (error) {
+
+      results.textContent = 'Unable to load: ' + error.message;
+
+    }
+
+  }
+
+  section.querySelector('#edge-analyze')
+
+    .addEventListener('click', analyze);
+
+  function renderSelected(){document.getElementById('selected-player').replaceChildren(playerIdentity({id:playerSelect.value,name:playerSelect.selectedOptions[0]?.textContent||'NHL player',season:seasonSelect.value,large:true}));}
+  playerSelect.addEventListener('change',renderSelected);seasonSelect.addEventListener('change',renderSelected);renderSelected();
+  // A prop quote links to the exact player, stat, and threshold.
+  (async function loadLinkedPlayer(){
+    const params=new URLSearchParams(location.search),name=params.get('playerName'),stat=params.get('stat'),line=Number(params.get('line'));
+    if(!name||!['shots','goals','assists','points'].includes(stat)||!params.has('line')||!Number.isFinite(line)||line<0||line>100)return;
+    results.textContent='Finding the selected player…';
+    try{
+      const response=await fetch('/api/nhl-player-search?q='+encodeURIComponent(name));
+      if(!response.ok)throw Error('Player search unavailable');
+      const data=await response.json();
+      const clean=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+      const matches=(data.players||[]).filter(p=>clean(p.name)===clean(name));
+      if(matches.length!==1){results.textContent='Select the correct player using search above, then analyze the line.';searchInput.value=name;return;}
+      const player=matches[0];let option=[...playerSelect.options].find(o=>o.value===String(player.id));
+      if(!option){option=new Option(player.name,String(player.id));playerSelect.append(option);}
+      playerSelect.value=String(player.id);statSelect.value=stat;
+      if(![...lineSelect.options].some(o=>Number(o.value)===line))lineSelect.append(new Option('Over '+line,String(line)));
+      lineSelect.value=String(line);await analyze();
+    }catch{results.textContent='Could not find the linked player. Use player search to continue.';}
+  })();
+
+})();
+
+</script></body></html>
