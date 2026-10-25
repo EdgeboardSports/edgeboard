@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "mode": "automatic-paper-testing",
+  "createdAt": "2026-10-25T21:34:13.511Z",
+  "updatedAt": null,
+  "lastRunAt": null,
+  "remainingCredits": null,
+  "policy": {
+    "maxGamesPerDay": 2,
+    "captureMinutesBeforeStart": [
+      15,
+      180
+    ],
+    "quotaReserve": 100,
+    "grading": "Hourly; official final game + player game log. DNP void after 24 hours. Recheck corrections for 14 days.",
+    "selection": "Earliest available games in capture window; all offered best-price shots selections, including failed checks. No outcome-based backfill.",
+    "audience": "Public model paper predictions; no personal wagers or account data."
+  },
+  "events": [],
+  "runs": []
+}
