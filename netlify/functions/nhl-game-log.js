@@ -17,6 +17,17 @@ exports.handler = async (event) => {
     };
   }
 
+  const requestedSeason = event.queryStringParameters?.season;
+  if (requestedSeason !== undefined &&
+      (!/^\d{8}$/.test(requestedSeason) ||
+       Number(requestedSeason.slice(4)) !== Number(requestedSeason.slice(0, 4)) + 1)) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Invalid season; expected consecutive years YYYYZZZZ' })
+    };
+  }
+
   try {
     const url =
       `https://api-web.nhle.com/v1/player/${playerId}/landing`;
@@ -32,14 +43,14 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
-    const rawGames = Array.isArray(data.seasonTotals)
-      ? data.seasonTotals
-      : [];
-
-    // Game-by-game records are supplied separately
-    // by the NHL game-log endpoint.
-    const season = data.featuredStats?.regularSeason
-      ?.subSeason?.season || '20262027';
+    // Explicit historical seasons take precedence over the player's current season.
+    const season = requestedSeason || String(data.currentSeason ||
+      data.featuredStats?.regularSeason?.subSeason?.season ||
+      (() => {
+        const now = new Date();
+        const start = now.getUTCFullYear() - (now.getUTCMonth() < 6 ? 1 : 0);
+        return `${start}${start + 1}`;
+      })());
 
     const gameResponse = await fetch(
       `https://api-web.nhle.com/v1/player/${playerId}/game-log/${season}/2`,
@@ -57,7 +68,8 @@ exports.handler = async (event) => {
 
     const gameData = await gameResponse.json();
 
-    const games = (gameData.gameLog || []).map(g => ({
+    const games = (Array.isArray(gameData.gameLog) ? gameData.gameLog : []).map(g => ({
+      ...g, // Preserve NHL fields used by home/away and opponent analytics.
       date: g.gameDate,
       opponent: g.opponentAbbrev,
       homeAway: g.homeRoadFlag,

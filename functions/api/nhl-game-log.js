@@ -17,7 +17,8 @@ export async function onRequestGet({ request }) {
     return json({ error: "Valid 7-digit playerId required" }, 400);
   }
 
-  if (!/^\d{8}$/.test(season)) {
+  if (!/^\d{8}$/.test(season) ||
+      Number(season.slice(4)) !== Number(season.slice(0, 4)) + 1) {
     return json({ error: "Invalid season" }, 400);
   }
 
