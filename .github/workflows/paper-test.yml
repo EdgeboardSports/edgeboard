@@ -10,6 +10,9 @@ on:
       - 'scripts/paper-runner.mjs'
       - 'paper-core.js'
       - 'shots-model.js'
+      - 'scripts/game-archive.mjs'
+      - 'game-model.js'
+      - 'game-paper.js'
 permissions:
   contents: write
 concurrency:
@@ -26,6 +29,10 @@ jobs:
           ref: main
       - name: Validate model and paper rules
         run: npm test
+      - name: Refresh official team goal histories
+        id: archive
+        continue-on-error: true
+        run: node scripts/game-archive.mjs
       - name: Capture pregame predictions and grade official results
         id: capture
         continue-on-error: true
@@ -36,16 +43,16 @@ jobs:
           node scripts/paper-runner.mjs
       - name: Preserve ledger
         run: |
-          if git diff --quiet -- data/paper-ledger.json
+          if git diff --quiet -- data/paper-ledger.json data/game-archive.json
           then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/paper-ledger.json
+          git add data/paper-ledger.json data/game-archive.json
           git commit -m "[CF-Pages-Skip] Refresh automatic paper ledger"
           git pull --rebase origin main
           git push origin HEAD:main
       - name: Report capture errors after preserving audit log
-        if: steps.capture.outcome == 'failure'
+        if: steps.capture.outcome == 'failure' || steps.archive.outcome == 'failure'
         run: exit 1
