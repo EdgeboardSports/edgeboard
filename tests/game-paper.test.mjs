@@ -48,3 +48,8 @@ const repair={...built,errors:['TAA 20262027: Official NHL HTTP 429']};let repai
 const repaired=await buildArchive(repair,async url=>{repairedReads++;return official(url)},{now:clock+10000,pause:async()=>{}});
 assert.equal(repairedReads,2);assert.equal(repaired.errors.length,0);assert.equal(repaired.games.length,2);
 console.log('Passed rate-limit stop/cooldown and retry-only-missing-feed repair.');
+
+const {onRequestGet:archiveResponse}=await import('../functions/api/game-archive.js');let archiveReads=0;
+globalThis.fetch=async url=>{archiveReads++;return new Response(JSON.stringify(url.startsWith('https://api.github.com')?{schemaVersion:1,generatedAt:'2026-10-25T15:00:00Z',games:[{id:1}],errors:[]}:{schemaVersion:1,generatedAt:null,games:[],errors:[]}))};
+const warmed=await archiveResponse();assert.equal((await warmed.json()).games.length,1);assert.equal(archiveReads,2);
+console.log('Passed fresh public archive fallback during initial-cache warm-up.');
