@@ -32,11 +32,19 @@ let attempts=0;const noRetry=makeClient('https://test',{pause:async()=>{},fetchI
 await assert.rejects(()=>noRetry('/api/nhl-game-odds?event='+id));assert.equal(attempts,1);
 const teams=Array.from({length:30},(_,i)=>'T'+String.fromCharCode(65+Math.floor(i/26))+String.fromCharCode(65+i%26));let reads=0;
 const official=async url=>{reads++;return url.endsWith('/standings/now')?{standings:teams.map(t=>({teamAbbrev:{default:t},teamName:{default:t+' Team'}}))}:{games:[{id:Number(url.split('/').at(-1)),season:Number(url.split('/').at(-1)),gameType:2,gameState:'OFF',gameDate:'2025-10-01',homeTeam:{abbrev:'HOM',score:4},awayTeam:{abbrev:'AWY',score:2},gameOutcome:{lastPeriodType:'REG'}}]}};
-const built=await buildArchive({games:[],seasons:[]},official,{now:clock});assert.equal(built.games.length,2);assert.equal(built.errors.length,0);assert.equal(reads,61);
-await buildArchive(built,official,{now:clock+1000});assert.equal(reads,61);
-await buildArchive(built,official,{now:clock+13*3600000});assert.equal(reads,92);
+const built=await buildArchive({games:[],seasons:[]},official,{now:clock,pause:async()=>{}});assert.equal(built.games.length,2);assert.equal(built.errors.length,0);assert.equal(reads,61);
+await buildArchive(built,official,{now:clock+1000,pause:async()=>{}});assert.equal(reads,61);
+await buildArchive(built,official,{now:clock+13*3600000,pause:async()=>{}});assert.equal(reads,92);
 let providerCalls=0,cacheKey;globalThis.caches={default:{match:async()=>undefined,put:async(k,v)=>{cacheKey=k.url;assert(!(await v.text()).includes('private-test-key'))}}};
 globalThis.fetch=async()=>{providerCalls++;return new Response(JSON.stringify({home_team:'Home',away_team:'Away',bookmakers:[{key:'test',markets:[{key:'h2h_3_way',last_update:new Date(clock).toISOString(),outcomes:[{name:'Home',price:150},{name:'Away',price:150},{name:'Draw',price:300}]}]}]}))};
 let r=await onRequestGet({env:{THE_ODDS_API_KEY:'private-test-key'},request:new Request('https://app/api/nhl-game-odds?event=bad')});assert.equal(r.status,400);assert.equal(providerCalls,0);
 r=await onRequestGet({env:{THE_ODDS_API_KEY:'private-test-key'},request:new Request('https://app/api/nhl-game-odds?event='+id)});const normalized=await r.json();assert.equal(normalized.odds.length,3);assert.equal(normalized.odds[2].side,'Draw');assert(!cacheKey.includes('private-test-key'));
 console.log('Passed game-paper capture, immutable shots/game snapshots, independent OT/three-way grading, reserve, no paid retries, archive dedup/freshness, and secret-free odds normalization/cache.');
+
+let limitedReads=0;const limitedArchive=await buildArchive({games:[],seasons:[]},async url=>{limitedReads++;if(url.endsWith('/standings/now'))return official(url);const e=Error('rate limited');e.status=429;e.retryAfterSeconds=120;throw e},{now:clock,pause:async()=>{}});
+assert.equal(limitedReads,2);assert.equal(limitedArchive.errors.length,60);
+await buildArchive(limitedArchive,async()=>{throw Error('Must respect cooldown')},{now:clock+1000,pause:async()=>{}});
+const repair={...built,errors:['TAA 20262027: Official NHL HTTP 429']};let repairedReads=0;
+const repaired=await buildArchive(repair,async url=>{repairedReads++;return official(url)},{now:clock+10000,pause:async()=>{}});
+assert.equal(repairedReads,2);assert.equal(repaired.errors.length,0);assert.equal(repaired.games.length,2);
+console.log('Passed rate-limit stop/cooldown and retry-only-missing-feed repair.');
