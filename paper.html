@@ -10,7 +10,7 @@ import {aggregateGames} from '/game-paper.js';
 const $=id=>document.getElementById(id),make=(tag,text)=>{const e=document.createElement(tag);if(text!=null)e.textContent=text;return e};let ledger=null;
 const pct=v=>v===null?'—':(100*v).toFixed(1)+'%',num=v=>v===null?'—':v.toFixed(3),units=v=>(v>=0?'+':'')+v.toFixed(2)+'u';
 function table(headers,rows){const t=make('table'),head=make('thead'),tr=make('tr');for(const h of headers)tr.append(make('th',h));head.append(tr);t.append(head);const body=make('tbody');for(const row of rows){const tr=make('tr');for(const v of row)tr.append(make('td',String(v)));body.append(tr)}t.append(body);return t}
-function marketRows(){const market=$('market').value;return (ledger.events||[]).flatMap(e=>market==='shots'?(e.records||[]):(e.gameRecords||[]).filter(r=>r.snapshot.market===market))}
+function marketRows(){const market=$('market').value;return (ledger?.events||[]).flatMap(e=>market==='shots'?(e.records||[]):(e.gameRecords||[]).filter(r=>r.snapshot.market===market))}
 function fillVersions(){const selected=$('version').value,versions=new Set(marketRows().map(r=>r.snapshot.modelVersion));$('version').replaceChildren(new Option('All versions',''));for(const v of versions)$('version').append(new Option(v,v));$('version').value=versions.has(selected)?selected:''}
 function render(){
  if(!ledger)return;const version=$('version').value,events=ledger.events||[],records=marketRows().filter(r=>!version||r.snapshot.modelVersion===version),summarize=$('market').value==='shots'?aggregate:aggregateGames,all=summarize(records),selected=summarize(records,true);
