@@ -303,7 +303,9 @@ searchInput.addEventListener('keydown', event => {
 
       const heading = document.createElement('h3');
 
-      heading.textContent = data.playerName || 'NHL Player';
+      
+heading.textContent = playerSelect.options[playerSelect.selectedIndex]?.textContent || 'NHL Player';
+
 
       const summary = document.createElement('p');
 
