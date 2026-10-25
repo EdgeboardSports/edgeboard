@@ -106,7 +106,7 @@ async function main(){
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
- const result=await runPaper(ledger,client,{sourceCommit:process.env.GITHUB_SHA||'local'});
+ const result=await runPaper(ledger,client,{sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'});
  await mkdir(new URL('../data/',import.meta.url),{recursive:true});await writeFile(path,JSON.stringify(result,null,2)+'\n');
  const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),errors:last.errors,notes:last.notes}));
  if(last.errors.length)process.exitCode=1;
