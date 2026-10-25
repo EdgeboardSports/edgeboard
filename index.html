@@ -104,6 +104,21 @@ loadPlayerLeaders();
       <p id="edge-search-status" aria-live="polite"></p>
     </div>
 
+    <label for="edge-season">NHL Season</label>
+
+<select id="edge-season"
+
+  style="padding:12px;margin:8px;background:#101827;color:white;border:1px solid #60728b;border-radius:8px">
+
+  <option value="20262027">2026–27 (Current)</option>
+
+  <option value="20252026">2025–26</option>
+
+  <option value="20242025">2024–25</option>
+
+  <option value="20232024">2023–24</option>
+
+</select>
     <label for="edge-player">Player</label>
 
     <select id="edge-player"
@@ -150,8 +165,14 @@ loadPlayerLeaders();
       <option value="4.5">Over 4.5</option>
 
     </select>
-
-    <button id="edge-analyze"
+<label for="edge-season">NHL Season</label>
+<select id="edge-season" style="padding:12px;margin:8px;background:#101827;color:white;border:1px solid #60728b;border-radius:8px">
+  <option value="20262027">2026–27</option>
+  <option value="20252026">2025–26</option>
+  <option value="20242025">2024–25</option>
+  <option value="20232024">2023–24</option>
+  <option value="20222023">2022–23</option>
+</select>    <button id="edge-analyze"
 
       style="padding:12px;background:#75d8b1;
 
@@ -173,7 +194,7 @@ loadPlayerLeaders();
 
 const statSelect = section.querySelector('#edge-stat');  
  const lineSelect = section.querySelector('#edge-line');
-
+const seasonSelect = section.querySelector('#edge-season');
 
 statSelect.addEventListener('change', () => {
 
@@ -266,10 +287,10 @@ searchInput.addEventListener('keydown', event => {
     try {
 
       const id = playerSelect.value;
-
+const season = seasonSelect.value;
       const response = await fetch(
 
-        '/api/nhl-game-log?playerId=' + id
+       '/api/nhl-game-log?playerId=' + id + '&season=' + season
 
       );
 
