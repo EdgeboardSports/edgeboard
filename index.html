@@ -284,7 +284,55 @@ searchInput.addEventListener('keydown', event => {
       const line = Number(lineSelect.value);
 
       const games = data.games || [];
+// EDGEBOARD V12 - HOME/AWAY AND OPPONENT ANALYTICS
 
+const selectedStat = statSelect.value;
+
+function getHitRate(gameList) {
+  const total = gameList.length;
+  const hits = gameList.filter(
+    g => Number(g[selectedStat]) > line
+  ).length;
+
+  return {
+    games: total,
+    hits: hits,
+    rate: total
+      ? Math.round((hits / total) * 100)
+      : 0
+  };
+}
+
+const homeGames = games.filter(
+  g => g.homeRoadFlag === 'H'
+);
+
+const awayGames = games.filter(
+  g => g.homeRoadFlag === 'R'
+);
+
+const homeStats = getHitRate(homeGames);
+const awayStats = getHitRate(awayGames);
+
+const opponentStats = {};
+
+games.forEach(game => {
+  const opponent = game.opponentAbbrev;
+  if (!opponent) return;
+
+  if (!opponentStats[opponent]) {
+    opponentStats[opponent] = [];
+  }
+
+  opponentStats[opponent].push(game);
+});
+
+const opponentResults = Object.entries(opponentStats)
+  .map(([team, teamGames]) => ({
+    team,
+    ...getHitRate(teamGames)
+  }))
+  .sort((a, b) => b.rate - a.rate);
       function summarize(count) {
 
         const recent = games.slice(0, count);
@@ -323,6 +371,18 @@ heading.textContent = playerSelect.options[playerSelect.selectedIndex]?.textCont
       note.textContent =
 
         'Historical hit rates only. Not predicted probabilities.';
+     const breakdown = document.createElement('p');
+
+const totalHits = games.filter(
+  g => Number(g[statSelect.value]) > line
+).length;
+
+breakdown.textContent =
+  `Season sample: ${totalHits}/${games.length} games ` +
+  `(${games.length ? Math.round(totalHits / games.length * 100) : 0}% hit rate)`;
+
+breakdown.style.cssText =
+  'padding:12px;background:#101827;border-radius:8px;margin-top:16px;';
 const chart = document.createElement('div');
 chart.style.cssText = 'margin-top:24px;overflow-x:auto;';
 
@@ -380,7 +440,7 @@ chartNote.textContent =
   'Green = over the selected line. Red = under or equal. Oldest game on left.';
 
 chart.append(chartTitle, chartBars, chartNote);
-results.replaceChildren(heading, summary, note, chart);
+results.replaceChildren(heading, summary, note, breakdown, chart);
 
     } catch (error) {
 
