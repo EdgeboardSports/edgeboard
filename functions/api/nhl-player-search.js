@@ -43,7 +43,10 @@ export async function onRequestGet({ request }) {
         position: player.positionCode || "",
         active: player.active === true
       }))
-      .filter(player => /^\d{7}$/.test(player.id));
+      .filter(player =>
+  /^\d{7}$/.test(player.id) &&
+  player.name.toLowerCase().includes(query.toLowerCase())
+);
 
     return json({
       query,
