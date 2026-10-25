@@ -454,8 +454,40 @@ chartNote.textContent =
   'Green = over the selected line. Red = under or equal. Oldest game on left.';
 
 chart.append(chartTitle, chartBars, chartNote);
-results.replaceChildren(heading, summary, note, breakdown, chart);
+// EDGEBOARD V12 - HOME/AWAY AND OPPONENT DISPLAY
 
+const splits = document.createElement('div');
+splits.style.cssText =
+  'margin-top:24px;padding:16px;background:#101827;' +
+  'border-radius:12px;';
+
+const splitsTitle = document.createElement('h3');
+splitsTitle.textContent = 'Home vs Away Performance';
+splits.appendChild(splitsTitle);
+
+function addSplit(label, stats) {
+  const row = document.createElement('p');
+  row.textContent =
+    `${label}: ${stats.hits}/${stats.games} games ` +
+    `(${stats.rate}% hit rate)`;
+  splits.appendChild(row);
+}
+
+addSplit('Home', homeStats);
+addSplit('Away', awayStats);
+
+const opponentTitle = document.createElement('h3');
+opponentTitle.textContent = 'Performance by Opponent';
+opponentTitle.style.marginTop = '24px';
+splits.appendChild(opponentTitle);
+
+opponentResults.forEach(item => {
+  const row = document.createElement('p');
+  row.textContent =
+    `${item.team}: ${item.hits}/${item.games} ` +
+    `(${item.rate}% hit rate)`;
+  splits.appendChild(row);
+});results.replaceChildren(heading, summary, note, breakdown, chart, splits);
     } catch (error) {
 
       results.textContent = 'Unable to load: ' + error.message;
