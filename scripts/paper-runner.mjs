@@ -4,30 +4,29 @@ import {pathToFileURL} from 'node:url';
 import {evaluate,VERSION} from '../shots-model.js';
 import {seasonFor,completedBefore,cleanName} from '../prop-history.js';
 import {freezePrediction,gradePrediction} from '../paper-core.js';
+import {analyzeGame,gradeGame} from '../game-model.js';
+import {freezeGame} from '../game-paper.js';
 
 const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
 const digest=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
-export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2}={}){
+export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null}={}){
  const started=clock(),errors=[],notes=[],cache=new Map();
  const get=path=>{if(!cache.has(path))cache.set(path,client(path));return cache.get(path)};
- // Grade snapshots without modifying their original prediction fields.
+ // Existing shots and new game snapshots are graded independently.
+ const saveGrade=(record,result)=>{const old={...record.result};delete old.gradedAt;if(JSON.stringify(old)!==JSON.stringify(result)){if(record.result.state!=='pending')record.resultHistory=[...(record.resultHistory||[]),record.result];record.result={...result,...(result.state==='pending'?{}:{gradedAt:new Date(clock()).toISOString()})}}};
  for(const event of ledger.events){
-  if(!event.records.length||clock()-Date.parse(event.startTime)>14*86400000)continue;
-  if(event.records.every(r=>r.result.state!=='pending')&&event.lastGradedAt&&clock()-Date.parse(event.lastGradedAt)<24*3600000)continue;
+  const records=[...(event.records||[]),...(event.gameRecords||[])];if(!records.length||clock()-Date.parse(event.startTime)>14*86400000)continue;
+  if(records.every(r=>r.result.state!=='pending')&&event.lastGradedAt&&clock()-Date.parse(event.lastGradedAt)<24*3600000)continue;
   try{
    const schedule=await get('/api/nhl-schedule?date='+event.date),game=(schedule.games||[]).find(g=>String(g.id)===String(event.nhlGameId));
    if(!game||!['FINAL','OFF'].includes(game.gameState))continue;
-   for(const record of event.records){
+   for(const record of records)try{
     if(digest(record.snapshot)!==record.digest)throw Error('Snapshot integrity check failed for '+event.id);
-    const s=record.snapshot,season=seasonFor(event.startTime),log=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:s.playerId,season}));
-    if(!Array.isArray(log.games))throw Error('Invalid official game log');
-    const result=gradePrediction(s,game,log.games,clock());
-    const old={...record.result};delete old.gradedAt;
-    if(JSON.stringify(old)!==JSON.stringify(result)){
-     if(record.result.state!=='pending')record.resultHistory=[...(record.resultHistory||[]),record.result];
-     record.result={...result,...(result.state==='pending'?{}:{gradedAt:new Date(clock()).toISOString()})};
-    }
-   }
+    const s=record.snapshot;
+    if(s.kind==='game'){saveGrade(record,gradeGame(s,game));continue}
+    const season=seasonFor(event.startTime),log=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:s.playerId,season}));
+    if(!Array.isArray(log.games))throw Error('Invalid official game log');saveGrade(record,gradePrediction(s,game,log.games,clock()));
+   }catch(e){errors.push('Grade '+event.id+': '+e.message)}
    event.lastGradedAt=new Date(clock()).toISOString();
   }catch(e){errors.push('Grade '+event.id+': '+e.message)}
  }
@@ -80,6 +79,29 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
    event.status=event.records.length?'captured':'no_predictions';
   }catch(e){event.status='feed_error';event.error=e.message;errors.push('Capture '+event.id+': '+e.message)}
  }
+ // Game markets are separate frozen records; existing shots snapshots never change.
+ if(gameArchive?.games?.length&&gameArchive.generatedAt){
+  for(const event of ledger.events){
+   if(event.gameAttemptAt||(event.gameRecords||[]).length)continue;
+   const lead=Date.parse(event.startTime)-clock();if(lead<15*60000||lead>180*60000)continue;
+   if(ledger.remainingCredits!=null&&ledger.remainingCredits<103){notes.push('Game capture paused: reserve for three-market request');break}
+   try{
+    const schedule=await get('/api/nhl-schedule?date='+event.date),game=(schedule.games||[]).find(g=>String(g.id)===String(event.nhlGameId));if(!game||game.gameType!==2||!['FUT','PRE'].includes(game.gameState))continue;
+    event.gameAttemptAt=new Date(clock()).toISOString();event.gameRecords=[];event.gameExcluded=[];
+    const feed=await get('/api/nhl-game-odds?event='+event.id);if(feed.status!=='live'||!Array.isArray(feed.odds))throw Error('Game markets feed unavailable');
+    event.gameQuotesFetchedAt=feed.fetchedAt;if(feed.remainingCredits!=null){ledger.remainingCredits=Number(feed.remainingCredits);event.gameRemainingCredits=ledger.remainingCredits}
+    event.gameMarketsMissing=['h2h','spreads','h2h_3_way'].filter(m=>!feed.odds.some(q=>q.market===m));
+    const quotes=new Map();for(const q of feed.odds){const key=JSON.stringify([q.market,q.side,q.point]);if(!quotes.has(key)||q.decimal>quotes.get(key).decimal)quotes.set(key,q)}
+    const context={...event,homeAbbrev:game.homeTeam.abbrev,awayAbbrev:game.awayTeam.abbrev,verified:true};
+    for(const quote of quotes.values())try{
+     const analysis=analyzeGame(gameArchive,context,quote),snapshot=freezeGame({analysis,quote,event:context,capturedAt:new Date(clock()).toISOString(),sourceCommit});
+     event.gameRecords.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
+    }catch(e){event.gameExcluded.push({market:quote.market,side:quote.side,line:quote.point,reason:e.message})}
+    event.gameStatus=event.gameRecords.length?'captured':'no_predictions';
+   }catch(e){event.gameStatus='feed_error';event.gameError=e.message;errors.push('Game capture '+event.id+': '+e.message)}
+  }
+ }else notes.push('Game-market capture paused: team archive is not ready');
+
  ledger.lastRunAt=new Date(clock()).toISOString();ledger.updatedAt=ledger.lastRunAt;
  ledger.runs=[...(ledger.runs||[]),{at:ledger.lastRunAt,sourceCommit,errors,notes,capturedGames:ledger.events.filter(e=>Date.parse(e.capturedAt)>=started).length}].slice(-48);
  return ledger;
@@ -93,7 +115,7 @@ export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTim
   return null;
  };
  return async path=>{
-  let last;const attempts=path.startsWith('/api/nhl-props?')?1:3;
+  let last;const attempts=(path.startsWith('/api/nhl-props?')||path.startsWith('/api/nhl-game-odds?'))?1:3;
   for(let i=0;i<attempts;i++){
    try{const r=await fetchImpl(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return await r.json()}catch(e){last=e;if(i+1<attempts)await pause(1000*(i+1))}
   }
@@ -106,9 +128,10 @@ async function main(){
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
- const result=await runPaper(ledger,client,{sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'});
+ let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
+ const result=await runPaper(ledger,client,{gameArchive,sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'});
  await mkdir(new URL('../data/',import.meta.url),{recursive:true});await writeFile(path,JSON.stringify(result,null,2)+'\n');
- const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),errors:last.errors,notes:last.notes}));
+ const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),gamePredictions:result.events.reduce((n,e)=>n+(e.gameRecords||[]).length,0),errors:last.errors,notes:last.notes}));
  if(last.errors.length)process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
