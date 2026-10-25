@@ -84,12 +84,31 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
  ledger.runs=[...(ledger.runs||[]),{at:ledger.lastRunAt,sourceCommit,errors,notes,capturedGames:ledger.events.filter(e=>Date.parse(e.capturedAt)>=started).length}].slice(-48);
  return ledger;
 }
+export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTimeout(r,ms))}={}){
+ const official=path=>{
+  const u=new URL(path,'https://edgeboard.invalid'),p=u.searchParams;
+  if(u.pathname==='/api/nhl-schedule'&&/^\d{4}-\d{2}-\d{2}$/.test(p.get('date')||''))return {url:'https://api-web.nhle.com/v1/score/'+p.get('date'),normalize:d=>({games:d.games||[]})};
+  if(u.pathname==='/api/nhl-game-log'&&/^\d{7}$/.test(p.get('playerId')||'')&&/^\d{8}$/.test(p.get('season')||''))return {url:'https://api-web.nhle.com/v1/player/'+p.get('playerId')+'/game-log/'+p.get('season')+'/2',normalize:d=>({games:d.gameLog||[]})};
+  if(u.pathname==='/api/nhl-player-search'&&(p.get('q')||'').length>=2)return {url:'https://search.d3.nhle.com/api/v1/search/player?culture=en-us&limit=50&q='+encodeURIComponent(p.get('q')),normalize:d=>({players:(Array.isArray(d)?d:[]).map(x=>({id:String(x.playerId||''),name:x.name||'',team:x.teamAbbrev||'',position:x.positionCode||'',active:x.active===true})).filter(x=>/^\d{7}$/.test(x.id)&&x.name.toLowerCase().includes(p.get('q').toLowerCase()))})};
+  return null;
+ };
+ return async path=>{
+  let last;const attempts=path.startsWith('/api/nhl-props?')?1:3;
+  for(let i=0;i<attempts;i++){
+   try{const r=await fetchImpl(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return await r.json()}catch(e){last=e;if(i+1<attempts)await pause(1000*(i+1))}
+  }
+  const fallback=official(path);
+  if(fallback){const r=await fetchImpl(fallback.url,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('Both app and official NHL feeds unavailable: official HTTP '+r.status);return fallback.normalize(await r.json())}
+  throw last;
+ };
+}
 async function main(){
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
- const client=async path=>{const r=await fetch(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return r.json()};
+ const client=makeClient(base);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
  const result=await runPaper(ledger,client,{sourceCommit:process.env.GITHUB_SHA||'local'});
  await mkdir(new URL('../data/',import.meta.url),{recursive:true});await writeFile(path,JSON.stringify(result,null,2)+'\n');
  const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),errors:last.errors,notes:last.notes}));
+ if(last.errors.length)process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
