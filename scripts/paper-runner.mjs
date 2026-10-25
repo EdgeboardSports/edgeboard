@@ -1,0 +1,95 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+import {evaluate,VERSION} from '../shots-model.js';
+import {seasonFor,completedBefore,cleanName} from '../prop-history.js';
+import {freezePrediction,gradePrediction} from '../paper-core.js';
+
+const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+const digest=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
+export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2}={}){
+ const started=clock(),errors=[],notes=[],cache=new Map();
+ const get=path=>{if(!cache.has(path))cache.set(path,client(path));return cache.get(path)};
+ // Grade snapshots without modifying their original prediction fields.
+ for(const event of ledger.events){
+  if(!event.records.length||clock()-Date.parse(event.startTime)>14*86400000)continue;
+  if(event.records.every(r=>r.result.state!=='pending')&&event.lastGradedAt&&clock()-Date.parse(event.lastGradedAt)<24*3600000)continue;
+  try{
+   const schedule=await get('/api/nhl-schedule?date='+event.date),game=(schedule.games||[]).find(g=>String(g.id)===String(event.nhlGameId));
+   if(!game||!['FINAL','OFF'].includes(game.gameState))continue;
+   for(const record of event.records){
+    if(digest(record.snapshot)!==record.digest)throw Error('Snapshot integrity check failed for '+event.id);
+    const s=record.snapshot,season=seasonFor(event.startTime),log=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:s.playerId,season}));
+    if(!Array.isArray(log.games))throw Error('Invalid official game log');
+    const result=gradePrediction(s,game,log.games,clock());
+    const old={...record.result};delete old.gradedAt;
+    if(JSON.stringify(old)!==JSON.stringify(result)){
+     if(record.result.state!=='pending')record.resultHistory=[...(record.resultHistory||[]),record.result];
+     record.result={...result,...(result.state==='pending'?{}:{gradedAt:new Date(clock()).toISOString()})};
+    }
+   }
+   event.lastGradedAt=new Date(clock()).toISOString();
+  }catch(e){errors.push('Grade '+event.id+': '+e.message)}
+ }
+ // Event discovery itself uses no provider odds credits.
+ let discovery;
+ try{discovery=await get('/api/nhl-events');if(!Array.isArray(discovery.events))throw Error('Invalid event list')}
+ catch(e){errors.push('Discovery: '+e.message);discovery={events:[]}}
+ const remaining=discovery.remainingCredits==null?ledger.remainingCredits:Number(discovery.remainingCredits);
+ if(Number.isFinite(Number(remaining))&&remaining!==null)ledger.remainingCredits=Number(remaining);
+ const candidates=discovery.events.filter(e=>/^[a-f0-9]{32}$/.test(e.id||'')&&!ledger.events.some(old=>old.id===e.id)&&Date.parse(e.commenceTime)>started).sort((a,b)=>Date.parse(a.commenceTime)-Date.parse(b.commenceTime)||a.id.localeCompare(b.id));
+ for(const candidate of candidates){
+  const date=day(candidate.commenceTime);if(ledger.events.filter(e=>e.date===date).length>=maxGamesPerDay)continue;
+  if(ledger.remainingCredits!=null&&ledger.remainingCredits<100){notes.push('Capture paused: observed provider quota below 100-credit reserve');break}
+  if(Date.parse(candidate.commenceTime)-clock()>180*60000)continue;
+  let schedule,game;
+  try{
+   schedule=await get('/api/nhl-schedule?date='+date);
+   const name=t=>t?.name?.default||t?.commonName?.default;
+   const matches=(schedule.games||[]).filter(g=>name(g.homeTeam)&&name(g.awayTeam)&&cleanName(candidate.homeTeam).endsWith(cleanName(name(g.homeTeam)))&&cleanName(candidate.awayTeam).endsWith(cleanName(name(g.awayTeam))));
+   if(matches.length!==1){notes.push('Skipped event without unique NHL matchup '+candidate.id);continue}
+   game=matches[0];
+  }catch(e){errors.push('Schedule '+candidate.id+': '+e.message);continue}
+  if(ledger.events.some(e=>String(e.nhlGameId)===String(game.id)))continue;
+  if(game.gameType!==2){notes.push('Skipped non-regular-season game '+candidate.id);continue}
+  const start=Math.min(Date.parse(candidate.commenceTime),Date.parse(game.startTimeUTC||candidate.commenceTime)),lead=start-clock();
+  if(!Number.isFinite(start)||lead<15*60000||lead>180*60000||!['FUT','PRE'].includes(game.gameState))continue;
+  const event={id:candidate.id,nhlGameId:game.id,date,startTime:new Date(start).toISOString(),homeTeam:candidate.homeTeam,awayTeam:candidate.awayTeam,modelVersion:VERSION,sourceCommit,capturedAt:new Date(clock()).toISOString(),records:[],excluded:[]};
+  // Count the attempted game even if a feed fails: no selective retries based on results.
+  ledger.events.push(event);
+  try{
+   const props=await get('/api/nhl-props?'+new URLSearchParams({event:event.id,market:'player_shots_on_goal'}));
+   if(props.status!=='live'||!Array.isArray(props.odds))throw Error('Props feed unavailable');
+   event.quotesFetchedAt=props.fetchedAt;if(props.remainingCredits!=null){event.remainingCredits=Number(props.remainingCredits);ledger.remainingCredits=event.remainingCredits}
+   const quotes=new Map();
+   for(const q of props.odds){const key=JSON.stringify([q.player,q.point,q.side]);if(!quotes.has(key)||q.decimal>quotes.get(key).decimal)quotes.set(key,q)}
+   for(const quote of quotes.values()){
+    try{
+     const found=await get('/api/nhl-player-search?q='+encodeURIComponent(quote.player)),matches=(found.players||[]).filter(p=>cleanName(p.name)===cleanName(quote.player));
+     if(matches.length!==1)throw Error('No unique player match');
+     const player=matches[0],season=seasonFor(event.startTime),previous=String(Number(season.slice(0,4))-1)+season.slice(0,4);
+     const current=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:player.id,season}));
+     if(!Array.isArray(current.games))throw Error('Current game log unavailable');
+     let prior={games:[]};
+     try{prior=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:player.id,season:previous}))}catch{event.excluded.push({player:quote.player,reason:'Prior-season feed unavailable; current history only',informational:true})}
+     const games=completedBefore([...current.games,...(prior.games||[])],date),venue=player.team===game.homeTeam.abbrev?'H':player.team===game.awayTeam.abbrev?'R':null,context={venue,opponent:venue==='H'?game.awayTeam.abbrev:venue==='R'?game.homeTeam.abbrev:null},analysis={result:evaluate(games,quote.point,context),context};
+     const snapshot=freezePrediction({analysis,quote,event:{...event,commenceTime:event.startTime},player,capturedAt:new Date(clock()).toISOString(),sourceCommit,games});
+     event.records.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
+    }catch(e){event.excluded.push({player:quote.player,line:quote.point,side:quote.side,reason:e.message})}
+   }
+   event.status=event.records.length?'captured':'no_predictions';
+  }catch(e){event.status='feed_error';event.error=e.message;errors.push('Capture '+event.id+': '+e.message)}
+ }
+ ledger.lastRunAt=new Date(clock()).toISOString();ledger.updatedAt=ledger.lastRunAt;
+ ledger.runs=[...(ledger.runs||[]),{at:ledger.lastRunAt,sourceCommit,errors,notes,capturedGames:ledger.events.filter(e=>Date.parse(e.capturedAt)>=started).length}].slice(-48);
+ return ledger;
+}
+async function main(){
+ const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
+ const client=async path=>{const r=await fetch(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return r.json()};
+ const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
+ const result=await runPaper(ledger,client,{sourceCommit:process.env.GITHUB_SHA||'local'});
+ await mkdir(new URL('../data/',import.meta.url),{recursive:true});await writeFile(path,JSON.stringify(result,null,2)+'\n');
+ const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),errors:last.errors,notes:last.notes}));
+}
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
