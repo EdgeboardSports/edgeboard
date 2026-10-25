@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": "2026-10-25T21:44:37.940Z",
-  "lastRunAt": "2026-10-25T21:44:37.940Z",
+  "updatedAt": "2026-10-25T22:10:02.466Z",
+  "lastRunAt": "2026-10-25T22:10:02.466Z",
   "remainingCredits": 489,
   "policy": {
     "maxGamesPerDay": 2,
@@ -2035,6 +2035,15 @@
       "sourceCommit": "c3dfafe672285166fc9445110f98426e55337b40",
       "errors": [],
       "notes": [],
+      "capturedGames": 0
+    },
+    {
+      "at": "2026-10-25T22:10:02.466Z",
+      "sourceCommit": "e6e3d3015cb63f019d9fe67c12e7e96d3f0d82d3",
+      "errors": [],
+      "notes": [
+        "Game-market capture paused: team archive is not ready"
+      ],
       "capturedGames": 0
     }
   ]
