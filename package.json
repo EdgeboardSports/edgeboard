@@ -1,1 +1,7 @@
-{"private":true,"type":"module","scripts":{"test":"node tests/shots-model.test.mjs && node tests/paper-test.mjs"}}
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/shots-model.test.mjs && node tests/paper-test.mjs && node tests/game-model.test.mjs"
+  }
+}
