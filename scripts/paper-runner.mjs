@@ -4,7 +4,7 @@ import {pathToFileURL} from 'node:url';
 import {evaluate,VERSION} from '../shots-model.js';
 import {seasonFor,completedBefore,cleanName} from '../prop-history.js';
 import {freezePrediction,gradePrediction} from '../paper-core.js';
-import {analyzeGame,gradeGame} from '../game-model.js';
+import {analyzeGame,gradeGame,GAME_VERSION} from '../game-model.js';
 import {freezeGame} from '../game-paper.js';
 
 const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
@@ -102,6 +102,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
   }
  }else notes.push('Game-market capture paused: team archive is not ready');
 
+ ledger.policy={...(ledger.policy||{}),gameMarkets:['h2h','spreads','h2h_3_way'],gameModelVersion:GAME_VERSION,selection:'Best-price shots and game selections in up to two sampled games per day, including failed checks. No post-start backfill.',gameCreditsPerUncachedEvent:3};
  ledger.lastRunAt=new Date(clock()).toISOString();ledger.updatedAt=ledger.lastRunAt;
  ledger.runs=[...(ledger.runs||[]),{at:ledger.lastRunAt,sourceCommit,errors,notes,capturedGames:ledger.events.filter(e=>Date.parse(e.capturedAt)>=started).length}].slice(-48);
  return ledger;
