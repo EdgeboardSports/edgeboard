@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": "2026-10-25T22:10:02.466Z",
-  "lastRunAt": "2026-10-25T22:10:02.466Z",
-  "remainingCredits": 489,
+  "updatedAt": "2026-10-25T22:10:28.098Z",
+  "lastRunAt": "2026-10-25T22:10:28.098Z",
+  "remainingCredits": 482,
   "policy": {
     "maxGamesPerDay": 2,
     "captureMinutesBeforeStart": [
@@ -2001,7 +2001,509 @@
       ],
       "quotesFetchedAt": "2026-10-25T21:42:49.312Z",
       "remainingCredits": 487,
-      "status": "no_predictions"
+      "status": "no_predictions",
+      "gameAttemptAt": "2026-10-25T22:10:27.885Z",
+      "gameRecords": [
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"h2h\",\"Away\",null]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "h2h",
+            "side": "Away",
+            "line": null,
+            "quote": {
+              "american": -115,
+              "decimal": 1.8695652173913042,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-25T22:09:13Z"
+            },
+            "capturedAt": "2026-10-25T22:10:27.965Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.5621761740613206,
+              "push": 0,
+              "loss": 0.4378238259386791,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.5000000000000002,
+              "push": 0,
+              "loss": 0.5000000000000002,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.23184430343814655,
+              "baseline": 0.25
+            },
+            "estimatedValue": 0.051025021071164856,
+            "candidate": false,
+            "checks": [
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "17bf58ebe7b67589f6706b96ac5553eeb8b6ca2f61c7089ddbffa690b7ae6dc6",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"h2h\",\"Home\",null]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "h2h",
+            "side": "Home",
+            "line": null,
+            "quote": {
+              "american": 104,
+              "decimal": 2.04,
+              "bookmaker": "betrivers",
+              "bookmakerTitle": "BetRivers",
+              "lastUpdate": "2026-10-25T22:09:12Z"
+            },
+            "capturedAt": "2026-10-25T22:10:27.986Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.4378238259386791,
+              "push": 0,
+              "loss": 0.5621761740613206,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.5000000000000002,
+              "push": 0,
+              "loss": 0.5000000000000002,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.23184430343814655,
+              "baseline": 0.25
+            },
+            "estimatedValue": -0.10683939508509432,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "59fbf4979afa95dddc58fc0b718b05976af32f11a987fbe8c5afcd29a6101e34",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"spreads\",\"Away\",-1.5]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "spreads",
+            "side": "Away",
+            "line": -1.5,
+            "quote": {
+              "american": 220,
+              "decimal": 3.2,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-25T22:08:51Z"
+            },
+            "capturedAt": "2026-10-25T22:10:28.008Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.31640422772167326,
+              "push": 0,
+              "loss": 0.6835957722783264,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.25706121194275083,
+              "push": 0,
+              "loss": 0.7429387880572499,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.20434601563845495,
+              "baseline": 0.21670251528097037
+            },
+            "estimatedValue": 0.012493528709354829,
+            "candidate": false,
+            "checks": [
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "59dddae669a9dd25f89f7b3c789d8e8f375e1f24396482a99293284635443925",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"spreads\",\"Home\",1.5]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "spreads",
+            "side": "Home",
+            "line": 1.5,
+            "quote": {
+              "american": -250,
+              "decimal": 1.4,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-25T22:08:09Z"
+            },
+            "capturedAt": "2026-10-25T22:10:28.024Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.6835957722783264,
+              "push": 0,
+              "loss": 0.31640422772167326,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.7429387880572499,
+              "push": 0,
+              "loss": 0.25706121194275083,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.20434601563845495,
+              "baseline": 0.21670251528097037
+            },
+            "estimatedValue": -0.042965918810342785,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "a94390311c08d17c526bf0076c126fe083ce196ef9ce8195c0d97e3ef158197a",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"h2h_3_way\",\"Away\",null]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "h2h_3_way",
+            "side": "Away",
+            "line": null,
+            "quote": {
+              "american": 140,
+              "decimal": 2.4,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-25T22:09:12Z"
+            },
+            "capturedAt": "2026-10-25T22:10:28.046Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.4786952178059564,
+              "push": 0,
+              "loss": 0.5213047821940435,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.4135854524388486,
+              "push": 0,
+              "loss": 0.586414547561152,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.3157977893819701,
+              "baseline": 0.3277763842734014
+            },
+            "estimatedValue": 0.1488685227342954,
+            "candidate": false,
+            "checks": [
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "87a86c533bfda8468208726b27171f71055a2d118911950fe7e0058e3a98519c",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"h2h_3_way\",\"Home\",null]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "h2h_3_way",
+            "side": "Home",
+            "line": null,
+            "quote": {
+              "american": 170,
+              "decimal": 2.7,
+              "bookmaker": "betrivers",
+              "bookmakerTitle": "BetRivers",
+              "lastUpdate": "2026-10-25T22:09:00Z"
+            },
+            "capturedAt": "2026-10-25T22:10:28.072Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.354342869683315,
+              "push": 0,
+              "loss": 0.6456571303166848,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.41358545243884864,
+              "push": 0,
+              "loss": 0.5864145475611522,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.3157977893819701,
+              "baseline": 0.3277763842734014
+            },
+            "estimatedValue": -0.043274251855049184,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "5545c9e7d933e5b97943f822d0e277469bd77943ab2dfd9f4a02dc167737b53c",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"cd9f65faa44f221a72638e49afb134fb\",\"h2h_3_way\",\"Draw\",null]",
+            "kind": "game",
+            "eventId": "cd9f65faa44f221a72638e49afb134fb",
+            "nhlGameId": 2026020182,
+            "date": "2026-10-25",
+            "startTime": "2026-10-25T23:00:00.000Z",
+            "homeTeam": "Winnipeg Jets",
+            "awayTeam": "Montréal Canadiens",
+            "market": "h2h_3_way",
+            "side": "Draw",
+            "line": null,
+            "quote": {
+              "american": 330,
+              "decimal": 4.3,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-25T22:08:49Z"
+            },
+            "capturedAt": "2026-10-25T22:10:28.098Z",
+            "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 2.7307424574854364,
+              "away": 3.1175601708523173,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-22",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.16696191251072814,
+              "push": 0,
+              "loss": 0.833038087489272,
+              "regulation": {
+                "home": 0.354342869683315,
+                "draw": 0.16696191251072814,
+                "away": 0.4786952178059564
+              }
+            },
+            "baselineProbability": {
+              "win": 0.17282909512230335,
+              "push": 0,
+              "loss": 0.8271709048776975,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.3157977893819701,
+              "baseline": 0.3277763842734014
+            },
+            "estimatedValue": -0.28206377620386913,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check",
+              "Team archive stale or incomplete"
+            ],
+            "archiveAt": "2026-10-25T22:10:12.896Z",
+            "trainingEnd": "2026-10-22"
+          },
+          "digest": "0779b1bec138e1edf1b2b533f64fb5cb355e6dd71916df70e430cf53e86ff3f1",
+          "result": {
+            "state": "pending"
+          }
+        }
+      ],
+      "gameExcluded": [],
+      "gameQuotesFetchedAt": "2026-10-25T22:09:25.685Z",
+      "gameRemainingCredits": 482,
+      "gameMarketsMissing": [],
+      "gameStatus": "captured"
     }
   ],
   "runs": [
@@ -2044,6 +2546,13 @@
       "notes": [
         "Game-market capture paused: team archive is not ready"
       ],
+      "capturedGames": 0
+    },
+    {
+      "at": "2026-10-25T22:10:28.098Z",
+      "sourceCommit": "4a416578d26e441a56ff227937a07bd3d62122a0",
+      "errors": [],
+      "notes": [],
       "capturedGames": 0
     }
   ]
