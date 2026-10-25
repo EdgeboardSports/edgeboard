@@ -201,7 +201,7 @@ async function searchPlayers() {
 
   try {
     const response = await fetch(
-      '/.netlify/functions/nhl-player-search?q=' +
+      '/api/nhl-player-search?q=' +
       encodeURIComponent(query)
     );
 
@@ -269,7 +269,7 @@ searchInput.addEventListener('keydown', event => {
 
       const response = await fetch(
 
-        '/.netlify/functions/nhl-game-log?playerId=' + id
+        '/api/nhl-game-log?playerId=' + id
 
       );
 
