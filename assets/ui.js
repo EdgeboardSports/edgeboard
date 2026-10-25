@@ -3,14 +3,14 @@ export const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=nu
 const icons={today:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',game:'M4 7h16v10H4z M8 3v4 M16 3v4 M8 11h2 M14 11h2 M8 14h8',player:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21v-2a8 8 0 0 1 16 0v2',performance:'M4 20V10 M10 20V4 M16 20v-8 M22 20H2'};
 export function icon(name){const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');const path=document.createElementNS(NS,'path');path.setAttribute('d',icons[name]||icons.player);svg.append(path);return svg}
 function brand(){const a=el('a',null,'brand');a.href='/';a.setAttribute('aria-label','Edgeboard home');a.append(el('span','E','brand-mark'),el('span','EDGEBOARD'));return a}
-const entries=[['today','Today','/'],['game','Matchup','/game'],['player','Players','/player'],['performance','Performance','/paper']];
+const entries=[['today','Today','/'],['picks','Best Picks','/best-picks'],['game','Matchup','/game'],['player','Players','/player'],['performance','Performance','/paper']];
 function navigation(active,cls){const nav=el('nav',null,cls);nav.setAttribute('aria-label',cls==='mobile-nav'?'Mobile navigation':'Main navigation');for(const[key,label,path]of entries){const a=el('a',null,'nav-link');a.href=path;const event=new URLSearchParams(location.search).get('event');if(key==='game'&&/^[a-f0-9]{32}$/.test(event||''))a.href+='?event='+event;a.append(icon(key),el('span',label));if(key===active)a.setAttribute('aria-current','page');nav.append(a)}return nav}
 export function mountShell(active=document.body.dataset.page||'today'){
  if(document.querySelector('.app-sidebar'))return;
- document.body.classList.add('app-shell');
+ document.body.classList.add('app-shell');const picksStyle=el('style');picksStyle.textContent='.mobile-nav{grid-template-columns:repeat(5,1fr)!important}.mobile-nav .nav-link{font-size:10px!important}';document.head.append(picksStyle);
  const embed=new URLSearchParams(location.search).get('embed')==='1';if(embed)document.documentElement.classList.add('is-embedded');
  const side=el('aside',null,'app-sidebar');side.append(brand(),el('div','WORKSPACE','nav-label'),navigation(active,'app-nav'));
- const foot=el('div',null,'sidebar-foot'),badge=el('span','NHL research','chip mint');foot.append(badge,el('p','Live prices. Transparent models.\nPaper-tested before trusted.'),el('p','EDGEBOARD · V19'));side.append(foot);
+ const foot=el('div',null,'sidebar-foot'),badge=el('span','NHL research','chip mint');foot.append(badge,el('p','Live prices. Transparent models.\nPaper-tested before trusted.'),el('p','EDGEBOARD · V20'));side.append(foot);
  const top=el('div',null,'app-topbar');top.append(brand(),el('span',entries.find(e=>e[0]===active)?.[1]||'Edgeboard','topbar-label'));
  const right=el('div',null,'topbar-right'),help=el('a','How the models work');help.href='/game-markets#model-methodology';right.append(help,el('span','NHL · EXPERIMENTAL','chip'));top.append(right);
  document.body.prepend(top);document.body.prepend(side);document.body.append(navigation(active,'mobile-nav'));
