@@ -45,3 +45,9 @@ const corrupt=structuredClone(ledger);corrupt.events[0].records[0].snapshot.line
 await runPaper(corrupt,gradingSource,{clock:()=>now+86400000});assert(corrupt.runs.at(-1).errors.some(e=>e.includes('integrity')));
 assert.throws(()=>freezePrediction({analysis,quote,event,player:{id:'8477500'},capturedAt:new Date(now).toISOString(),games:[...games,{gameDate:'2026-10-25',shots:4}]}),/future dates/);
 console.log('Passed daily two-game cap, snapshot tamper detection, and target-date exclusion.');
+
+const {makeClient}=await import('../scripts/paper-runner.mjs');let attempts=0;
+const retry=makeClient('https://app.test',{pause:async()=>{},fetchImpl:async url=>{attempts++;return url.startsWith('https://api-web.nhle.com')?new Response(JSON.stringify({games:[{id:7}]}),{status:200}):new Response('{}',{status:502})}});
+assert.equal((await retry('/api/nhl-schedule?date=2026-10-25')).games[0].id,7);assert.equal(attempts,4);
+attempts=0;await assert.rejects(()=>retry('/api/nhl-props?event=x&market=y'));assert.equal(attempts,1);
+console.log('Passed bounded retries, official NHL fallback and no automatic paid-odds retry.');
