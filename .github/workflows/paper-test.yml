@@ -26,6 +26,8 @@ jobs:
       - name: Validate model and paper rules
         run: npm test
       - name: Capture pregame predictions and grade official results
+        id: capture
+        continue-on-error: true
         env:
           EDGEBOARD_URL: https://edgeboard-8fl.pages.dev
         run: node scripts/paper-runner.mjs
@@ -41,3 +43,6 @@ jobs:
           git commit -m "[CF-Pages-Skip] Refresh automatic paper ledger"
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: Report capture errors after preserving audit log
+        if: steps.capture.outcome == 'failure'
+        run: exit 1
