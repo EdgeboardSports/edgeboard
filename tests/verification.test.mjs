@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {verifyRoster} from '../prop-history.js';
+import {researchChecks} from '../paper-core.js';
+import {bestFreshQuotes} from '../quote-selection.js';
+import {onRequestGet} from '../functions/api/nhl-roster.js';
+const now=Date.parse('2026-10-26T20:00:00Z'),stamp=new Date(now).toISOString(),player={id:'8477500',team:'HOM'},ctx={venue:'H'};
+const roster={team:'HOM',playerIds:['8477500'],checkedAt:stamp};
+assert.equal((await verifyRoster(async()=>roster,player,ctx,now)).rosterVerified,true);
+for(const change of [{team:'AWY'},{playerIds:[]},{checkedAt:'invalid'},{checkedAt:new Date(now-11*60000).toISOString()},{checkedAt:new Date(now+120000).toISOString()}])assert.equal((await verifyRoster(async()=>({...roster,...change}),player,ctx,now)).rosterVerified,false);
+assert.equal((await verifyRoster(async()=>{throw Error('offline')},player,ctx,now)).rosterVerified,false);
+assert.equal((await verifyRoster(async()=>roster,player,{},now)).rosterVerified,false);
+const p={over:.7,under:.3,push:0},analysis={context:{venue:'H'},result:{prediction:p,low:p,high:p,test:{games:40,brier:.1,baseline:.2}}},quote={side:'Over',decimal:2,lastUpdate:stamp},event={commenceTime:new Date(now+3600000).toISOString()};
+assert(researchChecks(analysis,quote,event,now).includes('Current NHL roster unverified'));
+analysis.context={...ctx,...await verifyRoster(async()=>roster,player,ctx,now)};
+assert.deepEqual(researchChecks(analysis,quote,event,now),[]);
+assert(researchChecks(analysis,quote,event,now+11*60000).includes('Roster check stale or unavailable'));
+const fresh={...quote,player:'Player',point:2.5},stale={...fresh,decimal:3,lastUpdate:new Date(now-16*60000).toISOString()};
+const key=q=>JSON.stringify([q.player,q.point,q.side]);
+assert.deepEqual(bestFreshQuotes([stale,fresh],key,now),[fresh]);
+assert.deepEqual(bestFreshQuotes([stale],key,now),[]);
+assert.deepEqual(bestFreshQuotes([fresh,{...fresh,decimal:2.2}],key,now).map(q=>q.decimal),[2.2]);
+assert.equal((await onRequestGet({request:new Request('https://test/api/nhl-roster?team=../../x')})).status,400);
+const originalFetch=globalThis.fetch;
+try{
+ globalThis.fetch=async()=>new Response(JSON.stringify({forwards:[{id:8477500}],defensemen:[],goalies:[]}));
+ const response=await onRequestGet({request:new Request('https://test/api/nhl-roster?team=HOM')}),body=await response.json();
+ assert.equal(response.status,200);assert.deepEqual(body.playerIds,['8477500']);assert.equal(body.lineupConfirmed,false);
+ globalThis.fetch=async()=>new Response('{}');
+ assert.equal((await onRequestGet({request:new Request('https://test/api/nhl-roster?team=HOM')})).status,503);
+}finally{globalThis.fetch=originalFetch}
+console.log('Roster identity, freshness, fail-closed qualification, endpoint validation and fresh-price regression checks passed.');

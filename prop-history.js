@@ -11,3 +11,12 @@ export function completedBefore(games,day){
  return games.filter(g=>/^\d{4}-\d{2}-\d{2}$/.test(g.gameDate||g.date||'')&&(g.gameDate||g.date)<day).sort((a,b)=>(b.gameDate||b.date).localeCompare(a.gameDate||a.date));
 }
 export const cleanName=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+export async function verifyRoster(read,player,context,now=Date.now()){
+ const team=context.venue?player.team:null;
+ if(!/^[A-Z]{3}$/.test(team||''))return {rosterVerified:false};
+ try{
+  const roster=await read('/api/nhl-roster?team='+team),age=now-Date.parse(roster.checkedAt);
+  return {rosterVerified:roster.team===team&&Array.isArray(roster.playerIds)&&roster.playerIds.includes(String(player.id))&&Number.isFinite(age)&&age>=-60000&&age<=10*60000,rosterCheckedAt:roster.checkedAt||null};
+ }catch{return {rosterVerified:false}}
+}
+

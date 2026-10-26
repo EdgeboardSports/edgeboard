@@ -5,7 +5,7 @@ import {aggregate,freezePrediction,gradePrediction} from '../paper-core.js';
 import {runPaper} from '../scripts/paper-runner.mjs';
 const now=Date.parse('2026-10-25T15:00:00Z'),start='2026-10-25T17:00:00Z',id='a'.repeat(32),hash=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
 const p={over:.6,under:.4,push:0},quote={player:'Player One',point:2.5,side:'Over',decimal:2,american:100,bookmaker:'test',bookmakerTitle:'Test',lastUpdate:new Date(now).toISOString()},games=Array.from({length:80},(_,i)=>({gameId:i+100,gameDate:new Date(Date.UTC(2026,0,i+1)).toISOString().slice(0,10),shots:i%5,homeRoadFlag:'H',opponentAbbrev:'AWY',toi:'20:00'}));
-const analysis={context:{venue:'H'},result:{prediction:p,low:p,high:p,model:{mean:3},test:{games:40,brier:.2,baseline:.25}}},event={id,nhlGameId:11,date:'2026-10-25',commenceTime:start,homeTeam:'Team Home',awayTeam:'Team Away'};
+const analysis={context:{venue:'H',rosterVerified:true,rosterCheckedAt:new Date(now).toISOString()},result:{prediction:p,low:p,high:p,model:{mean:3},test:{games:40,brier:.2,baseline:.25}}},event={id,nhlGameId:11,date:'2026-10-25',commenceTime:start,homeTeam:'Team Home',awayTeam:'Team Away'};
 const snapshot=freezePrediction({analysis,quote,event,player:{id:'8477500'},capturedAt:new Date(now).toISOString(),sourceCommit:'test',games});assert(snapshot.candidate);assert.equal(snapshot.quote.american,100);
 assert.throws(()=>freezePrediction({analysis,quote,event,player:{id:'8477500'},capturedAt:start,games}),/after start/);
 const final={gameState:'OFF'},log=[{gameId:11,shots:3}];assert.deepEqual(gradePrediction(snapshot,final,log,now),{state:'win',shots:3,units:1});
@@ -22,6 +22,7 @@ const source=async path=>{
  if(path.startsWith('/api/nhl-schedule'))return {games:[{id:11,startTimeUTC:start,gameState:'FUT',gameType:2,homeTeam:{name:{default:'Home'},abbrev:'HOM'},awayTeam:{name:{default:'Away'},abbrev:'AWY'}}]};
  if(path.startsWith('/api/nhl-props'))return {status:'live',fetchedAt:new Date(now).toISOString(),odds:[quote,{...quote,side:'Under',american:-110,decimal:1+100/110}],remainingCredits:399};
  if(path.startsWith('/api/nhl-player-search'))return {players:[{id:'8477500',name:'Player One',team:'HOM'}]};
+ if(path.startsWith('/api/nhl-roster'))return {team:'HOM',playerIds:['8477500'],checkedAt:new Date(now).toISOString()};
  if(path.startsWith('/api/nhl-game-log'))return {games};
  throw Error('Unexpected endpoint');
 };
@@ -51,3 +52,16 @@ const retry=makeClient('https://app.test',{pause:async()=>{},fetchImpl:async url
 assert.equal((await retry('/api/nhl-schedule?date=2026-10-25')).games[0].id,7);assert.equal(attempts,4);
 attempts=0;await assert.rejects(()=>retry('/api/nhl-props?event=x&market=y'));assert.equal(attempts,1);
 console.log('Passed bounded retries, official NHL fallback and no automatic paid-odds retry.');
+
+
+const freshLedger={schemaVersion:1,events:[],runs:[],remainingCredits:400};
+await runPaper(freshLedger,async path=>{
+ if(path.startsWith('/api/nhl-props'))return {status:'live',odds:[{...quote,decimal:9,lastUpdate:new Date(now-16*60000).toISOString()},quote],remainingCredits:399};
+ return source(path);
+},{clock:()=>now});
+assert.equal(freshLedger.events[0].records[0].snapshot.quote.decimal,2);
+assert.equal(freshLedger.events[0].records[0].snapshot.playerVerification.rosterVerified,true);
+const noRoster={schemaVersion:1,events:[],runs:[],remainingCredits:400};
+await runPaper(noRoster,async path=>path.startsWith('/api/nhl-roster')?{team:'HOM',playerIds:[],checkedAt:new Date(now).toISOString()}:source(path),{clock:()=>now});
+assert(noRoster.events[0].records.every(r=>!r.snapshot.candidate&&r.snapshot.checks.includes('Current NHL roster unverified')));
+console.log('Passed collector integration: stale superior quote cannot displace fresh quote; missing roster blocks shortlist.');

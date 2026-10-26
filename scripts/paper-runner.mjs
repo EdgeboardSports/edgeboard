@@ -1,8 +1,9 @@
+import {bestFreshQuotes} from '../quote-selection.js';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {evaluate,VERSION} from '../shots-model.js';
-import {seasonFor,completedBefore,cleanName} from '../prop-history.js';
+import {seasonFor,completedBefore,cleanName,verifyRoster} from '../prop-history.js';
 import {freezePrediction,gradePrediction} from '../paper-core.js';
 import {analyzeGame,gradeGame,GAME_VERSION} from '../game-model.js';
 import {freezeGame} from '../game-paper.js';
@@ -60,9 +61,8 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
    const props=await get('/api/nhl-props?'+new URLSearchParams({event:event.id,market:'player_shots_on_goal'}));
    if(props.status!=='live'||!Array.isArray(props.odds))throw Error('Props feed unavailable');
    event.quotesFetchedAt=props.fetchedAt;if(props.remainingCredits!=null){event.remainingCredits=Number(props.remainingCredits);ledger.remainingCredits=event.remainingCredits}
-   const quotes=new Map();
-   for(const q of props.odds){const key=JSON.stringify([q.player,q.point,q.side]);if(!quotes.has(key)||q.decimal>quotes.get(key).decimal)quotes.set(key,q)}
-   for(const quote of quotes.values()){
+   const quotes=bestFreshQuotes(props.odds,q=>JSON.stringify([q.player,q.point,q.side]),clock());
+   for(const quote of quotes){
     try{
      const found=await get('/api/nhl-player-search?q='+encodeURIComponent(quote.player)),matches=(found.players||[]).filter(p=>cleanName(p.name)===cleanName(quote.player));
      if(matches.length!==1)throw Error('No unique player match');
@@ -71,7 +71,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
      if(!Array.isArray(current.games))throw Error('Current game log unavailable');
      let prior={games:[]};
      try{prior=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:player.id,season:previous}))}catch{event.excluded.push({player:quote.player,reason:'Prior-season feed unavailable; current history only',informational:true})}
-     const games=completedBefore([...current.games,...(prior.games||[])],date),venue=player.team===game.homeTeam.abbrev?'H':player.team===game.awayTeam.abbrev?'R':null,context={venue,opponent:venue==='H'?game.awayTeam.abbrev:venue==='R'?game.homeTeam.abbrev:null},analysis={result:evaluate(games,quote.point,context),context};
+     const games=completedBefore([...current.games,...(prior.games||[])],date),venue=player.team===game.homeTeam.abbrev?'H':player.team===game.awayTeam.abbrev?'R':null,context={venue,opponent:venue==='H'?game.awayTeam.abbrev:venue==='R'?game.homeTeam.abbrev:null};Object.assign(context,await verifyRoster(get,player,context,clock()));const analysis={result:evaluate(games,quote.point,context),context};
      const snapshot=freezePrediction({analysis,quote,event:{...event,commenceTime:event.startTime},player,capturedAt:new Date(clock()).toISOString(),sourceCommit,games});
      event.records.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
     }catch(e){event.excluded.push({player:quote.player,line:quote.point,side:quote.side,reason:e.message})}
@@ -91,9 +91,9 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
     const feed=await get('/api/nhl-game-odds?event='+event.id);if(feed.status!=='live'||!Array.isArray(feed.odds))throw Error('Game markets feed unavailable');
     event.gameQuotesFetchedAt=feed.fetchedAt;if(feed.remainingCredits!=null){ledger.remainingCredits=Number(feed.remainingCredits);event.gameRemainingCredits=ledger.remainingCredits}
     event.gameMarketsMissing=['h2h','spreads','h2h_3_way'].filter(m=>!feed.odds.some(q=>q.market===m));
-    const quotes=new Map();for(const q of feed.odds){const key=JSON.stringify([q.market,q.side,q.point]);if(!quotes.has(key)||q.decimal>quotes.get(key).decimal)quotes.set(key,q)}
+    const quotes=bestFreshQuotes(feed.odds,q=>JSON.stringify([q.market,q.side,q.point]),clock());
     const context={...event,homeAbbrev:game.homeTeam.abbrev,awayAbbrev:game.awayTeam.abbrev,verified:true};
-    for(const quote of quotes.values())try{
+    for(const quote of quotes)try{
      const analysis=analyzeGame(gameArchive,context,quote),snapshot=freezeGame({analysis,quote,event:context,capturedAt:new Date(clock()).toISOString(),sourceCommit});
      event.gameRecords.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
     }catch(e){event.gameExcluded.push({market:quote.market,side:quote.side,line:quote.point,reason:e.message})}
@@ -111,6 +111,7 @@ export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTim
  const official=path=>{
   const u=new URL(path,'https://edgeboard.invalid'),p=u.searchParams;
   if(u.pathname==='/api/nhl-schedule'&&/^\d{4}-\d{2}-\d{2}$/.test(p.get('date')||''))return {url:'https://api-web.nhle.com/v1/score/'+p.get('date'),normalize:d=>({games:d.games||[]})};
+  if(u.pathname==='/api/nhl-roster'&&/^[A-Z]{3}$/.test(p.get('team')||''))return {url:'https://api-web.nhle.com/v1/roster/'+p.get('team')+'/current',normalize:d=>{if(!['forwards','defensemen','goalies'].every(k=>Array.isArray(d[k])))throw Error('Invalid official roster');return {team:p.get('team'),playerIds:[...d.forwards,...d.defensemen,...d.goalies].map(x=>String(x.id)),checkedAt:new Date().toISOString(),lineupConfirmed:false}}};
   if(u.pathname==='/api/nhl-game-log'&&/^\d{7}$/.test(p.get('playerId')||'')&&/^\d{8}$/.test(p.get('season')||''))return {url:'https://api-web.nhle.com/v1/player/'+p.get('playerId')+'/game-log/'+p.get('season')+'/2',normalize:d=>({games:d.gameLog||[]})};
   if(u.pathname==='/api/nhl-player-search'&&(p.get('q')||'').length>=2)return {url:'https://search.d3.nhle.com/api/v1/search/player?culture=en-us&limit=50&q='+encodeURIComponent(p.get('q')),normalize:d=>({players:(Array.isArray(d)?d:[]).map(x=>({id:String(x.playerId||''),name:x.name||'',team:x.teamAbbrev||'',position:x.positionCode||'',active:x.active===true})).filter(x=>/^\d{7}$/.test(x.id)&&x.name.toLowerCase().includes(p.get('q').toLowerCase()))})};
   return null;
@@ -136,3 +137,4 @@ async function main(){
  if(last.errors.length)process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
+
