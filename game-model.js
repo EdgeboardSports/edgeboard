@@ -1,3 +1,4 @@
+import {confirmedGoalies} from './game-day.js';
 export const GAME_VERSION='goals-v1';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
 export function normalizeGame(g){
@@ -72,6 +73,8 @@ export function gameChecks(analysis,quote,event,now=Date.now()){
  const age=now-Date.parse(quote.lastUpdate);if(!Number.isFinite(age)||age>15*60000||age< -60000)reasons.push('Quote stale or undated');
  if(!(Date.parse(event.startTime)>now))reasons.push('Game already started');
  if(!event.verified)reasons.push('Upcoming NHL matchup unverified');
+ if(!confirmedGoalies(event,now))reasons.push('Both starting goalies must be confirmed with fresh identity checks');
  if(!Number.isFinite(Date.parse(analysis.archiveAt))||now-Date.parse(analysis.archiveAt)>48*3600000||Date.parse(analysis.archiveAt)>now+60000||analysis.archiveErrors)reasons.push('Team archive stale or incomplete');
  return reasons;
 }
+

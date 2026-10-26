@@ -36,7 +36,7 @@ export function playerResearch(player,games,event,own,opponent,now=Date.now()){
  return {version:CONTEXT_VERSION,checkedAt:own?.checkedAt||null,availability,iceTime,powerPlay,recentAbsence:missed,rest:restContext(own,event.date),opponentShots:freshContext(opponent,now)?shotContext(opponent):null,lineupConfirmed:false,warnings,blocks};
 }
 export function gameResearch(event,home,away,now=Date.now()){
- return {version:CONTEXT_VERSION,checkedAt:new Date(now).toISOString(),home:{team:event.homeAbbrev,rest:restContext(home,event.date),shots:freshContext(home,now)?shotContext(home):null},away:{team:event.awayAbbrev,rest:restContext(away,event.date),shots:freshContext(away,now)?shotContext(away):null},startingGoalies:'unconfirmed',warnings:['Starting goalies unconfirmed; no goalie-specific probability adjustment','Rest and shot matchup context are descriptive; model probabilities are unchanged']};
+ return {version:CONTEXT_VERSION,checkedAt:new Date(now).toISOString(),home:{team:event.homeAbbrev,rest:restContext(home,event.date),shots:freshContext(home,now)?shotContext(home):null},away:{team:event.awayAbbrev,rest:restContext(away,event.date),shots:freshContext(away,now)?shotContext(away):null},startingGoalies:'see_game_day_evidence',warnings:['No goalie-specific probability adjustment is applied','Rest and shot matchup context are descriptive; model probabilities are unchanged']};
 }
 export function researchLines(r){
  if(!r)return ['Additional game-day research unavailable'];const lines=[];

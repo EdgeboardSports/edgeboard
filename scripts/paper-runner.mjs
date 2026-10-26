@@ -1,3 +1,4 @@
+import {loadGameDay} from '../game-day.js';
 import {teamContext,playerResearch,gameResearch} from '../research-context.js';
 import {bestFreshQuotes} from '../quote-selection.js';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -57,7 +58,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
   if(!Number.isFinite(start)||lead<15*60000||lead>180*60000||!['FUT','PRE'].includes(game.gameState))continue;
   const event={id:candidate.id,nhlGameId:game.id,date,startTime:new Date(start).toISOString(),homeTeam:candidate.homeTeam,awayTeam:candidate.awayTeam,modelVersion:VERSION,sourceCommit,capturedAt:new Date(clock()).toISOString(),records:[],excluded:[]};
   // Count the attempted game even if a feed fails: no selective retries based on results.
-  ledger.events.push(event);
+  ledger.events.push(event);event.homeAbbrev=game.homeTeam.abbrev;event.awayAbbrev=game.awayTeam.abbrev;event.gameDay=await loadGameDay(get,event);
   try{
    const props=await get('/api/nhl-props?'+new URLSearchParams({event:event.id,market:'player_shots_on_goal'}));
    if(props.status!=='live'||!Array.isArray(props.odds))throw Error('Props feed unavailable');
@@ -72,7 +73,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
      if(!Array.isArray(current.games))throw Error('Current game log unavailable');
      let prior={games:[]};
      try{prior=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:player.id,season:previous}))}catch{event.excluded.push({player:quote.player,reason:'Prior-season feed unavailable; current history only',informational:true})}
-     const games=completedBefore([...current.games,...(prior.games||[])],date),venue=player.team===game.homeTeam.abbrev?'H':player.team===game.awayTeam.abbrev?'R':null,context={venue,opponent:venue==='H'?game.awayTeam.abbrev:venue==='R'?game.homeTeam.abbrev:null};Object.assign(context,await verifyRoster(get,player,context,clock()));const [ownResearch,opponentResearch]=await Promise.all([teamContext(get,player.team,date),teamContext(get,context.opponent,date)]);context.research=playerResearch(player,games,event,ownResearch,opponentResearch,clock());const analysis={result:evaluate(games,quote.point,context),context};
+     const games=completedBefore([...current.games,...(prior.games||[])],date),venue=player.team===game.homeTeam.abbrev?'H':player.team===game.awayTeam.abbrev?'R':null,context={venue,opponent:venue==='H'?game.awayTeam.abbrev:venue==='R'?game.homeTeam.abbrev:null};Object.assign(context,await verifyRoster(get,player,context,clock()));const [ownResearch,opponentResearch]=await Promise.all([teamContext(get,player.team,date),teamContext(get,context.opponent,date)]);context.playerId=player.id;context.research=playerResearch(player,games,event,ownResearch,opponentResearch,clock());const analysis={result:evaluate(games,quote.point,context),context};
      const snapshot=freezePrediction({analysis,quote,event:{...event,commenceTime:event.startTime},player,capturedAt:new Date(clock()).toISOString(),sourceCommit,games});
      event.records.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
     }catch(e){event.excluded.push({player:quote.player,line:quote.point,side:quote.side,reason:e.message})}
@@ -93,7 +94,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
     event.gameQuotesFetchedAt=feed.fetchedAt;if(feed.remainingCredits!=null){ledger.remainingCredits=Number(feed.remainingCredits);event.gameRemainingCredits=ledger.remainingCredits}
     event.gameMarketsMissing=['h2h','spreads','h2h_3_way'].filter(m=>!feed.odds.some(q=>q.market===m));
     const quotes=bestFreshQuotes(feed.odds,q=>JSON.stringify([q.market,q.side,q.point]),clock());
-    const context={...event,homeAbbrev:game.homeTeam.abbrev,awayAbbrev:game.awayTeam.abbrev,verified:true};const [homeResearch,awayResearch]=await Promise.all([teamContext(get,context.homeAbbrev,event.date),teamContext(get,context.awayAbbrev,event.date)]);context.research=gameResearch(context,homeResearch,awayResearch,clock());
+    const context={...event,homeAbbrev:game.homeTeam.abbrev,awayAbbrev:game.awayTeam.abbrev,verified:true};const [homeResearch,awayResearch]=await Promise.all([teamContext(get,context.homeAbbrev,event.date),teamContext(get,context.awayAbbrev,event.date)]);context.research=gameResearch(context,homeResearch,awayResearch,clock());context.gameDay=await loadGameDay(get,context);
     for(const quote of quotes)try{
      const analysis=analyzeGame(gameArchive,context,quote);if(analysis)analysis.research=context.research;const snapshot=freezeGame({analysis,quote,event:context,capturedAt:new Date(clock()).toISOString(),sourceCommit});
      event.gameRecords.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});

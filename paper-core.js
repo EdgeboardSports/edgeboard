@@ -1,3 +1,4 @@
+import {playerLineup} from './game-day.js';
 import {quoteValue,VERSION,validGames} from './shots-model.js';
 export function researchChecks(analysis,quote,event,now=Date.now()){
  const r=analysis.result;if(!r)return ['Fewer than 20 training games'];
@@ -13,6 +14,7 @@ export function researchChecks(analysis,quote,event,now=Date.now()){
  const rosterAge=now-Date.parse(analysis.context.rosterCheckedAt);
  if(!Number.isFinite(rosterAge)||rosterAge>10*60000||rosterAge< -60000)reasons.push('Roster check stale or unavailable');
  if(analysis.context.research){reasons.push(...analysis.context.research.blocks);const age=now-Date.parse(analysis.context.research.checkedAt);if(!Number.isFinite(age)||age>10*60000||age< -60000)reasons.push('Game-day research stale or unavailable')}
+ if(playerLineup(event,analysis.context.playerId,now).status==='scratched')reasons.push('Official game-day scratch');
  return [...new Set(reasons)];
 }
 export function baselineProbability(games,line){
@@ -25,7 +27,7 @@ export function freezePrediction({analysis,quote,event,player,capturedAt,sourceC
  if(!analysis.result)throw Error('Insufficient model history');
  if(validGames(games).some(g=>(g.gameDate||g.date)>=event.date))throw Error('Training includes target or future dates');
  const checks=researchChecks(analysis,quote,event,Date.parse(capturedAt)),r=analysis.result;
- return {id:JSON.stringify([event.id,player.id,quote.point,quote.side]),eventId:event.id,nhlGameId:event.nhlGameId,date:event.date,startTime:event.commenceTime,homeTeam:event.homeTeam,awayTeam:event.awayTeam,playerId:player.id,player:quote.player,line:quote.point,side:quote.side,quote:{american:quote.american,decimal:quote.decimal,bookmaker:quote.bookmaker,bookmakerTitle:quote.bookmakerTitle,lastUpdate:quote.lastUpdate},capturedAt,sourceCommit,modelVersion:VERSION,probability:r.prediction,baselineProbability:baselineProbability(games,quote.point),modelInputs:r.model,playerVerification:{rosterVerified:analysis.context.rosterVerified===true,rosterCheckedAt:analysis.context.rosterCheckedAt||null,lineupConfirmed:false},research:analysis.context.research||null,backtest:{games:r.test.games,brier:r.test.brier,baseline:r.test.baseline},estimatedValue:quoteValue(r.prediction,quote.side,quote.decimal).ev,candidate:checks.length===0,checks,trainingEnd:validGames(games).at(-1)?.gameDate||null};
+ return {id:JSON.stringify([event.id,player.id,quote.point,quote.side]),eventId:event.id,nhlGameId:event.nhlGameId,date:event.date,startTime:event.commenceTime,homeTeam:event.homeTeam,awayTeam:event.awayTeam,playerId:player.id,player:quote.player,line:quote.point,side:quote.side,quote:{american:quote.american,decimal:quote.decimal,bookmaker:quote.bookmaker,bookmakerTitle:quote.bookmakerTitle,lastUpdate:quote.lastUpdate},capturedAt,sourceCommit,modelVersion:VERSION,probability:r.prediction,baselineProbability:baselineProbability(games,quote.point),modelInputs:r.model,playerVerification:{rosterVerified:analysis.context.rosterVerified===true,rosterCheckedAt:analysis.context.rosterCheckedAt||null,lineupConfirmed:false},research:analysis.context.research||null,gameDay:event.gameDay||null,gameDayVersion:'game-day-v1',backtest:{games:r.test.games,brier:r.test.brier,baseline:r.test.baseline},estimatedValue:quoteValue(r.prediction,quote.side,quote.decimal).ev,candidate:checks.length===0,checks,trainingEnd:validGames(games).at(-1)?.gameDate||null};
 }
 export function gradePrediction(snapshot,nhlGame,playerGames,now=Date.now()){
  if(!nhlGame||!['OFF','FINAL'].includes(nhlGame.gameState))return {state:'pending'};

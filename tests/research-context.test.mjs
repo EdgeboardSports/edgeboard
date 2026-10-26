@@ -23,7 +23,7 @@ assert(researchChecks(analysis,{side:'Over',decimal:2,lastUpdate:stamp},{commenc
 const source={timestamp:stamp,team:{abbreviation:'TOR'},athletes:[{items:[{fullName:'Mátthéws',injuries:[{status:'Out',date:stamp}]}]}]};
 assert.equal(normalizeAvailability(source,'TOR',now).players[0].key,'matthews');assert(!normalizeAvailability(source,'NYR',now).available);assert(!normalizeAvailability({...source,timestamp:'bad'},'TOR',now).available);
 for(const [nhl,espn]of [['LAK','LA'],['NJD','NJ'],['SJS','SJ'],['TBL','TB'],['UTA','UTAH']])assert(normalizeAvailability({...source,team:{abbreviation:espn}},nhl,now).available);
-const g=gameResearch({homeAbbrev:'TOR',awayAbbrev:'CGY',date},own,own,now);assert.equal(g.startingGoalies,'unconfirmed');assert(researchLines(g).some(s=>s.includes('unchanged')));
+const g=gameResearch({homeAbbrev:'TOR',awayAbbrev:'CGY',date},own,own,now);assert.equal(g.startingGoalies,'see_game_day_evidence');assert(researchLines(g).some(s=>s.includes('unchanged')));
 let usagePages=0;const oldFetch=globalThis.fetch,oldNow=Date.now;Date.now=()=>now;
 try{
  globalThis.fetch=async url=>{
