@@ -1,9 +1,10 @@
+const espnTeam=team=>({LAK:'LA',NJD:'NJ',SJS:'SJ',TBL:'TB',UTA:'UTAH'}[team]||team);
 const name=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 const json=(d,status=200)=>new Response(JSON.stringify(d),{status,headers:{'Content-Type':'application/json','Cache-Control':status===200?'public, max-age=300':'no-store'}});
 async function read(url){const r=await fetch(url,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Source unavailable');return r.json()}
 export function normalizeAvailability(data,team,now){
  const age=now-Date.parse(data.timestamp);
- if(data.team?.abbreviation!==team||!Array.isArray(data.athletes)||!Number.isFinite(age)||age< -60000||age>3600000)return {available:false,players:[]};
+ if(data.team?.abbreviation!==espnTeam(team)||!Array.isArray(data.athletes)||!Number.isFinite(age)||age< -60000||age>3600000)return {available:false,players:[]};
  const players=data.athletes.flatMap(g=>Array.isArray(g.items)?g.items:[]).map(p=>({name:p.fullName||p.displayName,key:name(p.fullName||p.displayName),number:String(p.jersey||''),reports:(p.injuries||[]).filter(i=>typeof i.status==='string'&&Number.isFinite(Date.parse(i.date))&&Date.parse(i.date)<=now+60000).map(i=>({status:i.status,reportedAt:i.date}))}));
  return {available:players.length>0,source:'ESPN roster injury reports',sourceAt:data.timestamp,players};
 }
@@ -23,7 +24,7 @@ export async function onRequestGet({request}){
   const results=await Promise.allSettled([
    read('https://api.nhle.com/stats/rest/en/team/summary?isAggregate=false&isGame=true&start=0&limit=100&sort='+sort+'&cayenneExp='+exp),
    read('https://api.nhle.com/stats/rest/en/skater/timeonice?isAggregate=false&isGame=true&start=0&limit=100&sort='+sort+'&cayenneExp='+exp),
-   date===today?read('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/'+team.toLowerCase()+'/roster'):Promise.reject(Error('Availability is current-day only'))
+   date===today?read('https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/'+espnTeam(team).toLowerCase()+'/roster'):Promise.reject(Error('Availability is current-day only'))
   ]);
   const get=i=>results[i].status==='fulfilled'?results[i].value:null,summary=get(0),usage=get(1),injuries=get(2);
   // NHL caps this report at 100 rows even when a larger limit is requested.
