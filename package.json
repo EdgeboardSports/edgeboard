@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/shots-model.test.mjs && node tests/paper-test.mjs && node tests/game-model.test.mjs && node tests/game-paper.test.mjs && node tests/player-profile.test.mjs && node tests/best-picks.test.mjs && node tests/verification.test.mjs && node tests/research-context.test.mjs && node tests/game-day.test.mjs"
+    "test": "node tests/shots-model.test.mjs && node tests/paper-test.mjs && node tests/game-model.test.mjs && node tests/game-paper.test.mjs && node tests/player-profile.test.mjs && node tests/best-picks.test.mjs && node tests/verification.test.mjs && node tests/research-context.test.mjs && node tests/game-day.test.mjs && node tests/security.test.mjs",
+    "build:private": "node scripts/build-private.mjs"
   }
 }

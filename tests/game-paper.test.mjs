@@ -1,3 +1,4 @@
+import {ACCESS_IDENTITY} from '../lib/access.js';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {runPaper,makeClient} from '../scripts/paper-runner.mjs';
@@ -37,8 +38,8 @@ await buildArchive(built,official,{now:clock+1000,pause:async()=>{}});assert.equ
 await buildArchive(built,official,{now:clock+13*3600000,pause:async()=>{}});assert.equal(reads,92);
 let providerCalls=0,cacheKey;globalThis.caches={default:{match:async()=>undefined,put:async(k,v)=>{cacheKey=k.url;assert(!(await v.text()).includes('private-test-key'))}}};
 globalThis.fetch=async()=>{providerCalls++;return new Response(JSON.stringify({home_team:'Home',away_team:'Away',bookmakers:[{key:'test',markets:[{key:'h2h_3_way',last_update:new Date(clock).toISOString(),outcomes:[{name:'Home',price:150},{name:'Away',price:150},{name:'Draw',price:300}]}]}]}))};
-let r=await onRequestGet({env:{THE_ODDS_API_KEY:'private-test-key'},request:new Request('https://app/api/nhl-game-odds?event=bad')});assert.equal(r.status,400);assert.equal(providerCalls,0);
-r=await onRequestGet({env:{THE_ODDS_API_KEY:'private-test-key'},request:new Request('https://app/api/nhl-game-odds?event='+id)});const normalized=await r.json();assert.equal(normalized.odds.length,3);assert.equal(normalized.odds[2].side,'Draw');assert(!cacheKey.includes('private-test-key'));
+let r=await onRequestGet({env:{THE_ODDS_API_KEY:'private-test-key',ALLOW_ODDS_FEED:'true',ODDS_BUDGET_PERIOD:'2026-10-26',SECURITY_DB:{prepare:()=>({bind:()=>({first:async()=>({used:1,starts_at:Date.now()+3600000,remaining_credits:400}),run:async()=>({})})})}},data:{[ACCESS_IDENTITY]:{email:'test@example.test',expires:Date.now()/1000+3600}},request:new Request('https://app/api/nhl-game-odds?event=bad')});assert.equal(r.status,400);assert.equal(providerCalls,0);
+r=await onRequestGet({env:{THE_ODDS_API_KEY:'private-test-key',ALLOW_ODDS_FEED:'true',ODDS_BUDGET_PERIOD:'2026-10-26',SECURITY_DB:{prepare:()=>({bind:()=>({first:async()=>({used:1,starts_at:Date.now()+3600000,remaining_credits:400}),run:async()=>({})})})}},data:{[ACCESS_IDENTITY]:{email:'test@example.test',expires:Date.now()/1000+3600}},request:new Request('https://app/api/nhl-game-odds?event='+id)});const normalized=await r.json();assert.equal(normalized.odds.length,3);assert.equal(normalized.odds[2].side,'Draw');assert(!cacheKey.includes('private-test-key'));
 console.log('Passed game-paper capture, immutable shots/game snapshots, independent OT/three-way grading, reserve, no paid retries, archive dedup/freshness, and secret-free odds normalization/cache.');
 
 let limitedReads=0;const limitedArchive=await buildArchive({games:[],seasons:[]},async url=>{limitedReads++;if(url.endsWith('/standings/now'))return official(url);const e=Error('rate limited');e.status=429;e.retryAfterSeconds=120;throw e},{now:clock,pause:async()=>{}});
@@ -53,3 +54,4 @@ const {onRequestGet:archiveResponse}=await import('../functions/api/game-archive
 globalThis.fetch=async url=>{archiveReads++;return new Response(JSON.stringify(url.startsWith('https://api.github.com')?{schemaVersion:1,generatedAt:'2026-10-25T15:00:00Z',games:[{id:1}],errors:[]}:{schemaVersion:1,generatedAt:null,games:[],errors:[]}))};
 const warmed=await archiveResponse();assert.equal((await warmed.json()).games.length,1);assert.equal(archiveReads,2);
 console.log('Passed fresh public archive fallback during initial-cache warm-up.');
+

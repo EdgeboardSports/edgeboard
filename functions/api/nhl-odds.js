@@ -1,3 +1,4 @@
+import {authorizeProvider,recordProviderResponse,rememberEvents} from '../../lib/provider-security.js';
 // Cloudflare Pages Function: /api/nhl-odds
 // Free-tier friendly: server-side secret, one NHL region, three featured markets.
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
@@ -37,7 +38,8 @@ const normalize = (games) => {
   }
   return { odds, bestPrices: [...best.values()] };
 };
-export async function onRequestGet({ env, request }) {
+export async function onRequestGet(context) {
+  const {env,request}=context;const blocked=await authorizeProvider(context,3);if(blocked)return blocked;
   if (!env.THE_ODDS_API_KEY) return json({ status: 'not_configured', message: 'Live odds key is not configured.' }, 503);
   // Only cache publicly safe response data; never include the provider key in cache URL.
   const cacheKey = new Request(new URL('/api/nhl-odds', request.url).toString(), { method: 'GET' });
@@ -51,6 +53,7 @@ export async function onRequestGet({ env, request }) {
   endpoint.searchParams.set('oddsFormat', 'american');
   try {
     const upstream = await fetch(endpoint.toString(), { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(12000) });
+    await recordProviderResponse(env,upstream);
     if (!upstream.ok) return json({
       status: 'unavailable', message: upstream.status === 429 ? 'Odds provider quota exhausted' : 'Odds provider unavailable'
     }, upstream.status === 429 ? 429 : 502);
@@ -70,3 +73,4 @@ export async function onRequestGet({ env, request }) {
     return json({ status: 'unavailable', message: 'Odds provider connection failed' }, 502);
   }
 }
+

@@ -26,5 +26,8 @@ export async function readOfficial(url){
   return await r.json();
  }catch(e){if(e.status===429)throw e;last=e;if(i<2)await new Promise(r=>setTimeout(r,1000*(i+1)))}throw last;
 }
-async function main(){const path=new URL('../data/game-archive.json',import.meta.url),old=JSON.parse(await readFile(path,'utf8')),next=await buildArchive(old,readOfficial);await writeFile(path,JSON.stringify(next)+'\n');console.log(JSON.stringify({archiveAt:next.generatedAt,teams:next.teams.length,games:next.games.length,errors:next.errors,nextRetryAt:next.nextRetryAt}));if(next.errors.length)process.exitCode=1}
+async function main(){
+ if(process.env.EDGEBOARD_COLLECTION_APPROVED!=='true'){console.log('Collection paused pending access and provider permission review.');return}
+const path=new URL('../data/game-archive.json',import.meta.url),old=JSON.parse(await readFile(path,'utf8')),next=await buildArchive(old,readOfficial);await writeFile(path,JSON.stringify(next)+'\n');console.log(JSON.stringify({archiveAt:next.generatedAt,teams:next.teams.length,games:next.games.length,errors:next.errors,nextRetryAt:next.nextRetryAt}));if(next.errors.length)process.exitCode=1}
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
+

@@ -129,6 +129,8 @@ export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTim
  };
 }
 async function main(){
+ if(process.env.EDGEBOARD_COLLECTION_APPROVED!=='true'){console.log('Collection paused pending access and provider permission review.');return}
+
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));

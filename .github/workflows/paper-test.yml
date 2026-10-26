@@ -1,58 +1,10 @@
 name: Edgeboard paper testing
 on:
-  schedule:
-    - cron: '17 * * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/paper-test.yml'
-      - 'scripts/paper-runner.mjs'
-      - 'paper-core.js'
-      - 'shots-model.js'
-      - 'scripts/game-archive.mjs'
-      - 'game-model.js'
-      - 'game-paper.js'
 permissions:
-  contents: write
-concurrency:
-  group: edgeboard-paper-ledger
-  cancel-in-progress: false
+  contents: read
 jobs:
-  capture-and-grade:
+  permission-review-hold:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-        with:
-          fetch-depth: 0
-          ref: main
-      - name: Validate model and paper rules
-        run: npm test
-      - name: Refresh official team goal histories
-        id: archive
-        continue-on-error: true
-        run: node scripts/game-archive.mjs
-      - name: Capture pregame predictions and grade official results
-        id: capture
-        continue-on-error: true
-        env:
-          EDGEBOARD_URL: https://edgeboard-8fl.pages.dev
-        run: |
-          export PAPER_SOURCE_COMMIT=$(git rev-parse HEAD)
-          node scripts/paper-runner.mjs
-      - name: Preserve ledger
-        run: |
-          if git diff --quiet -- data/paper-ledger.json data/game-archive.json
-          then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/paper-ledger.json data/game-archive.json
-          git commit -m "[CF-Pages-Skip] Refresh automatic paper ledger"
-          git pull --rebase origin main
-          git push origin HEAD:main
-      - name: Report capture errors after preserving audit log
-        if: steps.capture.outcome == 'failure' || steps.archive.outcome == 'failure'
-        run: exit 1
+      - run: echo "Collection paused pending private access, quota configuration, and provider permissions."
