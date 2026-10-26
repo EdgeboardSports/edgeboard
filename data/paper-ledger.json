@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": "2026-10-26T20:43:45.046Z",
-  "lastRunAt": "2026-10-26T20:43:45.046Z",
-  "remainingCredits": 460,
+  "updatedAt": "2026-10-26T21:00:45.146Z",
+  "lastRunAt": "2026-10-26T21:00:45.146Z",
+  "remainingCredits": 464,
   "policy": {
     "maxGamesPerDay": 2,
     "captureMinutesBeforeStart": [
@@ -5216,6 +5216,13 @@
       "errors": [],
       "notes": [],
       "capturedGames": 1
+    },
+    {
+      "at": "2026-10-26T21:00:45.146Z",
+      "sourceCommit": "ccb36c937c57ebae6de61daca9974fb7874fcc66",
+      "errors": [],
+      "notes": [],
+      "capturedGames": 0
     }
   ]
 }
