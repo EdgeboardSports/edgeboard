@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": "2026-10-26T01:52:42.877Z",
-  "lastRunAt": "2026-10-26T01:52:42.877Z",
-  "remainingCredits": 468,
+  "updatedAt": "2026-10-26T02:43:53.135Z",
+  "lastRunAt": "2026-10-26T02:43:53.135Z",
+  "remainingCredits": 464,
   "policy": {
     "maxGamesPerDay": 2,
     "captureMinutesBeforeStart": [
@@ -2163,7 +2163,11 @@
           },
           "digest": "17bf58ebe7b67589f6706b96ac5553eeb8b6ca2f61c7089ddbffa690b7ae6dc6",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "finalHome": 1,
+            "finalAway": 2,
+            "units": 0.8695652173913042,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         },
         {
@@ -2234,7 +2238,11 @@
           },
           "digest": "59fbf4979afa95dddc58fc0b718b05976af32f11a987fbe8c5afcd29a6101e34",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "finalHome": 1,
+            "finalAway": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         },
         {
@@ -2304,7 +2312,11 @@
           },
           "digest": "59dddae669a9dd25f89f7b3c789d8e8f375e1f24396482a99293284635443925",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "finalHome": 1,
+            "finalAway": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         },
         {
@@ -2375,7 +2387,11 @@
           },
           "digest": "a94390311c08d17c526bf0076c126fe083ce196ef9ce8195c0d97e3ef158197a",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "finalHome": 1,
+            "finalAway": 2,
+            "units": 0.3999999999999999,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         },
         {
@@ -2445,7 +2461,12 @@
           },
           "digest": "87a86c533bfda8468208726b27171f71055a2d118911950fe7e0058e3a98519c",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "finalHome": 1,
+            "finalAway": 2,
+            "regulation": "away",
+            "units": 1.4,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         },
         {
@@ -2516,7 +2537,12 @@
           },
           "digest": "5545c9e7d933e5b97943f822d0e277469bd77943ab2dfd9f4a02dc167737b53c",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "finalHome": 1,
+            "finalAway": 2,
+            "regulation": "away",
+            "units": -1,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         },
         {
@@ -2587,7 +2613,12 @@
           },
           "digest": "0779b1bec138e1edf1b2b533f64fb5cb355e6dd71916df70e430cf53e86ff3f1",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "finalHome": 1,
+            "finalAway": 2,
+            "regulation": "away",
+            "units": -1,
+            "gradedAt": "2026-10-26T02:43:52.923Z"
           }
         }
       ],
@@ -2595,7 +2626,8 @@
       "gameQuotesFetchedAt": "2026-10-25T22:09:25.685Z",
       "gameRemainingCredits": 482,
       "gameMarketsMissing": [],
-      "gameStatus": "captured"
+      "gameStatus": "captured",
+      "lastGradedAt": "2026-10-26T02:43:52.923Z"
     }
   ],
   "runs": [
@@ -2685,6 +2717,13 @@
     {
       "at": "2026-10-26T01:52:42.877Z",
       "sourceCommit": "3d5801f0b0c5555ab95baa2893b387020aca76f4",
+      "errors": [],
+      "notes": [],
+      "capturedGames": 0
+    },
+    {
+      "at": "2026-10-26T02:43:53.135Z",
+      "sourceCommit": "812fdf8c2c1d4833f52da021847fe0a4e3cd7b97",
       "errors": [],
       "notes": [],
       "capturedGames": 0
