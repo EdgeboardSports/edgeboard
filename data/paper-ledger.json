@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": "2026-10-26T19:48:24.341Z",
-  "lastRunAt": "2026-10-26T19:48:24.341Z",
-  "remainingCredits": 464,
+  "updatedAt": "2026-10-26T20:43:45.046Z",
+  "lastRunAt": "2026-10-26T20:43:45.046Z",
+  "remainingCredits": 460,
   "policy": {
     "maxGamesPerDay": 2,
     "captureMinutesBeforeStart": [
@@ -2628,6 +2628,2383 @@
       "gameMarketsMissing": [],
       "gameStatus": "captured",
       "lastGradedAt": "2026-10-26T02:43:52.923Z"
+    },
+    {
+      "id": "daa5166685c4ca1a4f033d8bff91a6ba",
+      "nhlGameId": 2026020185,
+      "date": "2026-10-26",
+      "startTime": "2026-10-26T23:00:00.000Z",
+      "homeTeam": "New York Rangers",
+      "awayTeam": "Los Angeles Kings",
+      "modelVersion": "shots-v1",
+      "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+      "capturedAt": "2026-10-26T20:43:39.555Z",
+      "records": [
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8481604\",2.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8481604",
+            "player": "Pavel Dorofeyev",
+            "line": 2.5,
+            "side": "Over",
+            "quote": {
+              "american": -130,
+              "decimal": 1.7692307692307692,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:40.165Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6128581561888605,
+              "under": 0.3871418438111395,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.573170731707317,
+              "under": 0.4268292682926829,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.1655408138836227,
+              "alpha": 0,
+              "sample": 40,
+              "base": 3.1,
+              "recent": 2.9,
+              "venue": 1.0080645161290323,
+              "opponent": 0.9984639016897081,
+              "iceTime": 1.0483491965536063,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.26130606417867763,
+              "baseline": 0.2511897679952409
+            },
+            "estimatedValue": 0.08428750710336858,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "de1446f9dcd2df58c38ce842805f12cbfb86984fe807395101cc5954dd5d16a9",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8481604\",2.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8481604",
+            "player": "Pavel Dorofeyev",
+            "line": 2.5,
+            "side": "Under",
+            "quote": {
+              "american": 120,
+              "decimal": 2.2,
+              "bookmaker": "bovada",
+              "bookmakerTitle": "Bovada",
+              "lastUpdate": "2026-10-26T20:43:11Z"
+            },
+            "capturedAt": "2026-10-26T20:43:40.173Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6128581561888605,
+              "under": 0.3871418438111395,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.573170731707317,
+              "under": 0.4268292682926829,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.1655408138836227,
+              "alpha": 0,
+              "sample": 40,
+              "base": 3.1,
+              "recent": 2.9,
+              "venue": 1.0080645161290323,
+              "opponent": 0.9984639016897081,
+              "iceTime": 1.0483491965536063,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.26130606417867763,
+              "baseline": 0.2511897679952409
+            },
+            "estimatedValue": -0.14828794361549308,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "33ff066c35514d7f442d98261fc6939f216f2202c338bd2cc1d617391dd70f17",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8477960\",2.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8477960",
+            "player": "Adrian Kempe",
+            "line": 2.5,
+            "side": "Over",
+            "quote": {
+              "american": -135,
+              "decimal": 1.7407407407407407,
+              "bookmaker": "betonlineag",
+              "bookmakerTitle": "BetOnline.ag",
+              "lastUpdate": "2026-10-26T20:42:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:40.653Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.5993288972391448,
+              "under": 0.40067110276085516,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5975609756097561,
+              "under": 0.4024390243902439,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.145560146548999,
+              "alpha": 0.02520478890989287,
+              "sample": 40,
+              "base": 2.875,
+              "recent": 3,
+              "venue": 1.0137857900318135,
+              "opponent": 1,
+              "iceTime": 1.0562675040312315,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2614528576085385,
+              "baseline": 0.2566329565734681
+            },
+            "estimatedValue": 0.04327622852740026,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "77708c7b237b269e3a1d3fd22d06330453ba50b9cd97d04dacac6d147134296e",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8477960\",2.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8477960",
+            "player": "Adrian Kempe",
+            "line": 2.5,
+            "side": "Under",
+            "quote": {
+              "american": 115,
+              "decimal": 2.15,
+              "bookmaker": "bovada",
+              "bookmakerTitle": "Bovada",
+              "lastUpdate": "2026-10-26T20:43:11Z"
+            },
+            "capturedAt": "2026-10-26T20:43:40.656Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.5993288972391448,
+              "under": 0.40067110276085516,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5975609756097561,
+              "under": 0.4024390243902439,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.145560146548999,
+              "alpha": 0.02520478890989287,
+              "sample": 40,
+              "base": 2.875,
+              "recent": 3,
+              "venue": 1.0137857900318135,
+              "opponent": 1,
+              "iceTime": 1.0562675040312315,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2614528576085385,
+              "baseline": 0.2566329565734681
+            },
+            "estimatedValue": -0.13855712906416146,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "7f90b5ab3d881d882f76e8792526ae04712111967d34a705ea193d28a3128ad6",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8478550\",2.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8478550",
+            "player": "Artemi Panarin",
+            "line": 2.5,
+            "side": "Over",
+            "quote": {
+              "american": -127,
+              "decimal": 1.7874015748031495,
+              "bookmaker": "betonlineag",
+              "bookmakerTitle": "BetOnline.ag",
+              "lastUpdate": "2026-10-26T20:42:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:41.023Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6003151852284249,
+              "under": 0.39968481477157514,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5487804878048781,
+              "under": 0.45121951219512196,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.1068378427158145,
+              "alpha": 0,
+              "sample": 40,
+              "base": 2.775,
+              "recent": 3.1,
+              "venue": 1.0239507800483412,
+              "opponent": 0.993188310261481,
+              "iceTime": 1.039992076854511,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.24821390338392643,
+              "baseline": 0.2554729327781083
+            },
+            "estimatedValue": 0.07300430745553099,
+            "candidate": false,
+            "checks": [
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "31e06806112470440b6defda5195f17338932bd41e28f71a7154499e48163ee1",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8478550\",2.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8478550",
+            "player": "Artemi Panarin",
+            "line": 2.5,
+            "side": "Under",
+            "quote": {
+              "american": 108,
+              "decimal": 2.08,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:41.026Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6003151852284249,
+              "under": 0.39968481477157514,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5487804878048781,
+              "under": 0.45121951219512196,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.1068378427158145,
+              "alpha": 0,
+              "sample": 40,
+              "base": 2.775,
+              "recent": 3.1,
+              "venue": 1.0239507800483412,
+              "opponent": 0.993188310261481,
+              "iceTime": 1.039992076854511,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.24821390338392643,
+              "baseline": 0.2554729327781083
+            },
+            "estimatedValue": -0.1686555852751237,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "f7e050414121b668a6c0960bcfb7d20cedcd2079643b4ae2b74e1c7c5fa0de6f",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482155\",2.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482155",
+            "player": "Alex Laferriere",
+            "line": 2.5,
+            "side": "Over",
+            "quote": {
+              "american": 105,
+              "decimal": 2.05,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:41.401Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3531768465575579,
+              "under": 0.6468231534424421,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.45121951219512196,
+              "under": 0.5487804878048781,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.110402763346368,
+              "alpha": 0,
+              "sample": 40,
+              "base": 2.625,
+              "recent": 1.8,
+              "venue": 0.9059233449477352,
+              "opponent": 1.0034843205574913,
+              "iceTime": 1.0492525303858045,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.26209741556768096,
+              "baseline": 0.25386674598453296
+            },
+            "estimatedValue": -0.2759874645570064,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "7e51ab28cffbaf3344582e9bfa8663b22bd1cc4c425a16befa312dcd101fc229",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482155\",2.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482155",
+            "player": "Alex Laferriere",
+            "line": 2.5,
+            "side": "Under",
+            "quote": {
+              "american": -120,
+              "decimal": 1.8333333333333335,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:41.403Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3531768465575579,
+              "under": 0.6468231534424421,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.45121951219512196,
+              "under": 0.5487804878048781,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.110402763346368,
+              "alpha": 0,
+              "sample": 40,
+              "base": 2.625,
+              "recent": 1.8,
+              "venue": 0.9059233449477352,
+              "opponent": 1.0034843205574913,
+              "iceTime": 1.0492525303858045,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.26209741556768096,
+              "baseline": 0.25386674598453296
+            },
+            "estimatedValue": 0.1858424479778107,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "df57efd0462ea3601bf3b9550378dedf5a7d69768d3796e3eb98d1df76397978",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8476459\",2.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8476459",
+            "player": "Mika Zibanejad",
+            "line": 2.5,
+            "side": "Over",
+            "quote": {
+              "american": 120,
+              "decimal": 2.2,
+              "bookmaker": "betonlineag",
+              "bookmakerTitle": "BetOnline.ag",
+              "lastUpdate": "2026-10-26T20:42:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:41.805Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3325903967049235,
+              "under": 0.6674096032950765,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.4024390243902439,
+              "under": 0.5975609756097561,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.041047374365895,
+              "alpha": 0.10410495955250386,
+              "sample": 40,
+              "base": 2.225,
+              "recent": 1.8,
+              "venue": 1.0190749934674679,
+              "opponent": 0.975609756097561,
+              "iceTime": 1.020081606528522,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.25207777589109054,
+              "baseline": 0.24901844140392612
+            },
+            "estimatedValue": -0.2683011272491682,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "239772eccb200449af87b37a75835186a4b8ebbc30dfde9dd6e359496e765761",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8476459\",2.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8476459",
+            "player": "Mika Zibanejad",
+            "line": 2.5,
+            "side": "Under",
+            "quote": {
+              "american": -140,
+              "decimal": 1.7142857142857144,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:41.807Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3325903967049235,
+              "under": 0.6674096032950765,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.4024390243902439,
+              "under": 0.5975609756097561,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.041047374365895,
+              "alpha": 0.10410495955250386,
+              "sample": 40,
+              "base": 2.225,
+              "recent": 1.8,
+              "venue": 1.0190749934674679,
+              "opponent": 0.975609756097561,
+              "iceTime": 1.020081606528522,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.25207777589109054,
+              "baseline": 0.24901844140392612
+            },
+            "estimatedValue": 0.1441307485058455,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "db149457bc68db86bb54939591d8c8d30a4656ef7dc4f3ddb78c592dc1e78cc0",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482109\",2.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482109",
+            "player": "Alexis Lafrenière",
+            "line": 2.5,
+            "side": "Over",
+            "quote": {
+              "american": 135,
+              "decimal": 2.35,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:42.183Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.47045203142359115,
+              "under": 0.5295479685764088,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.3780487804878049,
+              "under": 0.6219512195121951,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.597210753529899,
+              "alpha": 0.05715793436917266,
+              "sample": 40,
+              "base": 2.325,
+              "recent": 2.6,
+              "venue": 1.0352588147036759,
+              "opponent": 1.007081038552321,
+              "iceTime": 1.0116204431262315,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.25452678431017783,
+              "baseline": 0.2527662105889351
+            },
+            "estimatedValue": 0.10556227384543926,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "dc44c80739c20e0c6e9f2f56fb2eea6ae84cbe4ba0a49dbc25eae62333338256",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482109\",2.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482109",
+            "player": "Alexis Lafrenière",
+            "line": 2.5,
+            "side": "Under",
+            "quote": {
+              "american": -152,
+              "decimal": 1.6578947368421053,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:42.185Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.47045203142359115,
+              "under": 0.5295479685764088,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.3780487804878049,
+              "under": 0.6219512195121951,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.597210753529899,
+              "alpha": 0.05715793436917266,
+              "sample": 40,
+              "base": 2.325,
+              "recent": 2.6,
+              "venue": 1.0352588147036759,
+              "opponent": 1.007081038552321,
+              "iceTime": 1.0116204431262315,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.25452678431017783,
+              "baseline": 0.2527662105889351
+            },
+            "estimatedValue": -0.1220652099917432,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "57e5e89dbf67a960197fe4f2ba1a63039522b785d97900af0c8fdb1c617d7cc7",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482157\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482157",
+            "player": "Will Cuylle",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": -150,
+              "decimal": 1.6666666666666665,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:42.679Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6238460830440585,
+              "under": 0.37615391695594147,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5487804878048781,
+              "under": 0.45121951219512196,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.2906385325556906,
+              "alpha": 0.14448514448514446,
+              "sample": 40,
+              "base": 2.1,
+              "recent": 2.1,
+              "venue": 1.0963455149501662,
+              "opponent": 0.975609756097561,
+              "iceTime": 1.0197969022463844,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2573692336211832,
+              "baseline": 0.2589530041641879
+            },
+            "estimatedValue": 0.03974347174009746,
+            "candidate": false,
+            "checks": [
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "51dd6d4cc6536de3013e4bea210404d380c6c620deb445ee8cf911ef1b5409d0",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482157\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482157",
+            "player": "Will Cuylle",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": 125,
+              "decimal": 2.25,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:42.681Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6238460830440585,
+              "under": 0.37615391695594147,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5487804878048781,
+              "under": 0.45121951219512196,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.2906385325556906,
+              "alpha": 0.14448514448514446,
+              "sample": 40,
+              "base": 2.1,
+              "recent": 2.1,
+              "venue": 1.0963455149501662,
+              "opponent": 0.975609756097561,
+              "iceTime": 1.0197969022463844,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2573692336211832,
+              "baseline": 0.2589530041641879
+            },
+            "estimatedValue": -0.15365368684913172,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "6827d3a993e9f4335f373fadafaf9f16b897517a0be01f590cfce1c70977a21f",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8479675\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8479675",
+            "player": "Trevor Moore",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": -145,
+              "decimal": 1.6896551724137931,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:43.077Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6694864802282036,
+              "under": 0.33051351977179644,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.6951219512195121,
+              "under": 0.3048780487804878,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.337979034755358,
+              "alpha": 0.02418745275888134,
+              "sample": 40,
+              "base": 2.625,
+              "recent": 2.5,
+              "venue": 0.9750566893424036,
+              "opponent": 0.9941927990708479,
+              "iceTime": 0.9411877348780425,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2076833632274909,
+              "baseline": 0.22231942808030677
+            },
+            "estimatedValue": 0.1312012941786888,
+            "candidate": false,
+            "checks": [
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "3c3edb4899c1c724faeb641ca989a69ae662d21c175615b45c90ba1ce04c6809",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8479675\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8479675",
+            "player": "Trevor Moore",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": 122,
+              "decimal": 2.2199999999999998,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:43.080Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.6694864802282036,
+              "under": 0.33051351977179644,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.6951219512195121,
+              "under": 0.3048780487804878,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.337979034755358,
+              "alpha": 0.02418745275888134,
+              "sample": 40,
+              "base": 2.625,
+              "recent": 2.5,
+              "venue": 0.9750566893424036,
+              "opponent": 0.9941927990708479,
+              "iceTime": 0.9411877348780425,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2076833632274909,
+              "baseline": 0.22231942808030677
+            },
+            "estimatedValue": -0.266259986106612,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "bd5aa77080a4102cca2125378e79e738f6bcb155a8b5307b54aa60f56a60f9a3",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8484210\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8484210",
+            "player": "Gabe Perreault",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": -125,
+              "decimal": 1.8,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:43.355Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.5827123607963921,
+              "under": 0.4172876392036079,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.47560975609756095,
+              "under": 0.524390243902439,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.0665188988478036,
+              "alpha": 0.1115859449192783,
+              "sample": 40,
+              "base": 1.8,
+              "recent": 2.4,
+              "venue": 0.9689922480620154,
+              "opponent": 1.002710027100271,
+              "iceTime": 1.0128017102090534,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2686146996090873,
+              "baseline": 0.2608682908156449
+            },
+            "estimatedValue": 0.04888224943350583,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "4c5b4627f76f93d9ee6e02a3b794aad3948def19ec49bfbd0bed99234777b3be",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8484210\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8484210",
+            "player": "Gabe Perreault",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": 105,
+              "decimal": 2.05,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:43.356Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.5827123607963921,
+              "under": 0.4172876392036079,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.47560975609756095,
+              "under": 0.524390243902439,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 2.0665188988478036,
+              "alpha": 0.1115859449192783,
+              "sample": 40,
+              "base": 1.8,
+              "recent": 2.4,
+              "venue": 0.9689922480620154,
+              "opponent": 1.002710027100271,
+              "iceTime": 1.0128017102090534,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2686146996090873,
+              "baseline": 0.2608682908156449
+            },
+            "estimatedValue": -0.1445603396326039,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "6a3fe3e825666a5e43fc43c7474f68519849f9c1a348caf59606b908a6ea2382",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482730\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482730",
+            "player": "Brandt Clarke",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": -135,
+              "decimal": 1.7407407407407407,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:43.731Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.5591182404143438,
+              "under": 0.4408817595856563,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5,
+              "under": 0.5,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.9201857961085484,
+              "alpha": 0.05431797639589855,
+              "sample": 40,
+              "base": 1.925,
+              "recent": 1.9,
+              "venue": 1.0326259106746911,
+              "opponent": 1.0009502692429522,
+              "iceTime": 0.971373586721193,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2697308215676373,
+              "baseline": 0.26281975014872105
+            },
+            "estimatedValue": -0.026720100019475723,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "44cda56043b34370792f01fe110989e5b22b70b2fb989043f245f7721f2ab35f",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8482730\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8482730",
+            "player": "Brandt Clarke",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": 118,
+              "decimal": 2.1799999999999997,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:43.733Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.5591182404143438,
+              "under": 0.4408817595856563,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5,
+              "under": 0.5,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.9201857961085484,
+              "alpha": 0.05431797639589855,
+              "sample": 40,
+              "base": 1.925,
+              "recent": 1.9,
+              "venue": 1.0326259106746911,
+              "opponent": 1.0009502692429522,
+              "iceTime": 0.971373586721193,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2697308215676373,
+              "baseline": 0.26281975014872105
+            },
+            "estimatedValue": -0.038877764103269485,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "77d2ecafead44166c4d5b38dbb1c5987bf4adcdb512ff27f045ca5b3cdc78cf0",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8476468\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8476468",
+            "player": "J.T. Miller",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": -128,
+              "decimal": 1.78125,
+              "bookmaker": "betonlineag",
+              "bookmakerTitle": "BetOnline.ag",
+              "lastUpdate": "2026-10-26T20:42:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.104Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.43524935848367474,
+              "under": 0.5647506415163253,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5,
+              "under": 0.5,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.5054687466675647,
+              "alpha": 0.07221350078492939,
+              "sample": 40,
+              "base": 1.75,
+              "recent": 1.1,
+              "venue": 0.9833887043189369,
+              "opponent": 1.1,
+              "iceTime": 0.97665005549148,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2536108210364112,
+              "baseline": 0.2561273051754907
+            },
+            "estimatedValue": -0.22471208020095434,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "f258a94b2eddd5e8409ee323296bfcbe552f04d64202ba55b4892ec7198245a7",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8476468\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8476468",
+            "player": "J.T. Miller",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": 110,
+              "decimal": 2.1,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.107Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.43524935848367474,
+              "under": 0.5647506415163253,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5,
+              "under": 0.5,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.5054687466675647,
+              "alpha": 0.07221350078492939,
+              "sample": 40,
+              "base": 1.75,
+              "recent": 1.1,
+              "venue": 0.9833887043189369,
+              "opponent": 1.1,
+              "iceTime": 0.97665005549148,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2536108210364112,
+              "baseline": 0.2561273051754907
+            },
+            "estimatedValue": 0.18597634718428313,
+            "candidate": true,
+            "checks": [],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "89760743992cbe49e30b4480ad59c84105588bc276959c9150b2c2fab523110f",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8479323\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8479323",
+            "player": "Adam Fox",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": 120,
+              "decimal": 2.2,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.455Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3352882177518972,
+              "under": 0.6647117822481028,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.35365853658536583,
+              "under": 0.6463414634146342,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.194235383725919,
+              "alpha": 0,
+              "sample": 40,
+              "base": 1.3,
+              "recent": 1.1,
+              "venue": 1.0017889087656529,
+              "opponent": 1.0131332082551594,
+              "iceTime": 0.9805413631916512,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.25541531907148474,
+              "baseline": 0.2492516778818806
+            },
+            "estimatedValue": -0.26236592094582606,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "87f324d3b895aeb60c69846c154bcbc9b27a6a04303264e7b09dc8aaaa84a5b8",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8479323\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8479323",
+            "player": "Adam Fox",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": -125,
+              "decimal": 1.8,
+              "bookmaker": "betonlineag",
+              "bookmakerTitle": "BetOnline.ag",
+              "lastUpdate": "2026-10-26T20:42:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.457Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3352882177518972,
+              "under": 0.6647117822481028,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.35365853658536583,
+              "under": 0.6463414634146342,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.194235383725919,
+              "alpha": 0,
+              "sample": 40,
+              "base": 1.3,
+              "recent": 1.1,
+              "venue": 1.0017889087656529,
+              "opponent": 1.0131332082551594,
+              "iceTime": 0.9805413631916512,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.25541531907148474,
+              "baseline": 0.2492516778818806
+            },
+            "estimatedValue": 0.1964812080465851,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "77d47984c668e68c68a7343e5d301be51a874064a39c149be7cac4fca07d1322",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8475692\",1.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8475692",
+            "player": "Mats Zuccarello",
+            "line": 1.5,
+            "side": "Over",
+            "quote": {
+              "american": -103,
+              "decimal": 1.970873786407767,
+              "bookmaker": "betonlineag",
+              "bookmakerTitle": "BetOnline.ag",
+              "lastUpdate": "2026-10-26T20:42:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.743Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3487588114832252,
+              "under": 0.6512411885167748,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5,
+              "under": 0.5,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.241834583407414,
+              "alpha": 0.06925207756232687,
+              "sample": 40,
+              "base": 1.9,
+              "recent": 0.9,
+              "venue": 0.975609756097561,
+              "opponent": 1.0526315789473684,
+              "iceTime": 0.8637403039949783,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.27196530453210455,
+              "baseline": 0.2625716864841267
+            },
+            "estimatedValue": -0.31264040066898335,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "54b964ff5e19bda28aead4334f9bee27a37bd4296baa30fcb3bea205e36abb04",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8475692\",1.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8475692",
+            "player": "Mats Zuccarello",
+            "line": 1.5,
+            "side": "Under",
+            "quote": {
+              "american": -111,
+              "decimal": 1.900900900900901,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.744Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3487588114832252,
+              "under": 0.6512411885167748,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.5,
+              "under": 0.5,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 1.241834583407414,
+              "alpha": 0.06925207756232687,
+              "sample": 40,
+              "base": 1.9,
+              "recent": 0.9,
+              "venue": 0.975609756097561,
+              "opponent": 1.0526315789473684,
+              "iceTime": 0.8637403039949783,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.27196530453210455,
+              "baseline": 0.2625716864841267
+            },
+            "estimatedValue": 0.23794496195531079,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "c55be41338210d2a5b9509f2b7cf409205a2507ac2ead0e46b0103e36658e01c",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8477960\",3.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8477960",
+            "player": "Adrian Kempe",
+            "line": 3.5,
+            "side": "Over",
+            "quote": {
+              "american": 150,
+              "decimal": 2.5,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.746Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3840217411176211,
+              "under": 0.6159782588823789,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.35365853658536583,
+              "under": 0.6463414634146342,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.145560146548999,
+              "alpha": 0.02520478890989287,
+              "sample": 40,
+              "base": 2.875,
+              "recent": 3,
+              "venue": 1.0137857900318135,
+              "opponent": 1,
+              "iceTime": 1.0562675040312315,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2543626929377073,
+              "baseline": 0.23135038667459845
+            },
+            "estimatedValue": -0.03994564720594729,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "0c9254a3b1fa067c9784e0ee02ddc782d64fdd52f9e569590c839adfc576631f",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8477960\",3.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8477960",
+            "player": "Adrian Kempe",
+            "line": 3.5,
+            "side": "Under",
+            "quote": {
+              "american": -220,
+              "decimal": 1.4545454545454546,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.747Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.3840217411176211,
+              "under": 0.6159782588823789,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.35365853658536583,
+              "under": 0.6463414634146342,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.145560146548999,
+              "alpha": 0.02520478890989287,
+              "sample": 40,
+              "base": 2.875,
+              "recent": 3,
+              "venue": 1.0137857900318135,
+              "opponent": 1,
+              "iceTime": 1.0562675040312315,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.2543626929377073,
+              "baseline": 0.23135038667459845
+            },
+            "estimatedValue": -0.1040316234438125,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "771cdddf31ea3bb8c69766ecc53917e97592468b20be092ac9619a768bff9890",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8478550\",3.5,\"Over\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8478550",
+            "player": "Artemi Panarin",
+            "line": 3.5,
+            "side": "Over",
+            "quote": {
+              "american": 140,
+              "decimal": 2.4,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.749Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.37668934898035045,
+              "under": 0.6233106510196496,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.32926829268292684,
+              "under": 0.6707317073170732,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.1068378427158145,
+              "alpha": 0,
+              "sample": 40,
+              "base": 2.775,
+              "recent": 3.1,
+              "venue": 1.0239507800483412,
+              "opponent": 0.993188310261481,
+              "iceTime": 1.039992076854511,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.23308136402866322,
+              "baseline": 0.22879238548483044
+            },
+            "estimatedValue": -0.09594556244715902,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "c203517864dc150857406ad580705455431e6cd01db8399187bb423cce079b5d",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"8478550\",3.5,\"Under\"]",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "playerId": "8478550",
+            "player": "Artemi Panarin",
+            "line": 3.5,
+            "side": "Under",
+            "quote": {
+              "american": -210,
+              "decimal": 1.4761904761904763,
+              "bookmaker": "betmgm",
+              "bookmakerTitle": "BetMGM",
+              "lastUpdate": "2026-10-26T20:42:47Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.751Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "shots-v1",
+            "probability": {
+              "over": 0.37668934898035045,
+              "under": 0.6233106510196496,
+              "push": 0
+            },
+            "baselineProbability": {
+              "over": 0.32926829268292684,
+              "under": 0.6707317073170732,
+              "push": 0
+            },
+            "modelInputs": {
+              "mean": 3.1068378427158145,
+              "alpha": 0,
+              "sample": 40,
+              "base": 2.775,
+              "recent": 3.1,
+              "venue": 1.0239507800483412,
+              "opponent": 0.993188310261481,
+              "iceTime": 1.039992076854511,
+              "usesIceTime": true
+            },
+            "backtest": {
+              "games": 40,
+              "brier": 0.23308136402866322,
+              "baseline": 0.22879238548483044
+            },
+            "estimatedValue": -0.07987475325670773,
+            "candidate": false,
+            "checks": [
+              "Does not beat baseline",
+              "Non-positive estimated value",
+              "Fails sensitivity check"
+            ],
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "e71a035b066b92ed10f53ed77cbe520189674f6a848bb2b5c56497c0237b090f",
+          "result": {
+            "state": "pending"
+          }
+        }
+      ],
+      "excluded": [],
+      "quotesFetchedAt": "2026-10-26T20:43:39.687Z",
+      "remainingCredits": 463,
+      "status": "captured",
+      "gameAttemptAt": "2026-10-26T20:43:44.752Z",
+      "gameRecords": [
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"h2h\",\"Away\",null]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "h2h",
+            "side": "Away",
+            "line": null,
+            "quote": {
+              "american": 116,
+              "decimal": 2.16,
+              "bookmaker": "lowvig",
+              "bookmakerTitle": "LowVig.ag",
+              "lastUpdate": "2026-10-26T20:43:10Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.900Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.41172672890744333,
+              "push": 0,
+              "loss": 0.588273271092556,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.5000000000000002,
+              "push": 0,
+              "loss": 0.5000000000000002,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.2379657014180606,
+              "baseline": 0.25
+            },
+            "estimatedValue": -0.11067026555992171,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "7820f123dbb879b42126011f2eba6975df03d2ddf4bfb19d5f710e0654300b18",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"h2h\",\"Home\",null]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "h2h",
+            "side": "Home",
+            "line": null,
+            "quote": {
+              "american": -130,
+              "decimal": 1.7692307692307692,
+              "bookmaker": "betus",
+              "bookmakerTitle": "BetUS",
+              "lastUpdate": "2026-10-26T20:43:09Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.922Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.588273271092556,
+              "push": 0,
+              "loss": 0.41172672890744333,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.5000000000000002,
+              "push": 0,
+              "loss": 0.5000000000000002,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.2379657014180606,
+              "baseline": 0.25
+            },
+            "estimatedValue": 0.040791171932984316,
+            "candidate": false,
+            "checks": [
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "8f02441671640739d97c959da3f84befd2a48b37d67f0f48b15cd80acc177e35",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"spreads\",\"Away\",1.5]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "spreads",
+            "side": "Away",
+            "line": 1.5,
+            "quote": {
+              "american": -220,
+              "decimal": 1.4545454545454546,
+              "bookmaker": "bovada",
+              "bookmakerTitle": "Bovada",
+              "lastUpdate": "2026-10-26T20:41:32Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.948Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.6603572424061076,
+              "push": 0,
+              "loss": 0.33964275759389084,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.7429387880572501,
+              "push": 0,
+              "loss": 0.2570612119427507,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.20476022551588638,
+              "baseline": 0.21670251528097068
+            },
+            "estimatedValue": -0.0394803746820237,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "28f24ab094f36a7ebf30cf4bffd3a39bff3fcd25d2bc6b4deed10b4d34a5ee3b",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"spreads\",\"Home\",-1.5]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "spreads",
+            "side": "Home",
+            "line": -1.5,
+            "quote": {
+              "american": 192,
+              "decimal": 2.92,
+              "bookmaker": "betus",
+              "bookmakerTitle": "BetUS",
+              "lastUpdate": "2026-10-26T20:43:09Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.968Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.33964275759389084,
+              "push": 0,
+              "loss": 0.6603572424061076,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.2570612119427507,
+              "push": 0,
+              "loss": 0.7429387880572501,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.20476022551588638,
+              "baseline": 0.21670251528097068
+            },
+            "estimatedValue": -0.008243147825837238,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "ed5597d5be7180f9751a84b7ac2a19a53162cbef884634d83a721db1a8e410cc",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"h2h_3_way\",\"Away\",null]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "h2h_3_way",
+            "side": "Away",
+            "line": null,
+            "quote": {
+              "american": 175,
+              "decimal": 2.75,
+              "bookmaker": "betrivers",
+              "bookmakerTitle": "BetRivers",
+              "lastUpdate": "2026-10-26T20:43:34Z"
+            },
+            "capturedAt": "2026-10-26T20:43:44.992Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.32879958958238387,
+              "push": 0,
+              "loss": 0.6712004104176157,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.4135854524388486,
+              "push": 0,
+              "loss": 0.586414547561152,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.32113169450011037,
+              "baseline": 0.3301839478465668
+            },
+            "estimatedValue": -0.09580112864844392,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "e22f4a5e9fffadfdfc93839f63e3fd2a6871d16896533f661936dafb466ab40b",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"h2h_3_way\",\"Home\",null]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "h2h_3_way",
+            "side": "Home",
+            "line": null,
+            "quote": {
+              "american": 120,
+              "decimal": 2.2,
+              "bookmaker": "draftkings",
+              "bookmakerTitle": "DraftKings",
+              "lastUpdate": "2026-10-26T20:43:03Z"
+            },
+            "capturedAt": "2026-10-26T20:43:45.016Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.5053461317674967,
+              "push": 0,
+              "loss": 0.49465386823250257,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.41358545243884864,
+              "push": 0,
+              "loss": 0.5864145475611522,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.32113169450011037,
+              "baseline": 0.3301839478465668
+            },
+            "estimatedValue": 0.11176148988849355,
+            "candidate": false,
+            "checks": [
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "1f741a207a9c9ce02552c0619fa20a73944cd91f9b6e8a7189a4489af2faa33f",
+          "result": {
+            "state": "pending"
+          }
+        },
+        {
+          "snapshot": {
+            "id": "[\"daa5166685c4ca1a4f033d8bff91a6ba\",\"h2h_3_way\",\"Draw\",null]",
+            "kind": "game",
+            "eventId": "daa5166685c4ca1a4f033d8bff91a6ba",
+            "nhlGameId": 2026020185,
+            "date": "2026-10-26",
+            "startTime": "2026-10-26T23:00:00.000Z",
+            "homeTeam": "New York Rangers",
+            "awayTeam": "Los Angeles Kings",
+            "market": "h2h_3_way",
+            "side": "Draw",
+            "line": null,
+            "quote": {
+              "american": 320,
+              "decimal": 4.2,
+              "bookmaker": "fanduel",
+              "bookmakerTitle": "FanDuel",
+              "lastUpdate": "2026-10-26T20:42:33Z"
+            },
+            "capturedAt": "2026-10-26T20:43:45.046Z",
+            "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+            "modelVersion": "goals-v1",
+            "modelInputs": {
+              "home": 3.168816270737116,
+              "away": 2.620292085190606,
+              "homeSample": 40,
+              "awaySample": 40,
+              "trainingEnd": "2026-10-24",
+              "overtimeHome": 0.5
+            },
+            "probability": {
+              "win": 0.16585427865011873,
+              "push": 0,
+              "loss": 0.8341457213498804,
+              "regulation": {
+                "home": 0.5053461317674967,
+                "draw": 0.16585427865011873,
+                "away": 0.32879958958238387
+              }
+            },
+            "baselineProbability": {
+              "win": 0.17282909512230335,
+              "push": 0,
+              "loss": 0.8271709048776975,
+              "regulation": {
+                "home": 0.41358545243884864,
+                "draw": 0.17282909512230335,
+                "away": 0.4135854524388486
+              }
+            },
+            "backtest": {
+              "games": 100,
+              "brier": 0.32113169450011037,
+              "baseline": 0.3301839478465668
+            },
+            "estimatedValue": -0.3034120296695004,
+            "candidate": false,
+            "checks": [
+              "Non-positive estimated value",
+              "Fails goal-rate/OT sensitivity check"
+            ],
+            "archiveAt": "2026-10-26T10:49:12.843Z",
+            "trainingEnd": "2026-10-24"
+          },
+          "digest": "b8510ebfe0cbd4823283bc53e8048e012cc8acccc7aef2b79962cc9d86ad6fb9",
+          "result": {
+            "state": "pending"
+          }
+        }
+      ],
+      "gameExcluded": [],
+      "gameQuotesFetchedAt": "2026-10-26T20:43:44.833Z",
+      "gameRemainingCredits": 460,
+      "gameMarketsMissing": [],
+      "gameStatus": "captured"
     }
   ],
   "runs": [
@@ -2832,6 +5209,13 @@
       "errors": [],
       "notes": [],
       "capturedGames": 0
+    },
+    {
+      "at": "2026-10-26T20:43:45.046Z",
+      "sourceCommit": "89e74691e960315b6a1167a0fac12392b65a42f4",
+      "errors": [],
+      "notes": [],
+      "capturedGames": 1
     }
   ]
 }
