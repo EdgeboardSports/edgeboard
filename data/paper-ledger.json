@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "mode": "automatic-paper-testing",
   "createdAt": "2026-10-25T21:34:13.511Z",
-  "updatedAt": "2026-10-25T23:34:56.218Z",
-  "lastRunAt": "2026-10-25T23:34:56.218Z",
-  "remainingCredits": 471,
+  "updatedAt": "2026-10-26T01:03:33.490Z",
+  "lastRunAt": "2026-10-26T01:03:33.490Z",
+  "remainingCredits": 468,
   "policy": {
     "maxGamesPerDay": 2,
     "captureMinutesBeforeStart": [
@@ -94,7 +94,10 @@
           },
           "digest": "d55e2b7e1e73c7c5e5be4b7167916ac11a710290ade6d9bd24297ac828c56a13",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.024Z"
           }
         },
         {
@@ -157,7 +160,10 @@
           },
           "digest": "2d8db1fff11a341cc4ce49abc2816d69e8e15ce891570342784c8c84dc3f4442",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.78125,
+            "gradedAt": "2026-10-26T01:03:32.024Z"
           }
         },
         {
@@ -220,7 +226,10 @@
           },
           "digest": "def9ea3acb5047091056f21ef6b2cda48f515c094c6b464163969a4a2eb064d2",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.097Z"
           }
         },
         {
@@ -282,7 +291,10 @@
           },
           "digest": "e7d043f32336f9c223aa1060ccd60ce3b6417a8057abb7c12f9f1495ba10d6a9",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.5405405405405406,
+            "gradedAt": "2026-10-26T01:03:32.097Z"
           }
         },
         {
@@ -344,7 +356,10 @@
           },
           "digest": "e404ead1c6a2aa560416174914e391c8353a1f560bdaff43e6202fb589d0d998",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 3,
+            "units": 0.6493506493506493,
+            "gradedAt": "2026-10-26T01:03:32.248Z"
           }
         },
         {
@@ -407,7 +422,10 @@
           },
           "digest": "1054db5ef35aad55dadf1b92fbe811938ee41a7fb2a2dc635448d74146061a6d",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 3,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.248Z"
           }
         },
         {
@@ -468,7 +486,10 @@
           },
           "digest": "6e07603aedd5752df991367d60f18aa55e1f3b74d06b68a843668b0cd6ab6d8b",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.466Z"
           }
         },
         {
@@ -531,7 +552,10 @@
           },
           "digest": "2016067c816deefccdd4c58c34c65d74debf771ea121f2adcbfd9839d301cd88",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.8771929824561404,
+            "gradedAt": "2026-10-26T01:03:32.466Z"
           }
         },
         {
@@ -590,7 +614,10 @@
           },
           "digest": "45185540d8079ba0c3aae7a1df375e0fd891a3e18b24319339b86da584728dac",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 1,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.533Z"
           }
         },
         {
@@ -652,7 +679,10 @@
           },
           "digest": "1d854aefb5133938d6a6a1214f8a8a3456bd6e8249b3a3c4a527af2d8bddd025",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 1,
+            "units": 1.1,
+            "gradedAt": "2026-10-26T01:03:32.533Z"
           }
         },
         {
@@ -715,7 +745,10 @@
           },
           "digest": "5a23573fa53f6e25a62933644c28c2e00ed8fa5bf1b2f40c52de187b80754816",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.7142857142857144,
+            "gradedAt": "2026-10-26T01:03:32.659Z"
           }
         },
         {
@@ -779,7 +812,10 @@
           },
           "digest": "b589bad8d8ae7088e92268a75fcd5bfe1ca6e657695a55079e2f0f98dcd0b32b",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.659Z"
           }
         },
         {
@@ -841,7 +877,10 @@
           },
           "digest": "fb68a89d3594ecba1cde5aaf23297134ecada0fc6a27b4725b0d2efeae89b673",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.845Z"
           }
         },
         {
@@ -900,7 +939,10 @@
           },
           "digest": "91ccdfc98b93a18695d4cb62358d96c3e7740f865978b7395bb6f879e17772f2",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.5882352941176472,
+            "gradedAt": "2026-10-26T01:03:32.845Z"
           }
         },
         {
@@ -962,7 +1004,10 @@
           },
           "digest": "92ee8e27def91a6ffe992727c51e77bdf5d9432fc259666cea4e7c32cba44809",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 3,
+            "units": 0.5714285714285714,
+            "gradedAt": "2026-10-26T01:03:32.947Z"
           }
         },
         {
@@ -1025,7 +1070,10 @@
           },
           "digest": "9ddcd14140610361978b5ad7a67d09ab6ac676c0aa8eadc419550b8b9a5aa6d6",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 3,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.947Z"
           }
         },
         {
@@ -1088,7 +1136,10 @@
           },
           "digest": "6612279e3706f10b801462bbfa618d713fb5944ca5e0364b87c5d382830e5374",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.5917159763313609,
+            "gradedAt": "2026-10-26T01:03:32.947Z"
           }
         },
         {
@@ -1150,7 +1201,10 @@
           },
           "digest": "b7081af0aefefa401a3602671928261bf990c565bc77b60f11fbe318d1654c1e",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.948Z"
           }
         },
         {
@@ -1212,7 +1266,10 @@
           },
           "digest": "982f668b46a161ca973948710336a56c9c29f89d54b62959dbaa3f16f5d414d0",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 2,
+            "units": 0.5128205128205128,
+            "gradedAt": "2026-10-26T01:03:32.948Z"
           }
         },
         {
@@ -1271,7 +1328,10 @@
           },
           "digest": "337a4f53f2b032f39e2bc5b06080acbe8275228456f05826e073db42ab74279f",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 2,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:32.948Z"
           }
         },
         {
@@ -1333,7 +1393,10 @@
           },
           "digest": "a5df92697083ac1a330245cacad6f045c1e82e818d32551e6f4b1e0ccf3b2029",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 4,
+            "units": 0.6896551724137931,
+            "gradedAt": "2026-10-26T01:03:33.108Z"
           }
         },
         {
@@ -1394,7 +1457,10 @@
           },
           "digest": "598b900b4c7fa1ce48df6c299cc6a7828c78772a5300ab75db9297505c6349b7",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 4,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:33.108Z"
           }
         },
         {
@@ -1456,7 +1522,10 @@
           },
           "digest": "f322e799807b23286a62540de102e455defb0e63a0ec6585b2ee9bd308243e7e",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 3,
+            "units": 0.7407407407407407,
+            "gradedAt": "2026-10-26T01:03:33.198Z"
           }
         },
         {
@@ -1518,7 +1587,10 @@
           },
           "digest": "a8846bf64aba9ff6e34c825296946fbade33c461a3fdef44f74623e5c40c4411",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 3,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:33.198Z"
           }
         },
         {
@@ -1579,7 +1651,10 @@
           },
           "digest": "5a2cd9197f2a2115155920bbdb2af27068e8f555ba01527042539fee0ea42ccf",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 3,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:33.198Z"
           }
         },
         {
@@ -1641,7 +1716,10 @@
           },
           "digest": "f6abc8e37fd7602019448cffd3dfa1ef2411af0b314868a312a0bf8c35216266",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 3,
+            "units": 0.606060606060606,
+            "gradedAt": "2026-10-26T01:03:33.198Z"
           }
         },
         {
@@ -1704,7 +1782,10 @@
           },
           "digest": "dd019b47e735df4cd3e73f48e91e8b5374716fce395f425401377eeccfb1b8aa",
           "result": {
-            "state": "pending"
+            "state": "win",
+            "shots": 4,
+            "units": 1.65,
+            "gradedAt": "2026-10-26T01:03:33.198Z"
           }
         },
         {
@@ -1767,7 +1848,10 @@
           },
           "digest": "e7982bd316991fe8d7dfcf678bb1eec807a450ae5f11ba1591c187a22000a476",
           "result": {
-            "state": "pending"
+            "state": "loss",
+            "shots": 4,
+            "units": -1,
+            "gradedAt": "2026-10-26T01:03:33.198Z"
           }
         }
       ],
@@ -1811,7 +1895,8 @@
       ],
       "quotesFetchedAt": "2026-10-25T21:42:44.040Z",
       "remainingCredits": 488,
-      "status": "captured"
+      "status": "captured",
+      "lastGradedAt": "2026-10-26T01:03:33.198Z"
     },
     {
       "id": "cd9f65faa44f221a72638e49afb134fb",
@@ -2586,6 +2671,13 @@
     {
       "at": "2026-10-25T23:34:56.218Z",
       "sourceCommit": "14ec18cfc9707101d91b838b5c1c7cf0c5a2bf11",
+      "errors": [],
+      "notes": [],
+      "capturedGames": 0
+    },
+    {
+      "at": "2026-10-26T01:03:33.490Z",
+      "sourceCommit": "f6ccce3b7982827c6410331dac1de8438b4cc15a",
       "errors": [],
       "notes": [],
       "capturedGames": 0
