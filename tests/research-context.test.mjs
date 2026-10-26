@@ -23,15 +23,15 @@ assert(researchChecks(analysis,{side:'Over',decimal:2,lastUpdate:stamp},{commenc
 const source={timestamp:stamp,team:{abbreviation:'TOR'},athletes:[{items:[{fullName:'Mátthéws',injuries:[{status:'Out',date:stamp}]}]}]};
 assert.equal(normalizeAvailability(source,'TOR',now).players[0].key,'matthews');assert(!normalizeAvailability(source,'NYR',now).available);assert(!normalizeAvailability({...source,timestamp:'bad'},'TOR',now).available);
 const g=gameResearch({homeAbbrev:'TOR',awayAbbrev:'CGY',date},own,own,now);assert.equal(g.startingGoalies,'unconfirmed');assert(researchLines(g).some(s=>s.includes('unchanged')));
-const oldFetch=globalThis.fetch,oldNow=Date.now;Date.now=()=>now;
+let usagePages=0;const oldFetch=globalThis.fetch,oldNow=Date.now;Date.now=()=>now;
 try{
  globalThis.fetch=async url=>{
   if(url.includes('club-schedule-season'))return new Response(JSON.stringify({games:[{id:1,gameType:2,gameDate:'2026-10-25',gameState:'OFF',homeTeam:{abbrev:'TOR',id:10},awayTeam:{abbrev:'CGY',id:20}},{id:2,gameType:2,gameDate:date,gameState:'FUT',homeTeam:{abbrev:'TOR',id:10},awayTeam:{abbrev:'CGY',id:20}}]}));
   if(url.includes('/team/summary'))return new Response(JSON.stringify({data:[{teamId:10,gameId:1,gameDate:'2026-10-25',shotsForPerGame:30,shotsAgainstPerGame:28},{teamId:10,gameId:2,gameDate:date,shotsAgainstPerGame:99}]}));
-  if(url.includes('/skater/timeonice'))return new Response(JSON.stringify({data:[{teamAbbrev:'TOR',playerId:8479318,gameId:1,gameDate:'2026-10-25',timeOnIce:1200,ppTimeOnIce:180},{teamAbbrev:'TOR',playerId:8479318,gameId:2,gameDate:date,timeOnIce:1800,ppTimeOnIce:600}]}));
+  if(url.includes('/skater/timeonice')){usagePages++;const start=Number(new URL(url).searchParams.get('start'));return new Response(JSON.stringify(start?{data:[{teamAbbrev:'TOR',playerId:8479318,gameId:1,gameDate:'2026-10-25',timeOnIce:1100,ppTimeOnIce:120}],total:3}:{data:[{teamAbbrev:'TOR',playerId:8479318,gameId:1,gameDate:'2026-10-25',timeOnIce:1200,ppTimeOnIce:180},{teamAbbrev:'TOR',playerId:8479318,gameId:2,gameDate:date,timeOnIce:1800,ppTimeOnIce:600}],total:3}));}
   return new Response(JSON.stringify(source));
  };
- const response=await onRequestGet({request:new Request('https://test/api/nhl-team-context?team=TOR&date='+date)}),body=await response.json();assert.equal(response.status,200);assert.equal(body.shots.length,1);assert.equal(body.usage['8479318'].length,1);assert.equal(body.lineup.status,'unknown');assert.equal(body.availability.available,true);
+ const response=await onRequestGet({request:new Request('https://test/api/nhl-team-context?team=TOR&date='+date)}),body=await response.json();assert.equal(response.status,200);assert.equal(body.shots.length,1);assert.equal(body.usage['8479318'].length,1);assert.equal(usagePages,2);assert.equal(body.lineup.status,'unknown');assert.equal(body.availability.available,true);
  for(const query of ['team=../../&date='+date,'team=TOR&date=2026-02-30','team=TOR&date=bad'])assert.equal((await onRequestGet({request:new Request('https://test/api/nhl-team-context?'+query)})).status,400);
  globalThis.fetch=async()=>new Response('{}',{status:503});assert.equal((await onRequestGet({request:new Request('https://test/api/nhl-team-context?team=TOR&date='+date)})).status,503);
  const id='a'.repeat(32),start=new Date(now+3600000).toISOString(),history=Array.from({length:80},(_,i)=>({gameId:100+i,gameDate:new Date(Date.UTC(2026,0,1+i)).toISOString().slice(0,10),shots:i%5,toi:'20:00',homeRoadFlag:'H',opponentAbbrev:'CGY'}));
