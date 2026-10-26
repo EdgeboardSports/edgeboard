@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import {playerResearch,roleTrend,gameResearch,researchLines,teamContext} from '../research-context.js';
+import {normalizeAvailability,onRequestGet} from '../functions/api/nhl-team-context.js';
+import {researchChecks,aggregate} from '../paper-core.js';
+import {createScanner,ranked} from '../best-picks-engine.js';
+const now=Date.parse('2026-10-26T20:00:00Z'),date='2026-10-26',stamp=new Date(now).toISOString(),player={id:'8479318',name:'Auston Matthews',team:'TOR'};
+const rows=Array.from({length:13},(_,i)=>({gameId:i+1,date:'2026-10-'+String(25-i).padStart(2,'0'),toi:1200,ppToi:180}));
+const own={team:'TOR',date,checkedAt:stamp,lastGames:[{id:1,date:'2026-10-25'},{id:2,date:'2026-10-24'}],usage:{'8479318':rows},availability:{available:true,players:[{key:'auston matthews',reports:[]}]},shots:[{shotsFor:30,shotsAgainst:28}]};
+const games=rows.map(r=>({gameId:r.gameId,gameDate:r.date}));
+let r=playerResearch(player,games,{date},own,own,now);
+assert.equal(r.availability.status,'no_report');assert.deepEqual(r.blocks,[]);assert.equal(r.rest.backToBack,true);assert.equal(r.rest.daysOff,0);assert.equal(r.lineupConfirmed,false);
+const injured=structuredClone(own);injured.availability.players[0].reports=[{status:'Injured Reserve',reportedAt:stamp}];
+assert(playerResearch(player,games,{date},injured,own,now).blocks.includes('Reported injury/status requires review'));
+assert(playerResearch(player,games,{date},null,null,now).blocks.includes('Current injury report unverified'));
+const stale={...own,checkedAt:new Date(now-11*60000).toISOString()};assert(playerResearch(player,games,{date},stale,own,now).blocks.length);
+assert(playerResearch(player,[],{date},own,own,now).recentAbsence);
+const changed=rows.map((g,i)=>({...g,toi:i<3?700:g.toi,ppToi:i<3?0:g.ppToi}));
+assert(roleTrend(changed,'toi').material);assert(roleTrend(changed,'ppToi').material);assert(!roleTrend(rows,'toi').material);assert(!roleTrend(rows.slice(0,4),'toi').available);
+const roleOwn={...own,usage:{'8479318':changed}};assert.equal(playerResearch(player,games,{date},roleOwn,own,now).blocks.length,2);
+const duplicate={...own,availability:{available:true,players:[{key:'auston matthews',reports:[]},{key:'auston matthews',reports:[]}]}};assert(playerResearch(player,games,{date},duplicate,own,now).blocks.length);
+const p={over:.7,under:.3,push:0},analysis={context:{venue:'H',rosterVerified:true,rosterCheckedAt:stamp,research:playerResearch(player,games,{date},injured,own,now)},result:{prediction:p,low:p,high:p,test:{games:40,brier:.1,baseline:.2}}};
+assert(researchChecks(analysis,{side:'Over',decimal:2,lastUpdate:stamp},{commenceTime:new Date(now+3600000).toISOString()},now).includes('Reported injury/status requires review'));
+const source={timestamp:stamp,team:{abbreviation:'TOR'},athletes:[{items:[{fullName:'Mátthéws',injuries:[{status:'Out',date:stamp}]}]}]};
+assert.equal(normalizeAvailability(source,'TOR',now).players[0].key,'matthews');assert(!normalizeAvailability(source,'NYR',now).available);assert(!normalizeAvailability({...source,timestamp:'bad'},'TOR',now).available);
+const g=gameResearch({homeAbbrev:'TOR',awayAbbrev:'CGY',date},own,own,now);assert.equal(g.startingGoalies,'unconfirmed');assert(researchLines(g).some(s=>s.includes('unchanged')));
+const oldFetch=globalThis.fetch,oldNow=Date.now;Date.now=()=>now;
+try{
+ globalThis.fetch=async url=>{
+  if(url.includes('club-schedule-season'))return new Response(JSON.stringify({games:[{id:1,gameType:2,gameDate:'2026-10-25',gameState:'OFF',homeTeam:{abbrev:'TOR',id:10},awayTeam:{abbrev:'CGY',id:20}},{id:2,gameType:2,gameDate:date,gameState:'FUT',homeTeam:{abbrev:'TOR',id:10},awayTeam:{abbrev:'CGY',id:20}}]}));
+  if(url.includes('/team/summary'))return new Response(JSON.stringify({data:[{teamId:10,gameId:1,gameDate:'2026-10-25',shotsForPerGame:30,shotsAgainstPerGame:28},{teamId:10,gameId:2,gameDate:date,shotsAgainstPerGame:99}]}));
+  if(url.includes('/skater/timeonice'))return new Response(JSON.stringify({data:[{teamAbbrev:'TOR',playerId:8479318,gameId:1,gameDate:'2026-10-25',timeOnIce:1200,ppTimeOnIce:180},{teamAbbrev:'TOR',playerId:8479318,gameId:2,gameDate:date,timeOnIce:1800,ppTimeOnIce:600}]}));
+  return new Response(JSON.stringify(source));
+ };
+ const response=await onRequestGet({request:new Request('https://test/api/nhl-team-context?team=TOR&date='+date)}),body=await response.json();assert.equal(response.status,200);assert.equal(body.shots.length,1);assert.equal(body.usage['8479318'].length,1);assert.equal(body.lineup.status,'unknown');assert.equal(body.availability.available,true);
+ for(const query of ['team=../../&date='+date,'team=TOR&date=2026-02-30','team=TOR&date=bad'])assert.equal((await onRequestGet({request:new Request('https://test/api/nhl-team-context?'+query)})).status,400);
+ globalThis.fetch=async()=>new Response('{}',{status:503});assert.equal((await onRequestGet({request:new Request('https://test/api/nhl-team-context?team=TOR&date='+date)})).status,503);
+ const id='a'.repeat(32),start=new Date(now+3600000).toISOString(),history=Array.from({length:80},(_,i)=>({gameId:100+i,gameDate:new Date(Date.UTC(2026,0,1+i)).toISOString().slice(0,10),shots:i%5,toi:'20:00',homeRoadFlag:'H',opponentAbbrev:'CGY'}));
+ const scan=createScanner(async path=>{
+  if(path.startsWith('/api/nhl-props'))return {eventId:id,homeTeam:'Toronto Maple Leafs',awayTeam:'Calgary Flames',commenceTime:start,odds:[{player:player.name,point:2.5,side:'Over',decimal:3,bookmaker:'test',lastUpdate:stamp}]};
+  if(path.startsWith('/api/nhl-schedule'))return {games:[{id:10,gameType:2,gameState:'FUT',startTimeUTC:start,homeTeam:{abbrev:'TOR',commonName:{default:'Maple Leafs'}},awayTeam:{abbrev:'CGY',commonName:{default:'Flames'}}}]};
+  if(path.startsWith('/api/nhl-team-context'))return path.includes('team=TOR')?injured:{...own,team:'CGY'};
+  if(path.startsWith('/api/nhl-player-search'))return {players:[player]};
+  if(path.startsWith('/api/nhl-roster'))return {team:'TOR',playerIds:[player.id],checkedAt:stamp};
+  if(path.startsWith('/api/nhl-game-log'))return {games:history};
+  throw Error('Unexpected path '+path);
+ });
+ const scanResult=await scan([{id,commenceTime:start,homeTeam:'Toronto Maple Leafs',awayTeam:'Calgary Flames'}],{games:false});assert.equal(scanResult.rows.length,1);assert.equal(scanResult.rows[0].analysis.context.research.availability.status,'reported');assert.equal(ranked(scanResult.rows,{now}).length,0);
+}finally{globalThis.fetch=oldFetch;Date.now=oldNow}
+const stats=aggregate([{snapshot:{eventId:'a',playerId:'1',line:2.5,candidate:true,probability:p,baselineProbability:p},result:{state:'win',shots:3,units:1}},{snapshot:{eventId:'a',playerId:'2',line:2.5,candidate:false,probability:p,baselineProbability:p},result:{state:'loss',shots:1,units:-1}}]);assert.equal(stats.independentGames,1);assert.equal(stats.gradedGames,1);
+let calls=0;const read=async()=>{calls++;return own};await Promise.all([teamContext(read,'TOR',date),teamContext(read,'TOR',date)]);assert.equal(calls,1);
+console.log('Passed injury/identity/freshness gates, ice-time/PP changes, absence/rest context, no target-date leakage, endpoint failures, game counts and shared request caching.');

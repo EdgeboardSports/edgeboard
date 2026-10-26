@@ -8,6 +8,7 @@
 </main><script type="module">
 import {summarize,seasonFor,completedBefore,cleanName,verifyRoster} from '/prop-history.js';
 import {evaluate,quoteValue,VERSION} from '/shots-model.js';
+import {teamContext,playerResearch,researchLines} from '/research-context.js';
 import {researchChecks} from '/paper-core.js';
 import {playerIdentity,hydrateNamedIdentities,hydrateIdentity} from '/assets/ui.js?v=19';
 const $=id=>document.getElementById(id);let data=null;const statKeys={player_shots_on_goal:'shots',player_goals:'goals',player_assists:'assists',player_points:'points'};
@@ -77,7 +78,7 @@ function modelFor(name,line,event){const cacheKey=JSON.stringify([event.eventId,
  const [record,context]=await Promise.all([historyFor(name,event),contextFor(event)]),season=record.season,prior=String(Number(season.slice(0,4))-1)+season.slice(0,4);
  const key=record.player.id+'-'+prior;
  if(!previousLogs.has(key))previousLogs.set(key,limited(()=>readJSON('/api/nhl-game-log?'+new URLSearchParams({playerId:record.player.id,season:prior}))).then(d=>({games:d.games||[],available:true})).catch(()=>({games:[],available:false})));
- const previous=await previousLogs.get(key),games=completedBefore([...record.games,...previous.games],gameDay(event.commenceTime)),ctx=currentContext(record,event,context);Object.assign(ctx,await verifyRoster(readJSON,record.player,ctx));const result=evaluate(games,Number(line),ctx);
+ const previous=await previousLogs.get(key),games=completedBefore([...record.games,...previous.games],gameDay(event.commenceTime)),ctx=currentContext(record,event,context);Object.assign(ctx,await verifyRoster(readJSON,record.player,ctx));const date=gameDay(event.commenceTime),[own,opponent]=await Promise.all([teamContext(readJSON,record.player.team,date),teamContext(readJSON,ctx.opponent,date)]);ctx.research=playerResearch(record.player,games,{date},own,opponent);const result=evaluate(games,Number(line),ctx);
  return {result,context:ctx,priorAvailable:previous.available};
  })().catch(error=>{modelCache.delete(cacheKey);throw error}));
  return modelCache.get(cacheKey);
@@ -97,7 +98,7 @@ function addModel(card,name,line,event){
  }
  box.append(make('p','Rolling test: '+r.test.games+' held-out games · Brier '+(r.test.brier===null?'—':r.test.brier.toFixed(3))+' vs hit-rate baseline '+(r.test.baseline===null?'—':r.test.baseline.toFixed(3))+' (lower is better).'));
  box.append(make('p','Over-probability bias: '+(r.test.bias===null?'—':signed(r.test.bias))+' · Ice-time input: '+(r.model.usesIceTime?'included':'insufficient data')+'.'));
- const details=make('details'),summary=make('summary','Calibration check and model inputs');details.append(summary);
+ const details=make('details'),summary=make('summary','Calibration check and model inputs');details.append(summary);for(const text of researchLines(analysis.context.research))details.append(make('p',text));
  details.append(make('p','Recent mean '+r.model.recent.toFixed(2)+'; sample mean '+r.model.base.toFixed(2)+'; venue ×'+r.model.venue.toFixed(2)+'; player/opponent history ×'+r.model.opponent.toFixed(2)+'; ice-time trend ×'+r.model.iceTime.toFixed(2)+'. Prior-season history '+(analysis.priorAvailable?'loaded.':'unavailable.')));
  for(const b of r.test.bins)if(b.n)details.append(make('p',b.n+' tests: predicted over '+pct(b.predicted)+'; observed over '+pct(b.observed)));
  details.append(make('p','Small samples and selection across many props can produce misleading edges. No historical-odds ROI or fitted calibration is claimed.'));box.append(details);
@@ -138,3 +139,4 @@ $('load').onclick=async()=>{const event=$('game').value,market=$('market').value
 for(const id of ['game','market'])$(id).onchange=()=>{data=null;$('results').replaceChildren();$('filters').hidden=true;$('status').textContent='Selection changed. Load selected props to continue.'};
 $('book').onchange=render;$('search').oninput=render;games();
 </script></body></html>
+
