@@ -23,3 +23,12 @@ Pick cards show availability and explain the role/matchup evidence under Evidenc
 ## Validation
 
 Run the existing shots, ranking, paper, game and verification tests plus tests/research-context.test.mjs. The new suite covers source/player mismatch, stale or missing reports, injury flags, TOI/PP thresholds, recent absences, rest days, target-date exclusion, source failures, unique game counts and shared request caching.
+
+
+## Evidence status and refresh
+
+Best Picks exposes per-team confirmed/projected/unknown/stale goalie status, last retrieved timestamp, source and announcement timestamp when supplied. A fresh retrieval is not a new announcement. Reports older than three minutes cannot confirm starters. Empty scratch lists do not establish a confirmed lineup; missing identities, source failures and mismatched game context remain unknown. Failure reasons identify the affected team.
+
+The existing minute refresh now also reevaluates injury/usage research, using shared team reports cached for up to five minutes. Availability changes rerun existing candidate checks; missing reports block verification. Predictions and frozen paper records are not rewritten. No feed permission gate or paid-odds request policy is changed.
+
+`goalieAdjustedChallenger` is an offline, unpromoted hypothesis. It requires fresh confirmed starter identities, identity-matched goals-saved-above-expected-per-60 evidence, 600+ minutes, a strictly prior training date, a named source and a publication timestamp within 48 hours and before the analysis cutoff. It shrinks the supplied per-60 metric by exposure/(exposure+1200), then adjusts the opposing team's expected goals. No live goalie-quality feed is connected. Synthetic tests establish identity, chronology, direction and input safeguards; they do not establish predictive improvement. Historical unseen pregame evaluation is required before promotion.

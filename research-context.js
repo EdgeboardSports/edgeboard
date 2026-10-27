@@ -47,3 +47,20 @@ export function researchLines(r){
  }else for(const side of ['home','away']){const t=r[side];if(t?.rest?.available)lines.push(t.team+': '+t.rest.daysOff+' days off'+(t.rest.backToBack?' · back-to-back':''));if(t?.shots?.games)lines.push(t.team+': allows '+t.shots.last10Against.toFixed(1)+' shots/game · last '+Math.min(10,t.shots.games))}
  if(r.checkedAt)lines.push('Research checked '+new Date(r.checkedAt).toISOString()+' · NHL statistics / ESPN injury reports');return [...lines,...r.warnings||[],'Matchup and role signals do not adjust the probability model yet'];
 }
+
+
+export async function refreshResearch(rows,read,now=Date.now()){
+ const events=new Map();for(const row of rows){const key=row.event.eventId||row.event.id;if(!events.has(key))events.set(key,[]);events.get(key).push(row)}
+ await Promise.all([...events.values()].map(async group=>{
+  const event=group[0].event;if(!(Date.parse(event.startTime||event.commenceTime)>now))return;
+  const [home,away]=await Promise.all([teamContext(read,event.homeAbbrev,event.date),teamContext(read,event.awayAbbrev,event.date)]);
+  for(const row of group){
+   row.event.teamResearch={home,away};row.event.research=gameResearch(row.event,home,away,now);
+   if(row.kind==='games'){row.analysis.research=row.event.research;continue}
+   if(!Array.isArray(row.analysis.history)){
+    row.analysis.context.research={checkedAt:null,availability:{status:'unknown',reports:[]},blocks:['Player history unavailable for refreshed injury checks'],warnings:['Availability refresh could not be verified']};continue;
+   }
+   const isHome=row.analysis.context.venue==='H';row.analysis.context.research=playerResearch(row.player,row.analysis.history,row.event,isHome?home:away,isHome?away:home,now);
+  }
+ }));
+}

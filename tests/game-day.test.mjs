@@ -42,3 +42,20 @@ try{
  }finally{globalThis.fetch=oldFetch}
 }finally{Date.now=oldNow}
 console.log('Passed explicit confirmation, team/name/jersey matching, ambiguity rejection, projection/staleness, game identity, scratch gating, minute-refresh deduplication, failure handling and endpoint integration.');
+
+const {gameDayEvidence}=await import('../game-day.js');
+const evidence=gameDayEvidence(event,now);assert.equal(evidence.home.status,'confirmed');assert.equal(evidence.home.sourceUpdatedAt,null);assert.equal(evidence.home.checkedAt,stamp);
+assert.equal(gameDayEvidence(event,now+240000).home.status,'stale');
+assert.equal(gameDayEvidence({...event,gameDay:null},now).home.status,'unknown');
+assert.equal(gameDayEvidence({...event,gameDay:{...d,gameId:'wrong'}},now).home.status,'unknown');
+assert.equal(gameDayEvidence({...event,gameDay:{...d,away:{...d.away,goalie:{...d.away.goalie,status:'projected'}}}},now).away.status,'projected');
+assert(gameDayLines(event,now).some(s=>s.includes('announcement time not provided')));
+const {goalieAdjustedChallenger}=await import('../game-model.js');
+const quality=Object.fromEntries(['home','away'].map((side,i)=>[side,{playerId:d[side].goalie.playerId,metric:'goals_saved_above_expected_per_60',value:i===0?.6:-.3,minutes:1200,trainingEnd:'2026-10-25',publishedAt:stamp,source:'synthetic test fixture'}]));
+const base={home:3,away:3,overtimeHome:.5},before=JSON.stringify(base),challenger=goalieAdjustedChallenger(base,event,quality,now);
+assert.equal(challenger.available,true);assert.equal(challenger.model.home,3.15);assert.equal(challenger.model.away,2.7);assert.equal(challenger.promoted,false);assert.equal(JSON.stringify(base),before);
+assert.equal(goalieAdjustedChallenger(base,{...event,gameDay:null},quality,now).available,false);
+for(const patch of [{playerId:'8479999'},{minutes:599},{trainingEnd:event.date},{publishedAt:new Date(now+1000).toISOString()},{value:NaN},{source:''}])assert.equal(goalieAdjustedChallenger(base,event,{...quality,home:{...quality.home,...patch}},now).available,false);
+console.log('Passed structured goalie evidence, freshness/source distinctions and offline identity-bound goalie challenger safeguards.');
+
+assert.doesNotThrow(()=>gameDayLines({...event,gameDay:{...d,checkedAt:'invalid'}},now));

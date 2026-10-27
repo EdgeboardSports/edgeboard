@@ -1,4 +1,4 @@
-import {confirmedGoalies} from './game-day.js';
+import {confirmedGoalies,gameDayEvidence} from './game-day.js';
 export const GAME_VERSION='goals-v1';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
 export function normalizeGame(g){
@@ -77,8 +77,22 @@ export function gameChecks(analysis,quote,event,now=Date.now()){
  const age=now-Date.parse(quote.lastUpdate);if(!Number.isFinite(age)||age>15*60000||age< -60000)reasons.push('Quote stale or undated');
  if(!(Date.parse(event.startTime)>now))reasons.push('Game already started');
  if(!event.verified)reasons.push('Upcoming NHL matchup unverified');
- if(!confirmedGoalies(event,now))reasons.push('Both starting goalies must be confirmed with fresh identity checks');
+ if(!confirmedGoalies(event,now)){reasons.push('Both starting goalies must be confirmed with fresh identity checks');const evidence=gameDayEvidence(event,now);for(const side of ['home','away']){const g=evidence[side];if(g.status!=='confirmed')reasons.push(g.team+' starting goalie is '+g.status+'; confirmation required')}if(evidence.reason)reasons.push(evidence.reason)}
  if(!Number.isFinite(Date.parse(analysis.archiveAt))||now-Date.parse(analysis.archiveAt)>48*3600000||Date.parse(analysis.archiveAt)>now+60000||analysis.archiveErrors)reasons.push('Team archive stale or incomplete');
  return reasons;
 }
 
+
+// Offline challenger only. No acquisition or production recommendation adjustment.
+export function goalieAdjustedChallenger(model,event,evidence,now=Date.now()){
+ if(!confirmedGoalies(event,now))return {available:false,reason:'Fresh confirmed starter identities required'};
+ if(!model||![model.home,model.away].every(n=>Number.isFinite(n)&&n>0))return {available:false,reason:'Valid base goal rates required'};
+ const adjustments={};
+ for(const side of ['home','away']){
+  const x=evidence?.[side],starter=event.gameDay[side].goalie;
+  if(!x||String(x.playerId)!==String(starter.playerId)||x.metric!=='goals_saved_above_expected_per_60'||!Number.isFinite(x.value)||Math.abs(x.value)>3||!Number.isFinite(x.minutes)||x.minutes<600||typeof x.source!=='string'||!x.source.trim()||!/^\d{4}-\d{2}-\d{2}$/.test(x.trainingEnd||'')||!(x.trainingEnd<event.date)||!Number.isFinite(Date.parse(x.publishedAt))||Date.parse(x.publishedAt)>now||now-Date.parse(x.publishedAt)>48*3600000)return {available:false,reason:'Matched pregame goalie-quality evidence with 600+ minutes required'};
+  adjustments[side]=x.value*x.minutes/(x.minutes+1200);
+ }
+ // A home goalie's goals saved reduce the away scoring rate, and vice versa.
+ return {available:true,version:'goalie-challenger-v1',experimental:true,promoted:false,base:{...model},model:{...model,home:clamp(model.home-adjustments.away,.25,6),away:clamp(model.away-adjustments.home,.25,6)},adjustments,evidence:structuredClone(evidence),limitations:['Fixed exposure shrinkage is a hypothesis, not a fitted coefficient','Requires unseen historical pregame evaluation before promotion','No live goalie-quality feed is enabled']};
+}

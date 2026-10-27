@@ -50,3 +50,14 @@ try{
 const stats=aggregate([{snapshot:{eventId:'a',playerId:'1',line:2.5,candidate:true,probability:p,baselineProbability:p},result:{state:'win',shots:3,units:1}},{snapshot:{eventId:'a',playerId:'2',line:2.5,candidate:false,probability:p,baselineProbability:p},result:{state:'loss',shots:1,units:-1}}]);assert.equal(stats.independentGames,1);assert.equal(stats.gradedGames,1);
 let calls=0;const read=async()=>{calls++;return own};await Promise.all([teamContext(read,'TOR',date),teamContext(read,'TOR',date)]);assert.equal(calls,1);
 console.log('Passed injury/identity/freshness gates, ice-time/PP changes, absence/rest context, no target-date leakage, endpoint failures, game counts and shared request caching.');
+
+const {refreshResearch}=await import('../research-context.js');
+const refreshEvent={id:'refresh',date,homeAbbrev:'TOR',awayAbbrev:'CGY',startTime:new Date(now+3600000).toISOString()},refreshRows=[{kind:'props',event:refreshEvent,player,analysis:{history:games,context:{venue:'H'}}},{kind:'games',event:structuredClone(refreshEvent),analysis:{}}];
+let refreshReads=0;
+await refreshResearch(refreshRows,async path=>{refreshReads++;return path.includes('team=TOR')?injured:{...own,team:'CGY'}},now);
+assert.equal(refreshReads,2);assert.equal(refreshRows[0].analysis.context.research.availability.status,'reported');assert(refreshRows[0].analysis.context.research.blocks.includes('Reported injury/status requires review'));
+await refreshResearch(refreshRows,async path=>path.includes('team=TOR')?own:{...own,team:'CGY'},now);
+assert.equal(refreshRows[0].analysis.context.research.availability.status,'no_report');
+await refreshResearch(refreshRows,async()=>{throw Error('offline')},now);
+assert(refreshRows[0].analysis.context.research.blocks.includes('Current injury report unverified'));
+console.log('Passed shared team refresh, changed injury eligibility and fail-closed unavailable research.');

@@ -75,3 +75,10 @@ By default, only the highest-ranked selection per player/market/game survives al
 ## Paper evaluation evidence cutoff — October 27, 2026
 
 The 30-day report now reconstructs timestamped settlement corrections as of an explicit cutoff, excludes future closing observations, leaves undated grades unresolved, deduplicates identical record copies and excludes conflicting copies. It exposes duplicate/conflict counts, daily capture cohorts and actual matched CLV coverage. The dashboard offers an optional UTC cutoff, and the offline report accepts it as its second argument. Frozen forecasts, existing grading automation, provider holds and collection schedules are unchanged. This does not provision private durable storage or start a prospective collection program.
+
+
+## Goalie and availability evidence — October 27, 2026
+
+Cards now expose structured goalie status and source/retrieval/announcement distinctions. Existing game eligibility failures identify the affected team's missing confirmation. The minute refresh reevaluates injury research as well as goalie/scratch evidence; shared team-context requests retain a five-minute cache. Scan rows retain their already fetched history for refreshed availability checks. No extra paid market acquisition or feed activation was added.
+
+An offline identity-bound goalie-quality challenger is implemented with strict prior-data, publication-time, sample and source safeguards. It is not wired into rankings or paper forecasts, has no live quality feed, and has only synthetic correctness tests. No historical accuracy benefit is claimed.
