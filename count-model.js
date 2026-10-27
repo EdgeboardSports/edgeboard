@@ -1,5 +1,5 @@
 // Experimental challengers. Never promoted automatically from an in-sample fit.
-import {probabilities,minutes} from './shots-model.js';
+import {probabilities,minutes,fit as fitLegacy} from './shots-model.js';
 export const COUNT_VERSION='count-challenger-v1';
 const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
 const finite=x=>typeof x==='number'&&Number.isFinite(x);
@@ -32,6 +32,7 @@ export function fitCount(games,{stat='shots',before,distribution='negative-binom
 }
 export function compareCounts(games,{stat='shots',line,before}={}){
  if(!finite(line)||line<0)throw Error('Valid market line required');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(before||''))throw Error('Explicit pregame cutoff required');
  const rows=history(games,stat,before),tests=[];
  for(let i=20;i<rows.length;i++){
   const target=rows[i],date=target.gameDate||target.date,train=rows.slice(0,i),actual=target[stat]>line?'over':target[stat]<line?'under':'push',scores={};
@@ -40,8 +41,9 @@ export function compareCounts(games,{stat='shots',line,before}={}){
    const p=probabilities(fit.mean,fit.alpha,line);
    scores[distribution]={brier:['over','under','push'].reduce((s,k)=>s+(p[k]-Number(actual===k))**2,0)/2,logLoss:-Math.log(Math.max(1e-15,p[actual])),probability:p,trainingEnd:fit.trainingEnd};
   }
-  if(Object.keys(scores).length===2)tests.push({date,actual,scores});
+  if(stat==='shots'){const legacy=fitLegacy(history(train,stat,date),{venue:target.homeRoadFlag,opponent:target.opponentAbbrev});if(legacy){const p=probabilities(legacy.mean,legacy.alpha,line);scores['shots-v1']={brier:['over','under','push'].reduce((s,k)=>s+(p[k]-Number(actual===k))**2,0)/2,logLoss:-Math.log(Math.max(1e-15,p[actual])),probability:p,trainingEnd:history(train,stat,date).at(-1)?.gameDate||history(train,stat,date).at(-1)?.date}}}
+  if(scores.poisson&&scores['negative-binomial'])tests.push({date,actual,scores});
  }
- const summary=Object.fromEntries(['poisson','negative-binomial'].map(d=>[d,{n:tests.length,brier:tests.length?avg(tests.map(t=>t.scores[d].brier)):null,logLoss:tests.length?avg(tests.map(t=>t.scores[d].logLoss)):null}]));
+ const summary=Object.fromEntries(['poisson','negative-binomial',...(stat==='shots'?['shots-v1']:[])].map(d=>{const valid=tests.filter(t=>t.scores[d]);return [d,{n:valid.length,brier:valid.length?avg(valid.map(t=>t.scores[d].brier)):null,logLoss:valid.length?avg(valid.map(t=>t.scores[d].logLoss)):null}]} ));
  return {version:COUNT_VERSION,stat,line,tests,summary,promoted:false,note:'Rolling origin evaluation; overlapping player games are not independent evidence. No automatic promotion.'};
 }

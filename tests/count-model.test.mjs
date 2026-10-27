@@ -11,3 +11,5 @@ const result=compareCounts(rows,{...opts,line:2.5});assert.equal(result.tests.le
 const changed=rows.map((g,i)=>i===59?{...g,shots:99}:g),other=compareCounts(changed,{...opts,line:2.5});assert.deepEqual(result.tests.at(-1).scores.poisson.probability,other.tests.at(-1).scores.poisson.probability);
 assert(Number.isFinite(result.summary.poisson.logLoss));
 console.log('Passed count challengers: distinct points, exposure normalization, minimum samples, deduplication, leakage exclusion and chronological distribution comparison.');
+
+assert.equal(result.summary['shots-v1'].n,40);assert.throws(()=>compareCounts(rows,{line:2.5}),/cutoff/);

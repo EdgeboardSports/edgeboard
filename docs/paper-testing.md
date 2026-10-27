@@ -1,6 +1,6 @@
 # V17 automatic paper testing
 
-The hourly GitHub workflow runs independently of an open browser. It uses only Edgeboard's public read-only data endpoints. The odds key stays in the existing Cloudflare server secret; no new credential or paid subscription is installed.
+Scheduled collection is paused. The current manual GitHub workflow reports the source-permission review hold; it does not collect predictions. Existing saved history remains readable after authentication. The odds key stays in the existing Cloudflare server secret; no new credential or paid subscription is installed.
 
 ## Sampling
 
