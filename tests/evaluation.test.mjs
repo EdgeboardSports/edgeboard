@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {closingValue,paperMetrics,evaluationWindow} from '../evaluation-core.js';
+const snapshot={eventId:'g',market:'h2h',side:'Home',line:null,capturedAt:'2026-01-01T10:00:00Z',startTime:'2026-01-01T12:00:00Z',candidate:true,modelVersion:'test',quote:{bookmaker:'b',decimal:2.2},probability:{win:.6,loss:.4,push:0}},record={snapshot,result:{state:'win'}};
+const observation={eventId:'g',market:'h2h',side:'Home',line:null,bookmaker:'b',decimal:2,observedAt:'2026-01-01T11:55:00Z',quoteAt:'2026-01-01T11:54:00Z'};
+assert(Math.abs(closingValue(snapshot,[observation]).priceRatio-.1)<1e-10);
+for(const change of [{line:1.5},{bookmaker:'other'},{observedAt:snapshot.startTime},{quoteAt:'2026-01-01T10:00:00Z'}])assert.equal(closingValue(snapshot,[{...observation,...change}]),null);
+assert.equal(closingValue(snapshot,[]),null);
+const metrics=paperMetrics([record,{snapshot,result:{state:'push'}},{snapshot,result:{state:'pending'}}]);assert.equal(metrics.settled,2);assert.equal(metrics.decisions,1);assert.equal(metrics.roi,.6000000000000001);assert.equal(metrics.independentEvents,1);assert(Number.isFinite(metrics.logLoss));
+const report=evaluationWindow([record,{...record,snapshot:{...snapshot,candidate:false}},{...record,snapshot:{...snapshot,capturedAt:snapshot.startTime}}],{start:'2026-01-01',now:Date.parse('2026-01-15')});assert.equal(report.metrics.predictions,1);assert.equal(report.complete,false);
+console.log('Passed same-market/book/line pregame CLV, missing evidence, flat-stake metrics and qualifying 30-day capture boundaries.');

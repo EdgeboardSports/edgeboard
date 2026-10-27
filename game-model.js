@@ -22,11 +22,11 @@ export function fitGame(games,home,away,before){
 function poisson(mu){const p=[Math.exp(-mu)];for(let k=1;k<=30;k++)p.push(p[k-1]*mu/k);const sum=p.reduce((a,b)=>a+b,0);return p.map(x=>x/sum)}
 export function marketProbabilities(model,market,side,point=null){
  if(!model||!Number.isFinite(model.home)||!Number.isFinite(model.away)||model.home<=0||model.away<=0)throw Error('Invalid goal model');
- if(!['h2h','spreads','h2h_3_way'].includes(market)||!['Home','Away','Draw'].includes(side)||(side==='Draw'&&market!=='h2h_3_way'))throw Error('Invalid market/selection');
- if(market==='spreads'&&!Number.isFinite(point))throw Error('Puck line required');
+ if(!['h2h','spreads','h2h_3_way','totals'].includes(market)||!(market==='totals'?['Over','Under']:['Home','Away','Draw']).includes(side)||(side==='Draw'&&market!=='h2h_3_way'))throw Error('Invalid market/selection');
+ if(['spreads','totals'].includes(market)&&(!Number.isFinite(point)||(market==='totals'&&point<0)))throw Error('Puck line required');
  const hp=poisson(model.home),ap=poisson(model.away);let win=0,push=0,loss=0;const outcomes={home:0,draw:0,away:0};
- const settle=(margin,p)=>{let value;if(market==='h2h')value=side==='Home'?margin:-margin;else if(market==='spreads')value=(side==='Home'?margin:-margin)+point;else value=side==='Draw'?(margin===0?1:-1):side==='Home'?(margin>0?1:-1):(margin<0?1:-1);if(value>0)win+=p;else if(value===0)push+=p;else loss+=p};
- for(let h=0;h<hp.length;h++)for(let a=0;a<ap.length;a++){const p=hp[h]*ap[a],margin=h-a;outcomes[margin>0?'home':margin<0?'away':'draw']+=p;if(market!=='h2h_3_way'&&margin===0){settle(1,p*model.overtimeHome);settle(-1,p*(1-model.overtimeHome))}else settle(margin,p)}
+ const settle=(margin,p,total)=>{let value;if(market==='totals')value=side==='Over'?total-point:point-total;else if(market==='h2h')value=side==='Home'?margin:-margin;else if(market==='spreads')value=(side==='Home'?margin:-margin)+point;else value=side==='Draw'?(margin===0?1:-1):side==='Home'?(margin>0?1:-1):(margin<0?1:-1);if(value>0)win+=p;else if(value===0)push+=p;else loss+=p};
+ for(let h=0;h<hp.length;h++)for(let a=0;a<ap.length;a++){const p=hp[h]*ap[a],margin=h-a;outcomes[margin>0?'home':margin<0?'away':'draw']+=p;if(market!=='h2h_3_way'&&margin===0){settle(1,p*model.overtimeHome,h+a+1);settle(-1,p*(1-model.overtimeHome),h+a+1)}else settle(margin,p,h+a)}
  return {win,push,loss,regulation:outcomes};
 }
 export function gameValue(probability,decimal){if(!Number.isFinite(decimal)||decimal<=1)throw Error('Invalid decimal odds');const settled=probability.win+probability.loss;return {ev:probability.win*(decimal-1)-probability.loss,conditional:settled?probability.win/settled:null,breakEven:1/decimal,push:probability.push}}
@@ -35,7 +35,11 @@ export function gradeGame(snapshot,g){
  const h=Number(g.homeTeam?.score),a=Number(g.awayTeam?.score);
  if(g.homeTeam?.score==null||g.awayTeam?.score==null||!Number.isInteger(h)||!Number.isInteger(a)||h===a)return {state:'pending',reason:'Waiting for official final score'};
  let result,regulation=null;const type=g.gameOutcome?.lastPeriodType||g.periodDescriptor?.periodType;
- if(snapshot.market==='h2h_3_way'){
+ if(!['h2h','spreads','h2h_3_way','totals'].includes(snapshot.market))return {state:'pending',reason:'Unknown settlement market'};
+ if(snapshot.market==='totals'){
+  if(!['Over','Under'].includes(snapshot.side)||!Number.isFinite(snapshot.line)||snapshot.line<0)return {state:'pending',reason:'Invalid total selection'};
+  const value=snapshot.side==='Over'?h+a-snapshot.line:snapshot.line-h-a;result=value>0?'win':value<0?'loss':'push';
+ }else if(snapshot.market==='h2h_3_way'){
   if(type==='REG')regulation=h>a?'home':'away';
   else if(['OT','SO'].includes(type)&&Math.abs(h-a)===1)regulation='draw';
   else return {state:'pending',reason:'Regulation result is not verified'};

@@ -7,14 +7,15 @@ export function freezeGame({analysis,quote,event,capturedAt,sourceCommit}){
 }
 export function aggregateGames(records,onlyCandidates=false){
  const rows=records.filter(r=>!onlyCandidates||r.snapshot.candidate),graded=rows.filter(r=>['win','loss','push'].includes(r.result.state)),unique=new Map();
- for(const r of graded){const s=r.snapshot,key=JSON.stringify([s.eventId,s.market,s.market==='spreads'?(s.side==='Home'?s.line:-s.line):null]);unique.set(key,r)}
+ for(const r of graded){const s=r.snapshot,key=JSON.stringify([s.eventId,s.market,s.market==='totals'?s.line:s.market==='spreads'?(s.side==='Home'?s.line:-s.line):null]);unique.set(key,r)}
  let loss=0,baseline=0;const bins=Array.from({length:5},()=>({n:0,predicted:0,observed:0}));
  for(const {snapshot:s,result:r}of unique.values()){
   const score=p=>s.market==='h2h_3_way'?['home','draw','away'].reduce((n,k)=>n+(p.regulation[k]-Number(k===r.regulation))**2,0)/2:['win','loss','push'].reduce((n,k)=>n+(p[k]-Number(k===r.state))**2,0)/2;
   loss+=score(s.probability);baseline+=score(s.baselineProbability);
   const add=(probability,observed)=>{const b=bins[Math.min(4,Math.floor(probability*5))];b.n++;b.predicted+=probability;b.observed+=observed};
   if(s.market==='h2h_3_way'){for(const k of ['home','draw','away'])add(s.probability.regulation[k],Number(r.regulation===k))}
-  else{const line=s.market==='spreads'?(s.side==='Home'?s.line:-s.line):null,canonical=marketProbabilities(s.modelInputs,s.market,'Home',line),margin=r.finalHome-r.finalAway+(s.market==='spreads'?line:0);add(canonical.win,Number(margin>0))}
+  else if(s.market==='totals'){const canonical=marketProbabilities(s.modelInputs,'totals','Over',s.line);add(canonical.win,Number(r.finalHome+r.finalAway>s.line))}
+  else{const line=s.market==='totals'?s.line:s.market==='spreads'?(s.side==='Home'?s.line:-s.line):null,canonical=marketProbabilities(s.modelInputs,s.market,'Home',line),margin=r.finalHome-r.finalAway+(s.market==='spreads'?line:0);add(canonical.win,Number(margin>0))}
  }
  const units=graded.reduce((n,r)=>n+r.result.units,0);return {independentGames:new Set(rows.map(r=>r.snapshot.eventId)).size,gradedGames:new Set(graded.map(r=>r.snapshot.eventId)).size,predictions:rows.length,graded:graded.length,wins:graded.filter(r=>r.result.state==='win').length,losses:graded.filter(r=>r.result.state==='loss').length,pushes:graded.filter(r=>r.result.state==='push').length,voids:rows.filter(r=>r.result.state==='void').length,pending:rows.filter(r=>r.result.state==='pending').length,units,roi:graded.length?units/graded.length:null,uniqueTests:unique.size,brier:unique.size?loss/unique.size:null,baselineBrier:unique.size?baseline/unique.size:null,bins:bins.map(b=>({n:b.n,predicted:b.n?b.predicted/b.n:null,observed:b.n?b.observed/b.n:null}))};
 }

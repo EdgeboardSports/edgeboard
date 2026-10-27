@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {fitCount,compareCounts} from '../count-model.js';
+const rows=Array.from({length:60},(_,i)=>({gameId:i,gameDate:new Date(Date.UTC(2025,0,i+1)).toISOString().slice(0,10),shots:i%6,points:i%3===0?2:0,toi:'20:00'}));
+const opts={before:'2026-01-01'};
+assert.throws(()=>fitCount(rows),/cutoff/);
+assert.equal(fitCount(rows.slice(0,19),opts),null);
+const shots=fitCount(rows,opts),points=fitCount(rows,{...opts,stat:'points'});assert.notEqual(shots.mean,points.mean);assert.equal(shots.expectedMinutes,20);
+assert.equal(fitCount([...rows,{gameDate:'2026-01-01',shots:999}],opts).mean,shots.mean);
+assert.equal(fitCount([...rows,rows[0]],opts).sample,60);
+const result=compareCounts(rows,{...opts,line:2.5});assert.equal(result.tests.length,40);assert(result.tests.every(t=>Object.values(t.scores).every(s=>s.trainingEnd<t.date)));assert.equal(result.promoted,false);
+const changed=rows.map((g,i)=>i===59?{...g,shots:99}:g),other=compareCounts(changed,{...opts,line:2.5});assert.deepEqual(result.tests.at(-1).scores.poisson.probability,other.tests.at(-1).scores.poisson.probability);
+assert(Number.isFinite(result.summary.poisson.logLoss));
+console.log('Passed count challengers: distinct points, exposure normalization, minimum samples, deduplication, leakage exclusion and chronological distribution comparison.');

@@ -14,6 +14,15 @@ export function bestQuotes(rows,book='',now=Date.now()){
 export function ranked(rows,{kind='props',book='',includeFailed=false,now=Date.now()}={}){
  return bestQuotes(rows.filter(r=>r.kind===kind),book,now).map(r=>({...r,reasons:r.kind==='props'?researchChecks(r.analysis,r.quote,r.event,now):gameChecks(r.analysis,r.quote,r.event,now)})).filter(r=>Number.isFinite(r.value?.ev)&&(includeFailed||!r.reasons.length)).sort((a,b)=>b.value.ev-a.value.ev||a.label.localeCompare(b.label));
 }
+// Margin removal is only defined for a complete, fresh, same-book outcome set.
+export function marketComparison(row,rows,now=Date.now()){
+ const q=row.quote,event=row.event.eventId||row.event.id,expected=q.market==='h2h_3_way'?['Home','Away','Draw']:q.market==='player_shots_on_goal'?['Over','Under']:['Home','Away'];
+ const peers=rows.filter(r=>{const p=r.quote,age=now-Date.parse(p.lastUpdate);return (r.event.eventId||r.event.id)===event&&p.market===q.market&&p.bookmaker===q.bookmaker&&(p.player||'')===(q.player||'')&&Number.isFinite(age)&&age>=-60000&&age<=900000&&(q.market==='spreads'?p.point===(p.side===q.side?q.point:-q.point):p.point===q.point)});
+ const sides=new Map();for(const r of peers){if(sides.has(r.quote.side))return {implied:1/q.decimal,noVig:null,edge:null,reason:'Ambiguous outcome set'};sides.set(r.quote.side,r.quote)}
+ if(sides.size!==expected.length||!expected.every(side=>sides.has(side)))return {implied:1/q.decimal,noVig:null,edge:null,reason:'Complete fresh same-book market unavailable'};
+ const sum=[...sides.values()].reduce((n,p)=>n+1/p.decimal,0),noVig=(1/q.decimal)/sum;
+ return {implied:1/q.decimal,noVig,overround:sum-1,edge:row.value.conditional==null?null:row.value.conditional-noVig,method:'proportional; conditional on no push'};
+}
 export function createScanner(read){
  const cache=new Map();const memo=(url)=>{const ttl=(url.includes('nhl-schedule')||url.includes('nhl-game-context'))?60000:300000,old=cache.get(url);if(!old||Date.now()-old.at>ttl){const entry={at:Date.now(),promise:read(url).catch(e=>{cache.delete(url);throw e})};cache.set(url,entry)}return cache.get(url).promise};
  async function context(feed,archive){const date=day(feed.commenceTime),event={id:feed.eventId,eventId:feed.eventId,date,commenceTime:feed.commenceTime,startTime:feed.commenceTime,homeTeam:feed.homeTeam,awayTeam:feed.awayTeam,verified:false};

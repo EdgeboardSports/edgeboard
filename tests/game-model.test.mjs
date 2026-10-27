@@ -30,3 +30,9 @@ const snapshot=freezeGame({analysis:a,quote,event,capturedAt:'2026-10-25T15:00:0
 const record={snapshot,result:gradeGame(snapshot,raw('SO',2,1))};const metrics=aggregateGames([record]);assert.equal(metrics.wins,1);assert.equal(metrics.uniqueTests,1);assert.equal(metrics.roi,1);
 assert(gameChecks(a,quote,{...event,verified:false},Date.parse('2026-10-25T15:00:00Z')).includes('Upcoming NHL matchup unverified'));
 console.log('Passed: regulation/OT/SO normalization and grading; puck-line pushes; probability mass; symmetric moneylines; push-aware value; training minimum; time-ordered test; frozen capture and game metrics.');
+
+for(const line of [5,5.5,6,6.5]){const over=marketProbabilities(model,'totals','Over',line),under=marketProbabilities(model,'totals','Under',line);near(over.win+over.loss+over.push,1);near(over.win,under.loss);near(over.push,under.push)}
+assert.equal(gradeGame(s('totals','Over',6),raw('REG',4,2)).state,'push');
+assert.equal(gradeGame(s('totals','Under',6.5),raw('SO',4,3)).state,'loss');
+assert.throws(()=>marketProbabilities(model,'totals','Home',6));
+assert.equal(gradeGame(s('unknown','Home'),raw('REG',4,2)).state,'pending');

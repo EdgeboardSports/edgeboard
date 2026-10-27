@@ -16,3 +16,7 @@ let reads=0;const scan=createScanner(async()=>{reads++;throw Error('offline')});
 const past=await scan([{id:'a',commenceTime:new Date(0).toISOString()}],{games:false});assert.equal(past.rows.length,0);assert.equal(reads,3);
 console.log('Best Picks: quote selection, filtering, ranking, expiry and unavailable feeds passed');
 
+
+const {marketComparison}=await import('../best-picks-engine.js');
+const quoteRow=(side,decimal)=>({event:{id:'margin-test'},quote:{market:'h2h',side,point:null,decimal,bookmaker:'book',lastUpdate:new Date().toISOString()},value:{conditional:.6}});
+const home=quoteRow('Home',1.9),away=quoteRow('Away',1.9);const margin=marketComparison(home,[home,away]);assert.equal(margin.noVig,.5);assert(Math.abs(margin.edge-.1)<1e-10);assert.equal(marketComparison(home,[home]).noVig,null);assert.equal(marketComparison(home,[home,away,{...away,quote:{...away.quote,bookmaker:'other'}}]).noVig,.5);
