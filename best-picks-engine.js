@@ -7,17 +7,43 @@ import {analyzeGame,gameChecks,gameValue,GAME_VERSION} from './game-model.js';
 export const marketNames={player_shots_on_goal:'Shots on goal',h2h:'Moneyline · OT/SO',spreads:'Puck line · OT/SO',h2h_3_way:'Three-way · regulation'};
 export const day=t=>new Date(t).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
 export function bestQuotes(rows,book='',now=Date.now()){
- const groups=new Map();for(const r of rows){if(book&&r.quote.bookmaker!==book)continue;const q=r.quote,key=JSON.stringify([r.kind,r.event.eventId||r.event.id,q.market,q.player||'',q.side,q.point]);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r)}
+ const groups=new Map();for(const r of rows){if(!Number.isFinite(r.quote?.decimal)||r.quote.decimal<=1)continue;if(book&&r.quote.bookmaker!==book)continue;const q=r.quote,key=JSON.stringify([r.kind,r.event.eventId||r.event.id,q.market,q.player||'',q.side,q.point]);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r)}
  const fresh=r=>{const age=now-Date.parse(r.quote.lastUpdate);return Number.isFinite(age)&&age<=900000&&age>=-60000};
  return [...groups.values()].map(g=>(g.some(fresh)?g.filter(fresh):g).sort((a,b)=>b.quote.decimal-a.quote.decimal)[0]);
 }
 export function ranked(rows,{kind='props',book='',includeFailed=false,now=Date.now()}={}){
- return bestQuotes(rows.filter(r=>r.kind===kind),book,now).map(r=>({...r,reasons:r.kind==='props'?researchChecks(r.analysis,r.quote,r.event,now):gameChecks(r.analysis,r.quote,r.event,now)})).filter(r=>Number.isFinite(r.value?.ev)&&(includeFailed||!r.reasons.length)).sort((a,b)=>b.value.ev-a.value.ev||a.label.localeCompare(b.label));
+ return bestQuotes(rows.filter(r=>kind==='all'||r.kind===kind),book,now).map(r=>({...r,reasons:r.kind==='props'?researchChecks(r.analysis,r.quote,r.event,now):gameChecks(r.analysis,r.quote,r.event,now)})).filter(r=>Number.isFinite(r.value?.ev)&&(includeFailed||!r.reasons.length)).sort((a,b)=>Number(a.reasons.length>0)-Number(b.reasons.length>0)||b.value.ev-a.value.ev||a.label.localeCompare(b.label));
+}
+// Recompute decisions from model probabilities and the selected quote; never trust a cached EV.
+export function decisionBoard(rows,{kind='all',book='',includeFailed=false,collapseAlternatives=true,limit=10,now=Date.now()}={}){
+ if(!['all','props','games'].includes(kind)||!Number.isInteger(limit)||limit<1||limit>100)throw Error('Invalid board options');
+ const evaluated=[];
+ for(const row of rows){
+  if(!['props','games'].includes(row.kind))continue;
+  const q=row.quote;if(!Number.isFinite(q?.decimal)||q.decimal<=1)continue;
+  try{
+   const p=row.kind==='props'?row.analysis.result.prediction:row.analysis.probability;
+   const value=row.kind==='props'?quoteValue(p,q.side,q.decimal):gameValue(p,q.decimal);
+   const win=row.kind==='props'?(q.side==='Over'?p.over:p.under):p.win,loss=row.kind==='props'?(q.side==='Over'?p.under:p.over):p.loss,push=p.push;
+   if([win,loss,push].some(n=>!Number.isFinite(n)||n<0||n>1)||Math.abs(win+loss+push-1)>1e-6)continue;
+   const worstEv=row.kind==='props'?Math.min(...['low','high'].map(k=>quoteValue(row.analysis.result[k],q.side,q.decimal).ev)):row.analysis.worstValue;
+   evaluated.push({...row,value,probability:{win,loss,push},decision:{worstEv:Number.isFinite(worstEv)?worstEv:null,fairDecimal:win>0?1+loss/win:null}});
+  }catch{continue}
+ }
+ const all=ranked(evaluated,{kind,book,includeFailed:true,now}),eligible=all.filter(r=>!r.reasons.length),pool=includeFailed?all:eligible,seen=new Set(),retained=[];
+ for(const row of pool){
+  const key=JSON.stringify([row.event.eventId||row.event.id,row.kind,row.quote.market,row.player?.id||cleanName(row.quote.player||'')]);
+  if(collapseAlternatives&&seen.has(key))continue;
+  seen.add(key);retained.push(row);
+ }
+ const selected=retained.slice(0,limit),counts=new Map();
+ for(const row of selected){const id=row.event.eventId||row.event.id;counts.set(id,(counts.get(id)||0)+1)}
+ return {rows:selected.map(row=>({...row,decision:{...row.decision,sameEventSelections:counts.get(row.event.eventId||row.event.id)}})),qualifying:eligible.length,modeled:all.length,alternativesHidden:pool.length-retained.length,omittedInvalid:rows.length-evaluated.length,independentEvents:counts.size};
 }
 // Margin removal is only defined for a complete, fresh, same-book outcome set.
 export function marketComparison(row,rows,now=Date.now()){
  const q=row.quote,event=row.event.eventId||row.event.id,expected=q.market==='h2h_3_way'?['Home','Away','Draw']:q.market==='player_shots_on_goal'?['Over','Under']:['Home','Away'];
- const peers=rows.filter(r=>{const p=r.quote,age=now-Date.parse(p.lastUpdate);return (r.event.eventId||r.event.id)===event&&p.market===q.market&&p.bookmaker===q.bookmaker&&(p.player||'')===(q.player||'')&&Number.isFinite(age)&&age>=-60000&&age<=900000&&(q.market==='spreads'?p.point===(p.side===q.side?q.point:-q.point):p.point===q.point)});
+ const peers=rows.filter(r=>{const p=r.quote,age=now-Date.parse(p.lastUpdate);return Number.isFinite(p.decimal)&&p.decimal>1&&(r.event.eventId||r.event.id)===event&&p.market===q.market&&p.bookmaker===q.bookmaker&&(p.player||'')===(q.player||'')&&Number.isFinite(age)&&age>=-60000&&age<=900000&&(q.market==='spreads'?p.point===(p.side===q.side?q.point:-q.point):p.point===q.point)});
  const sides=new Map();for(const r of peers){if(sides.has(r.quote.side))return {implied:1/q.decimal,noVig:null,edge:null,reason:'Ambiguous outcome set'};sides.set(r.quote.side,r.quote)}
  if(sides.size!==expected.length||!expected.every(side=>sides.has(side)))return {implied:1/q.decimal,noVig:null,edge:null,reason:'Complete fresh same-book market unavailable'};
  const sum=[...sides.values()].reduce((n,p)=>n+1/p.decimal,0),noVig=(1/q.decimal)/sum;

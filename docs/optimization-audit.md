@@ -63,3 +63,10 @@ Performance now includes a selectable, locally remembered 30-day UTC window, qua
 Cloudflare Pages reported a completed successful check for documentation-only commit `44be7a39657538ad67513a831fcb4a3f8291a725`. Routine source updates can use GitHub `main`; inspect the Cloudflare check for each exact commit. This confirms deployment automation, not authenticated page behavior or private repository visibility.
 
 Player Lab comparisons now include a smoothed historical-outcome baseline fitted separately for each held-out target using strictly earlier dates. Every model reports Brier skill against its paired baseline and five Over-probability calibration bins, including sample counts and observed frequencies. Empty evidence remains unknown. Integer pushes retain their own probability mass. These descriptive diagnostics neither refit probabilities nor promote experimental models; no production forecast formula, external feed, authentication setting, or collection schedule changed.
+
+
+## Combined Decision Engine and Top 10 — October 27, 2026
+
+Best Picks now opens with All Markets, comparing shots props and game markets in a single Top 10. EV is recomputed from model outcome probabilities and the selected sportsbook price instead of trusting a stored estimate. Invalid prices and incoherent probability distributions are excluded. Existing pregame, history, roster, goalie, freshness and sensitivity gates are retained; failed estimates sort after eligible candidates even in inspection mode.
+
+By default, only the highest-ranked selection per player/market/game survives alternative-line and opposing-side suppression. Users can reveal alternatives or filter back to props/game bets. Cards expose model fair decimal price, sensitivity return and same-game selection counts; these are research diagnostics, not validated strength or independent portfolio recommendations. Three-tab keyboard navigation wraps in both directions. This introduces no additional provider requests, saved personal data, collection activation or wagering actions.
