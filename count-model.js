@@ -1,6 +1,6 @@
 // Experimental challengers. Never promoted automatically from an in-sample fit.
 import {probabilities,minutes,fit as fitLegacy} from './shots-model.js';
-export const COUNT_VERSION='count-challenger-v1';
+export const COUNT_VERSION='count-challenger-v2';
 const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
 const finite=x=>typeof x==='number'&&Number.isFinite(x);
 export function history(games,stat,before){
@@ -23,7 +23,8 @@ export function fitCount(games,{stat='shots',before,distribution='negative-binom
   expectedMinutes=(baseline*20+recent*5)/25;
   // Normalize counts by exposure before changing expected exposure (avoids counting TOI growth twice).
   const perMinute=timed.reduce((s,g)=>s+g.count,0)/timed.reduce((s,g)=>s+g.toi,0);
-  mean=perMinute*expectedMinutes;
+  const recentExposure=timed.slice(-10),recentRate=recentExposure.reduce((s,g)=>s+g.count,0)/recentExposure.reduce((s,g)=>s+g.toi,0);
+  mean=(perMinute*(1-recentWeight)+recentRate*recentWeight)*expectedMinutes;
  }
  // Points use their own production history and dispersion, never a shots conversion.
  const variance=values.reduce((s,x)=>s+(x-base)**2,0)/(values.length-1);

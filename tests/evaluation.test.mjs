@@ -8,3 +8,7 @@ assert.equal(closingValue(snapshot,[]),null);
 const metrics=paperMetrics([record,{snapshot,result:{state:'push'}},{snapshot,result:{state:'pending'}}]);assert.equal(metrics.settled,2);assert.equal(metrics.decisions,1);assert.equal(metrics.roi,.6000000000000001);assert.equal(metrics.independentEvents,1);assert(Number.isFinite(metrics.logLoss));
 const report=evaluationWindow([record,{...record,snapshot:{...snapshot,candidate:false}},{...record,snapshot:{...snapshot,capturedAt:snapshot.startTime}}],{start:'2026-01-01',now:Date.parse('2026-01-15')});assert.equal(report.metrics.predictions,1);assert.equal(report.complete,false);
 console.log('Passed same-market/book/line pregame CLV, missing evidence, flat-stake metrics and qualifying 30-day capture boundaries.');
+
+assert.equal(closingValue({...snapshot,quote:{...snapshot.quote,decimal:0}},[observation]),null);
+assert.equal(evaluationWindow([record],{start:'2026-01-01',now:Date.parse('2026-01-01T09:00:00Z')}).metrics.predictions,0);
+assert.equal(report.clv.matched,0);assert.equal(report.clv.averagePriceRatio,null);

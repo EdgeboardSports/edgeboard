@@ -1,4 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090f19"><title>Edgeboard · Player analysis</title><link rel="stylesheet" href="/assets/ui.css?v=19"></head><body data-page="player"><header class="page-header"><span class="eyebrow">PLAYER LAB</span><h1>Know the player.</h1><p>Search NHL players and inspect their results at the line you choose.</p></header><main><section class="card" id="selected-player"></section><div id="player-tools"></div></main><footer>Official NHL regular-season game logs. Historical hit rates are not predicted probabilities.</footer><script type="module">import {el,playerIdentity} from '/assets/ui.js?v=19';
+import {fitCount,compareCounts} from '/count-model.js';
+import {probabilities} from '/shots-model.js';
 // EDGEBOARD V10 — NHL PLAYER PROP ANALYZER
 
 (function () {
@@ -222,6 +224,9 @@ searchInput.addEventListener('keydown', event => {
 
  async function analyze() {
     renderSelected();
+    const analyzeButton=section.querySelector('#edge-analyze');
+    if(analyzeButton.disabled)return;
+    const controls=[...section.querySelectorAll('input,select,button')];controls.forEach(e=>e.disabled=true);
 
     results.textContent = 'Loading NHL game logs...';
 
@@ -245,7 +250,8 @@ const season = seasonSelect.value;
 
       const line = Number(lineSelect.value);
 
-      const games = data.games || [];
+      const before=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
+      const games = (data.games || []).filter(g=>(g.gameDate||g.date)<before&&Number.isInteger(g[statSelect.value])&&g[statSelect.value]>=0).sort((a,b)=>(b.gameDate||b.date).localeCompare(a.gameDate||a.date));
 // EDGEBOARD V12 - HOME/AWAY AND OPPONENT ANALYTICS
 
 const selectedStat = statSelect.value;
@@ -436,11 +442,23 @@ opponentResults.forEach(item => {
     `(${item.rate}% hit rate)`;
   splits.appendChild(row);
 });results.replaceChildren(heading, summary, note, breakdown, chart, splits);
+if(['shots','points'].includes(selectedStat)){
+ const lab=el('section',null,'card');lab.append(el('h3','Experimental probability model · '+selectedStat));
+ const fit=fitCount(games,{stat:selectedStat,before});
+ if(!fit)lab.append(el('p','At least 20 valid prior games are required. No estimate is available.'));
+ else{
+  const p=probabilities(fit.mean,fit.alpha,line),test=compareCounts(games,{stat:selectedStat,line,before});
+  lab.append(el('p','Estimated mean '+fit.mean.toFixed(2)+' · Over '+(100*p.over).toFixed(1)+'% · Under '+(100*p.under).toFixed(1)+'% · Push '+(100*p.push).toFixed(1)+'%'),el('p',fit.sample+' prior games · training through '+fit.trainingEnd+' · '+fit.version));
+  for(const [name,score]of Object.entries(test.summary))lab.append(el('p',name+': '+score.n+' chronological tests · Brier '+(score.brier==null?'—':score.brier.toFixed(4))+' · log loss '+(score.logLoss==null?'—':score.logLoss.toFixed(4))));
+  lab.append(el('p','Unvalidated estimate, not a betting recommendation or strength rating. No automatic promotion. Missing: '+fit.missing.join(', ')+'.'),el('p','Comparisons use only this selected season, exclude the target date, and do not include historical sportsbook prices. Small samples may mislead.'));
+ }
+ results.append(lab);
+}
     } catch (error) {
 
       results.textContent = 'Unable to load: ' + error.message;
 
-    }
+    } finally { controls.forEach(e=>e.disabled=false); }
 
   }
 

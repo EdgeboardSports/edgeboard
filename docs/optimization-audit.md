@@ -51,3 +51,9 @@ Lower is better. Three-way uses half multiclass squared error and is not directl
 4. Connect private append-only capture and closing-observation storage. Existing public Git repository must not receive personal watchlists, private credentials or wagering records. Repository visibility was not changed.
 5. Wire points/totals live market acquisition only with explicit quota accounting, complete market settlement rules and tests. No silent extra provider credit was added.
 6. Complete cross-market leaderboard, explanation factors/counterarguments, watchlist and automated prospective evaluation. A report command alone is not a completed 30-day program.
+
+## Follow-up: interactive research and performance
+
+Player Lab now exposes experimental shots/points probabilities and Poisson/NB/production-shots comparisons from its already requested season game log. Target/current-day games and missing statistics are excluded. This adds no provider requests. Minimum history and missing advanced inputs are displayed. Count challenger exposure rates now also shrink recent per-minute production toward the longer record; its version is now `count-challenger-v2` and no production recommendation formula is promoted.
+
+Performance now includes a selectable, locally remembered 30-day UTC window, qualifying pregame captures, flat-stake outcomes, selection Brier/log loss, market/version breakdown and explicit unknown closing value. This is a report over saved records, not activated collection. Empty and incomplete samples do not receive a strength rating. Both research modules are packaged and served only behind existing authentication; raw data/source route restrictions remain.
