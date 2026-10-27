@@ -22,3 +22,12 @@ Tables keep their underlying data and use labeled mobile rows. History/model det
 npm test includes player profile input/asset validation. Existing model/paper checks remain intact. Tests/ui/mobile-preview.html provides an unlinked 390×844 smoke-check frame for Today, Matchup, Props, Players and Performance.
 
 Manual QA: portrait loads/fallback, name/line linking, same-event market/prop tabs, model detail expansion, mobile overflow, and performance market switches.
+
+
+## Paused research and performance update
+
+The shared research-status module reflects the checked-in collection hold. Every page shows a paused banner; Today and Performance label the last run as a historical record. The status does not claim production access is configured. Changing a heartbeat cannot turn the status live. Collection and grading remain paused.
+
+Performance compares all frozen forecasts and passed-at-capture subsets by model version within the selected market, with distinct graded games, selections, deduplicated forecasts, model/baseline Brier, absolute Brier improvement and relative skill. Empty or pending-only samples show no accuracy score. These descriptive measures are not confidence ratings or betting returns; different versions may cover different games. Existing snapshots and grades are unchanged.
+
+Validation: npm test (including performance-summary regressions) and npm run build:private. Browser rendering needs a separate check when a browser runtime is available.

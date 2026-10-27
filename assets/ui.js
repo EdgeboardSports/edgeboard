@@ -1,3 +1,4 @@
+import {researchStatus} from '/research-status.js';
 const NS='http://www.w3.org/2000/svg';
 export const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e};
 const icons={today:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',game:'M4 7h16v10H4z M8 3v4 M16 3v4 M8 11h2 M14 11h2 M8 14h8',player:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21v-2a8 8 0 0 1 16 0v2',performance:'M4 20V10 M10 20V4 M16 20v-8 M22 20H2'};
@@ -10,9 +11,10 @@ export function mountShell(active=document.body.dataset.page||'today'){
  document.body.classList.add('app-shell');const picksStyle=el('style');picksStyle.textContent='.mobile-nav{grid-template-columns:repeat(5,1fr)!important}.mobile-nav .nav-link{font-size:10px!important}';document.head.append(picksStyle);
  const embed=new URLSearchParams(location.search).get('embed')==='1';if(embed)document.documentElement.classList.add('is-embedded');
  const side=el('aside',null,'app-sidebar');side.append(brand(),el('div','WORKSPACE','nav-label'),navigation(active,'app-nav'));
- const foot=el('div',null,'sidebar-foot'),badge=el('span','NHL research','chip mint');foot.append(badge,el('p','Live prices. Transparent models.\nPaper-tested before trusted.'),el('p','EDGEBOARD · V20'));side.append(foot);
+ const foot=el('div',null,'sidebar-foot'),badge=el('span','NHL research','chip mint');foot.append(badge,el('p',researchStatus.title+'. Frozen forecasts; experimental models.'),el('p','EDGEBOARD · V20'));side.append(foot);
  const top=el('div',null,'app-topbar');top.append(brand(),el('span',entries.find(e=>e[0]===active)?.[1]||'Edgeboard','topbar-label'));
  const right=el('div',null,'topbar-right'),help=el('a','How the models work');help.href='/game-markets#model-methodology';right.append(help,el('span','NHL · EXPERIMENTAL','chip'));top.append(right);
+ const notice=el('div',researchStatus.title+' · '+researchStatus.detail,'research-status-banner');notice.setAttribute('role','status');const main=document.querySelector('main');if(main)main.prepend(notice);
  document.body.prepend(top);document.body.prepend(side);document.body.append(navigation(active,'mobile-nav'));
  if(embed)for(const a of document.querySelectorAll('a[href]'))if(!a.getAttribute('href').startsWith('#'))a.target='_top';
 }
@@ -73,3 +75,4 @@ if(new URLSearchParams(location.search).get('embed')==='1'){
  let lastHeight=0;const send=()=>{const h=Math.ceil(document.body.getBoundingClientRect().height);if(h!==lastHeight){lastHeight=h;parent.postMessage({type:'edgeboard:height',height:h},location.origin)}};
  new ResizeObserver(send).observe(document.body);addEventListener('load',send);setTimeout(send,100);
 }
+
