@@ -48,3 +48,10 @@ The journal persists pregame context before an odds request, uses full SQLite sy
 `node scripts/evidence-report.mjs /absolute/private/evidence.sqlite` checks an existing journal and prints coverage/integrity counts without player details or credentials. Collector observations contain `goalieEvidence: null` until an authorized quality source is implemented; starter snapshots alone cannot validate the goalie challenger. Observations from different capture phases must not be mistaken for independent games.
 
 This supplies a storage adapter, not a hosted durable service. The private collector host must retain and back up the database before a prospective program starts. A hash chain detects inconsistent contents but does not provide an independently trusted timestamp or prevent an administrator from replacing the whole file. Existing Git-tracked forecasts were not migrated, collection was not enabled, and no credentials or account settings changed.
+
+
+## Verified hosted storage companion — October 27, 2026
+
+The existing owner-only preview now has a managed private D1 collector companion at https://edgeboard-research-preview.speedystone18.chatgpt.site/collector (Site project appgprj_6ae0acd669388191b7b30615f3e57a7c, source commit 794692be907e5ea2338732970b22bd9f88b4d8eb). Sites confirmed successful deployment and the DB/collector_evidence binding/table. An authenticated synthetic self-test was written, read back through the service API, and independently verified through the database reader. Anonymous API requests returned 401. The test namespace is separate from predictions.
+
+This supersedes the earlier statement that no hosted storage was provisioned. Local SQLite collection and this managed D1 companion are separate adapters; live ingestion into the companion is still disabled. No live feed or collection schedule is enabled. The production Edgeboard diagnostics endpoint requires app authentication; the attempted secure app sign-in was rejected. Verify source access and a real pregame writer before scheduling collection. No password or service credential is stored in these notes.
