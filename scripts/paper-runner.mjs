@@ -1,3 +1,4 @@
+import {openEvidenceStore} from './evidence-store.mjs';
 import {loadGameDay} from '../game-day.js';
 import {teamContext,playerResearch,gameResearch} from '../research-context.js';
 import {bestFreshQuotes} from '../quote-selection.js';
@@ -12,7 +13,7 @@ import {freezeGame} from '../game-paper.js';
 
 const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
 const digest=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
-export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null}={}){
+export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null}={}){
  const started=clock(),errors=[],notes=[],cache=new Map();
  const get=path=>{if(!cache.has(path))cache.set(path,client(path));return cache.get(path)};
  // Existing shots and new game snapshots are graded independently.
@@ -59,6 +60,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
   const event={id:candidate.id,nhlGameId:game.id,date,startTime:new Date(start).toISOString(),homeTeam:candidate.homeTeam,awayTeam:candidate.awayTeam,modelVersion:VERSION,sourceCommit,capturedAt:new Date(clock()).toISOString(),records:[],excluded:[]};
   // Count the attempted game even if a feed fails: no selective retries based on results.
   ledger.events.push(event);event.homeAbbrev=game.homeTeam.abbrev;event.awayAbbrev=game.awayTeam.abbrev;event.gameDay=await loadGameDay(get,event);
+  if(evidenceStore)try{await evidenceStore.append({event,capturedAt:new Date(clock()).toISOString(),sourceCommit,phase:'discovery'})}catch(e){event.status='evidence_error';errors.push('Evidence '+event.id+': '+e.message);continue}
   try{
    const props=await get('/api/nhl-props?'+new URLSearchParams({event:event.id,market:'player_shots_on_goal'}));
    if(props.status!=='live'||!Array.isArray(props.odds))throw Error('Props feed unavailable');
@@ -84,17 +86,19 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
  // Game markets are separate frozen records; existing shots snapshots never change.
  if(gameArchive?.games?.length&&gameArchive.generatedAt){
   for(const event of ledger.events){
-   if(event.gameAttemptAt||(event.gameRecords||[]).length)continue;
+   if(event.status==='evidence_error'||event.gameAttemptAt||(event.gameRecords||[]).length)continue;
    const lead=Date.parse(event.startTime)-clock();if(lead<15*60000||lead>180*60000)continue;
    if(ledger.remainingCredits!=null&&ledger.remainingCredits<103){notes.push('Game capture paused: reserve for three-market request');break}
    try{
     const schedule=await get('/api/nhl-schedule?date='+event.date),game=(schedule.games||[]).find(g=>String(g.id)===String(event.nhlGameId));if(!game||game.gameType!==2||!['FUT','PRE'].includes(game.gameState))continue;
     event.gameAttemptAt=new Date(clock()).toISOString();event.gameRecords=[];event.gameExcluded=[];
+    const context={...event,homeAbbrev:game.homeTeam.abbrev,awayAbbrev:game.awayTeam.abbrev,verified:true};const [homeResearch,awayResearch]=await Promise.all([teamContext(get,context.homeAbbrev,event.date),teamContext(get,context.awayAbbrev,event.date)]);context.research=gameResearch(context,homeResearch,awayResearch,clock());context.gameDay=await loadGameDay(get,context);
+    if(evidenceStore)await evidenceStore.append({event:context,capturedAt:new Date(clock()).toISOString(),sourceCommit,phase:'game_capture'});
     const feed=await get('/api/nhl-game-odds?event='+event.id);if(feed.status!=='live'||!Array.isArray(feed.odds))throw Error('Game markets feed unavailable');
     event.gameQuotesFetchedAt=feed.fetchedAt;if(feed.remainingCredits!=null){ledger.remainingCredits=Number(feed.remainingCredits);event.gameRemainingCredits=ledger.remainingCredits}
     event.gameMarketsMissing=['h2h','spreads','h2h_3_way'].filter(m=>!feed.odds.some(q=>q.market===m));
     const quotes=bestFreshQuotes(feed.odds,q=>JSON.stringify([q.market,q.side,q.point]),clock());
-    const context={...event,homeAbbrev:game.homeTeam.abbrev,awayAbbrev:game.awayTeam.abbrev,verified:true};const [homeResearch,awayResearch]=await Promise.all([teamContext(get,context.homeAbbrev,event.date),teamContext(get,context.awayAbbrev,event.date)]);context.research=gameResearch(context,homeResearch,awayResearch,clock());context.gameDay=await loadGameDay(get,context);
+
     for(const quote of quotes)try{
      const analysis=analyzeGame(gameArchive,context,quote);if(analysis)analysis.research=context.research;const snapshot=freezeGame({analysis,quote,event:context,capturedAt:new Date(clock()).toISOString(),sourceCommit});
      event.gameRecords.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
@@ -131,11 +135,13 @@ export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTim
 async function main(){
  if(process.env.EDGEBOARD_COLLECTION_APPROVED!=='true'){console.log('Collection paused pending access and provider permission review.');return}
 
+ if(!process.env.EDGEBOARD_EVIDENCE_PATH)throw Error('Private evidence storage must be configured before collection');
+ const evidenceStore=openEvidenceStore(process.env.EDGEBOARD_EVIDENCE_PATH);
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
  let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
- const result=await runPaper(ledger,client,{gameArchive,sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'});
+ let result;try{result=await runPaper(ledger,client,{gameArchive,evidenceStore,sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'})}finally{evidenceStore.close()}
  await mkdir(new URL('../data/',import.meta.url),{recursive:true});await writeFile(path,JSON.stringify(result,null,2)+'\n');
  const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),gamePredictions:result.events.reduce((n,e)=>n+(e.gameRecords||[]).length,0),errors:last.errors,notes:last.notes}));
  if(last.errors.length)process.exitCode=1;

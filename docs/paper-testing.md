@@ -37,3 +37,14 @@ The 30-day dashboard accepts an optional UTC report cutoff. Blank means now; fut
 Reports use only captures and timestamped grades known by that cutoff. A corrected result uses the latest eligible entry in `resultHistory`; undated settlements and a currently withdrawn/pending settlement stay unresolved. Closing observations after the cutoff are excluded, and closing value is not declared before the game starts. Missing observations remain unknown.
 
 Exact duplicate records count once. Conflicting copies of the same captured selection are all excluded and disclosed, rather than selecting a favorable result. Daily tables group by UTC capture day with grades known at the report cutoff; they are capture cohorts, not historical bankroll curves. Elapsed window completion does not prove collection completeness or statistical significance. These calculations do not modify ledger records or activate collection.
+
+
+## Private pregame evidence journal
+
+The collector CLI now requires `EDGEBOARD_EVIDENCE_PATH`, an absolute SQLite database path outside the repository, in addition to the existing collection approval flag. This is a local collector-host path, not a browser value or a Cloudflare secret. No database has been provisioned in production, and the scheduled workflow remains paused.
+
+The journal persists pregame context before an odds request, uses full SQLite synchronization and owner-only file permissions, and forbids updates/deletes through triggers. Each entry contains a SHA-256 chain link. Identical observations are idempotent; a conflicting observation at the same event/time/phase fails. Reopening verifies the chain. Storage failure stops the capture instead of silently losing evidence. Schema fields are allowlisted: no arbitrary headers, credentials or provider response payloads are written.
+
+`node scripts/evidence-report.mjs /absolute/private/evidence.sqlite` checks an existing journal and prints coverage/integrity counts without player details or credentials. Collector observations contain `goalieEvidence: null` until an authorized quality source is implemented; starter snapshots alone cannot validate the goalie challenger. Observations from different capture phases must not be mistaken for independent games.
+
+This supplies a storage adapter, not a hosted durable service. The private collector host must retain and back up the database before a prospective program starts. A hash chain detects inconsistent contents but does not provide an independently trusted timestamp or prevent an administrator from replacing the whole file. Existing Git-tracked forecasts were not migrated, collection was not enabled, and no credentials or account settings changed.

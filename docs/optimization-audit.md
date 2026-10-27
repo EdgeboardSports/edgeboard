@@ -87,3 +87,10 @@ An offline identity-bound goalie-quality challenger is implemented with strict p
 ## Paired goalie backtesting — October 27, 2026
 
 Added offline chronological goalie-challenger validation with paired base/challenger Brier/log loss and calibration, earliest-snapshot selection, identity/publication-time safeguards, and exclusion/coverage counters. The full saved archive has 1,496 eligible games but no supplied archived pregame goalie evidence, so paired tests and performance estimates remain zero/unknown. Synthetic tests cover future/late evidence, target-outcome isolation, identity mismatch, duplicate archives and ambiguous snapshots. Production models, authentication, data collection and frozen forecasts remain unchanged.
+
+
+## Prospective evidence journal — October 27, 2026
+
+Added a private local SQLite journal with append-only triggers, chained hashes, conflict rejection, reopen verification and repository/symlink path protections. The collector CLI requires configured private evidence storage and saves allowlisted pregame context before odds requests. Storage failure prevents that capture. Tests cover persistence, tampering, duplicate/conflicting writes, late captures, permissions, credential-field exclusion and collector failure behavior.
+
+No private collector host or durable volume was provisioned; no collection flag or schedule was enabled. The adapter records starter/scratch context but has no goalie-quality source. This closes a code-level evidence-preservation gap, not the operational prerequisites for a live 30-day trial.
