@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {goalieBacktest} from '../goalie-backtest.js';
+const games=Array.from({length:45},(_,i)=>{const date=new Date(Date.UTC(2026,0,i+1)).toISOString().slice(0,10);return {id:2026000000+i,date,startTime:date+'T20:00:00Z',home:'AAA',away:'BBB',homeGoals:3,awayGoals:2,finalHome:3,finalAway:2,endType:'REG'}});
+const snapshots=games.map((g,i)=>{const capturedAt=g.date+'T19:30:00Z',trainingEnd=new Date(Date.parse(g.date)-86400000).toISOString().slice(0,10);return {capturedAt,event:{nhlGameId:g.id,date:g.date,startTime:g.startTime,homeAbbrev:g.home,awayAbbrev:g.away,gameDay:{gameId:g.id,date:g.date,pregame:true,gameState:'FUT',startTime:g.startTime,checkedAt:capturedAt,home:{team:'AAA',goalie:{status:'confirmed',playerId:'8470001'}},away:{team:'BBB',goalie:{status:'confirmed',playerId:'8470002'}}}},goalieEvidence:Object.fromEntries(['home','away'].map((s,j)=>[s,{playerId:j?'8470002':'8470001',metric:'goals_saved_above_expected_per_60',value:j?-.4:.4,minutes:1200,trainingEnd,publishedAt:capturedAt,source:'Synthetic fixture; not real historical evidence'}]))}});
+const options={before:'2026-03-01'},archive={games};
+const frozen=JSON.stringify({archive,snapshots}),report=goalieBacktest(archive,snapshots,options);
+assert.equal(report.pairedGames,25);assert.equal(report.promoted,false);assert.equal(report.audit.insufficientTraining,20);
+for(const m of report.markets){assert.equal(m.tests.length,25);assert.equal(m.base.n,m.challenger.n);assert(Number.isFinite(m.pairedBrierImprovement));assert(m.tests.every(t=>t.trainingEnd<t.date));assert.equal(m.challenger.calibration.reduce((s,b)=>s+b.n,0),25)}
+assert.equal(JSON.stringify({archive,snapshots}),frozen);
+const zero=goalieBacktest(archive,[],options);assert.equal(zero.pairedGames,0);assert.equal(zero.audit.missingSnapshots,25);assert.equal(zero.markets[0].pairedBrierImprovement,null);
+const future=structuredClone(snapshots);for(const s of future)s.goalieEvidence.home.publishedAt=s.event.startTime;
+assert.equal(goalieBacktest(archive,future,options).pairedGames,0);
+const late=structuredClone(snapshots);for(const s of late)s.capturedAt=s.event.startTime;
+assert.equal(goalieBacktest(archive,late,options).audit.invalidPregameEvidence,25);
+const badIdentity=structuredClone(snapshots);for(const s of badIdentity)s.event.homeAbbrev='CCC';assert.equal(goalieBacktest(archive,badIdentity,options).pairedGames,0);
+const corrected=structuredClone(games);corrected.at(-1).homeGoals=corrected.at(-1).finalHome=1;corrected.at(-1).awayGoals=corrected.at(-1).finalAway=4;
+const changed=goalieBacktest({games:corrected},snapshots,options);assert.equal(changed.markets[0].tests.at(-1).base.winProbability,report.markets[0].tests.at(-1).base.winProbability);assert.equal(changed.markets[0].tests.at(-1).challenger.winProbability,report.markets[0].tests.at(-1).challenger.winProbability);
+assert.equal(goalieBacktest(archive,[...snapshots,snapshots.at(-1)],options).pairedGames,25);
+const ambiguous={...snapshots.at(-1),goalieEvidence:{}};assert.equal(goalieBacktest(archive,[...snapshots,ambiguous],options).audit.ambiguousSnapshots,1);
+const duplicate=goalieBacktest({games:[...games,games[0]]},snapshots,options);assert.equal(duplicate.pairedGames,25);assert.equal(duplicate.audit.duplicateArchiveCopies,1);
+assert.throws(()=>goalieBacktest(archive,snapshots,{before:'2026-02-30'}));
+console.log('Passed paired goalie backtests, chronological training, cutoff/identity rejection, sample coverage, no target leakage, calibration and duplicate audit.');
+const futureReport=structuredClone(snapshots);for(const s of futureReport)s.event.gameDay.home.goalie.sourceUpdatedAt=s.event.startTime;
+assert.equal(goalieBacktest(archive,futureReport,options).audit.invalidPregameEvidence,25);

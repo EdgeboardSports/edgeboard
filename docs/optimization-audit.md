@@ -82,3 +82,8 @@ The 30-day report now reconstructs timestamped settlement corrections as of an e
 Cards now expose structured goalie status and source/retrieval/announcement distinctions. Existing game eligibility failures identify the affected team's missing confirmation. The minute refresh reevaluates injury research as well as goalie/scratch evidence; shared team-context requests retain a five-minute cache. Scan rows retain their already fetched history for refreshed availability checks. No extra paid market acquisition or feed activation was added.
 
 An offline identity-bound goalie-quality challenger is implemented with strict prior-data, publication-time, sample and source safeguards. It is not wired into rankings or paper forecasts, has no live quality feed, and has only synthetic correctness tests. No historical accuracy benefit is claimed.
+
+
+## Paired goalie backtesting — October 27, 2026
+
+Added offline chronological goalie-challenger validation with paired base/challenger Brier/log loss and calibration, earliest-snapshot selection, identity/publication-time safeguards, and exclusion/coverage counters. The full saved archive has 1,496 eligible games but no supplied archived pregame goalie evidence, so paired tests and performance estimates remain zero/unknown. Synthetic tests cover future/late evidence, target-outcome isolation, identity mismatch, duplicate archives and ambiguous snapshots. Production models, authentication, data collection and frozen forecasts remain unchanged.
