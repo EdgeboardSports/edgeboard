@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {performanceSummary,performanceGroups} from '../performance-summary.js';
+import {collectionMessage} from '../research-status.js';
+const row=(version,event,state='win',candidate=true)=>({snapshot:{eventId:event,playerId:'1',line:2.5,modelVersion:version,candidate,probability:{over:.8,under:.2,push:0},baselineProbability:{over:.5,under:.5,push:0}},result:{state,shots:3,units:state==='win'?1:0}});
+const rows=[row('v1','a'),row('v1','a'),row('v2','b','pending',false)];
+const s=performanceSummary(rows,'shots');
+assert.equal(s.gradedGames,1);assert.equal(s.graded,2);assert.equal(s.uniqueTests,1);assert.equal(s.pending,1);
+assert.ok(Math.abs(s.brierImprovement-.21)<1e-10);assert.ok(Math.abs(s.skill-.84)<1e-10);
+const groups=performanceGroups(rows,'shots');assert.deepEqual(groups.map(g=>g.version),['v1','v2']);assert.equal(groups[1].all.brier,null);assert.equal(groups[1].candidates.predictions,0);
+assert.equal(performanceSummary([],'h2h').skill,null);assert.equal(performanceSummary([],'shots').brierImprovement,null);
+assert.match(collectionMessage(new Date().toISOString()),/paused/);assert.match(collectionMessage('invalid'),/No recorded run/);
+assert.match(s.evidence,/1 distinct graded game\./);
+console.log('Performance: version separation, correlated selections, pending/empty samples, baseline skill and paused status passed.');

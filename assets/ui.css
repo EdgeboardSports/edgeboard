@@ -15,3 +15,6 @@ body.app-shell>main{max-width:1192px;margin:auto;padding:19px 32px 32px}.card{ba
 .control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:20px 0}.control-grid label{display:block!important;margin-bottom:7px}.control-grid select{width:100%;margin:0!important}.player-analysis #edge-analyze{background:var(--accent)!important;border-color:var(--accent)!important;color:#10382b!important;min-width:160px}.player-analysis>div:first-of-type{margin-top:0!important}.player-analysis #edge-search{max-width:100%!important}
 @media(min-width:1050px){.control-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:760px){.control-grid{gap:12px}.control-grid>div{min-width:0}.control-grid label{font-size:10px}.control-grid select{padding:11px 7px!important;font-size:11px!important}.player-analysis #edge-analyze{width:100%}.player-analysis #edge-search-btn{width:100%}}
+
+
+.research-status-banner{padding:14px 16px;margin:0 0 18px;border:1px solid #80652f;border-radius:12px;background:#292315;color:#ffdc99;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
