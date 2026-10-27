@@ -70,3 +70,8 @@ Player Lab comparisons now include a smoothed historical-outcome baseline fitted
 Best Picks now opens with All Markets, comparing shots props and game markets in a single Top 10. EV is recomputed from model outcome probabilities and the selected sportsbook price instead of trusting a stored estimate. Invalid prices and incoherent probability distributions are excluded. Existing pregame, history, roster, goalie, freshness and sensitivity gates are retained; failed estimates sort after eligible candidates even in inspection mode.
 
 By default, only the highest-ranked selection per player/market/game survives alternative-line and opposing-side suppression. Users can reveal alternatives or filter back to props/game bets. Cards expose model fair decimal price, sensitivity return and same-game selection counts; these are research diagnostics, not validated strength or independent portfolio recommendations. Three-tab keyboard navigation wraps in both directions. This introduces no additional provider requests, saved personal data, collection activation or wagering actions.
+
+
+## Paper evaluation evidence cutoff — October 27, 2026
+
+The 30-day report now reconstructs timestamped settlement corrections as of an explicit cutoff, excludes future closing observations, leaves undated grades unresolved, deduplicates identical record copies and excludes conflicting copies. It exposes duplicate/conflict counts, daily capture cohorts and actual matched CLV coverage. The dashboard offers an optional UTC cutoff, and the offline report accepts it as its second argument. Frozen forecasts, existing grading automation, provider holds and collection schedules are unchanged. This does not provision private durable storage or start a prospective collection program.

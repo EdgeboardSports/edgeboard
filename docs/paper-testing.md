@@ -28,3 +28,12 @@ References:
 - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
 - https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/
 - https://the-odds-api.com/liveapi/guides/v4/
+
+
+## Reports at an explicit cutoff
+
+The 30-day dashboard accepts an optional UTC report cutoff. Blank means now; future cutoffs are rejected. The offline report supports the same cutoff: `node scripts/paper-report.mjs 2026-10-25 2026-10-26T00:00:00Z`.
+
+Reports use only captures and timestamped grades known by that cutoff. A corrected result uses the latest eligible entry in `resultHistory`; undated settlements and a currently withdrawn/pending settlement stay unresolved. Closing observations after the cutoff are excluded, and closing value is not declared before the game starts. Missing observations remain unknown.
+
+Exact duplicate records count once. Conflicting copies of the same captured selection are all excluded and disclosed, rather than selecting a favorable result. Daily tables group by UTC capture day with grades known at the report cutoff; they are capture cohorts, not historical bankroll curves. Elapsed window completion does not prove collection completeness or statistical significance. These calculations do not modify ledger records or activate collection.
