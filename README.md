@@ -35,3 +35,7 @@ Do not add an authentication bypass to preview the interface, re-enable schedule
 - Paper capture and grading: [paper-testing notes](docs/paper-testing.md).
 - Goalie, scratch, and game-day context: [research notes](docs/game-day-research.md).
 - Provider integration and remaining setup: [odds provider](docs/odds-provider.md) and [security status](docs/security-status.md).
+
+## Routine update workflow
+
+Routine code changes are tested offline and committed to `main`. The existing GitHub-to-Cloudflare Pages integration handles deployments; verify the Cloudflare Pages check against the exact new commit SHA before reporting deployment success. Dashboard login is not required for routine source updates. Authentication and provider collection holds remain unchanged.
