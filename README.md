@@ -1,46 +1,37 @@
 # Edgeboard
 
-NHL schedules, team statistics, player leaders, and historical player-prop analysis. The interface is static HTML; server functions retrieve public NHL data. No sportsbook odds feed or predictive model is connected yet.
+Private NHL analytics research project with player-prop and game-market models, price comparison, ranked research candidates, and paper-testing tools. Model estimates are experimental; paper results are not evidence of future performance.
 
-## Development
+## Current development decision — October 27, 2026
 
-Use Node.js 24 or newer. There are no npm dependencies or build step. In the published Codex cloud environment, start the retained local development helper:
+Zero Trust activation is deferred. Continue development with the existing access hold and collection pause in place. No billing authorization, subscription activation, public reopening, or provider-feed enablement is part of this decision.
 
-```sh
-cd /workspace/edgeboard
-NODE_USE_ENV_PROXY=1 node /workspace/edgeboard-cloud/server.mjs
-```
+The application denies access when its private authentication configuration is missing. This is a code-level hold, not proof that every production or older deployment URL is protected. Cloudflare account settings, older deployments, and repository visibility still need separate attention. See [security status](docs/security-status.md) for remaining limitations and release requirements.
 
-The helper serves the page on port 8888 and supports both function families. It is cloud-environment tooling outside the repository, not a production deployment emulator. Its `/api/*` routes invoke the Cloudflare handlers; test the Netlify handlers separately with the commands below. It does not implement Netlify rewrites.
+## Offline development
 
-Live HTTPS access to `api-web.nhle.com` and `search.d3.nhle.com` is confirmed in the published cloud environment. Keep both hosts allowed. Public NHL APIs need no credentials. Node fetch must use the environment proxy (`NODE_USE_ENV_PROXY=1`) and the supplied CA configuration. Processes need restarting in each new task; the environment snapshot retains files, not running services.
-
-## Deployment and API contract
-
-Netlify is the current deployment target. `netlify.toml` publishes the static site and deploys `netlify/functions`. The frontend exclusively uses `/api/*`; a forced HTTP 200 rewrite maps that namespace to `/.netlify/functions/*`. Native Netlify URLs remain available for existing clients.
-
-| Public route | Purpose |
-| --- | --- |
-| `/api/nhl-schedule?date=YYYY-MM-DD` | Daily scores and schedule |
-| `/api/nhl-stats` | Team standings |
-| `/api/nhl-player-search?q=McDavid` | Player search |
-| `/api/nhl-players` | Points, goals, and assists leaders |
-| `/api/nhl-game-log?playerId=8478402&season=20252026` | Regular-season games and historical prop hit rates |
-| `/api/nhl-prop-scanner?date=YYYY-MM-DD` | Scheduled matchups for prop analysis; no odds or projections |
-
-Explicit game-log seasons must be consecutive years encoded as eight digits. Netlify honors the requested season; if omitted, it uses the player's current season metadata. Game objects preserve NHL fields (`gameDate`, `homeRoadFlag`, `opponentAbbrev`) alongside legacy Netlify aliases (`date`, `homeAway`, `opponent`). Existing Netlify summaries and hit-rate fields remain available.
-
-Cloudflare Pages handlers live in `functions/api`. Their route namespace already matches the frontend. Before migrating, port standings and prop scanner handlers, align the remaining response differences (including leader limits and game-log summaries), and run the live checks against the deployment. Cloudflare's existing game-log handler defaults to 2026–27 when season is omitted; the interface always sends an explicit season. The cloud helper alone does not prove production routing.
-
-Keep sport-specific endpoints and provider retrieval outside the interface. Future NFL, NBA, MLB, sportsbook odds comparison, moneyline/three-way/spread markets, player props, and statistical models should build on explicit API contracts and separate provider/model modules. This change adds no speculative markets or models.
-
-## Validation
+Use Node.js 24 or newer. No npm dependencies are required.
 
 ```sh
-node --test tests/nhl.test.cjs
-NODE_USE_ENV_PROXY=1 node tests/nhl-live.cjs
+npm test
 ```
 
-The offline suite checks season selection, input validation, upstream errors, analytics field compatibility, and route configuration. The opt-in live suite exercises all six Netlify and four existing Cloudflare endpoints against public NHL data, including a known 82-game historical player season. Live checks depend on upstream availability and may require updating the sample date/player as data changes.
+The default suite uses mocked inputs and synthetic test cases to exercise models, immutable pregame records, grading, candidate ranking, research context, authentication, and provider quota controls. It does not require live feeds or production credentials. Keep new tests similarly offline while collection is paused.
 
-After Netlify deploys a review build, smoke-test all six public routes above and their native Netlify equivalents. Production routing must be checked on Netlify; the local adapter does not apply its configuration.
+Continue with interface improvements, model validation, and paper-tracking behavior using synthetic fixtures or data whose use has been approved. Keep synthetic examples clearly labeled and separate from real performance records. Do not run live-provider checks or capture scripts as part of this workflow.
+
+## Deployment
+
+Cloudflare Pages is the current target. Its handlers live in `functions/api`, and the root middleware applies authentication before serving intended pages and APIs. Legacy Netlify handlers remain in the repository; their presence does not establish that any old deployment is protected.
+
+`npm run build:private` prepares an explicit asset allowlist in `dist`. Do not activate that output in Cloudflare until private access and Pages **Fail closed** have been verified, as described in the security status. The output includes research data that requires those protections.
+
+Do not add an authentication bypass to preview the interface, re-enable scheduled collection, or put credentials into source. Before restoring live use, verify private authentication and anonymous denial on every retained hostname, configure provider quota controls, and resolve provider permissions. Private access can use a reviewed alternative to Zero Trust; this project does not yet implement one.
+
+## Research modules
+
+- Player shots model: [model notes](docs/shots-model.md).
+- Game moneyline, puck-line, total, and regulation markets: [model notes](docs/game-model.md).
+- Paper capture and grading: [paper-testing notes](docs/paper-testing.md).
+- Goalie, scratch, and game-day context: [research notes](docs/game-day-research.md).
+- Provider integration and remaining setup: [odds provider](docs/odds-provider.md) and [security status](docs/security-status.md).
