@@ -450,6 +450,13 @@ if(['shots','points'].includes(selectedStat)){
   const p=probabilities(fit.mean,fit.alpha,line),test=compareCounts(games,{stat:selectedStat,line,before});
   lab.append(el('p','Estimated mean '+fit.mean.toFixed(2)+' · Over '+(100*p.over).toFixed(1)+'% · Under '+(100*p.under).toFixed(1)+'% · Push '+(100*p.push).toFixed(1)+'%'),el('p',fit.sample+' prior games · training through '+fit.trainingEnd+' · '+fit.version));
   for(const [name,score]of Object.entries(test.summary))lab.append(el('p',name+': '+score.n+' chronological tests · Brier '+(score.brier==null?'—':score.brier.toFixed(4))+' · log loss '+(score.logLoss==null?'—':score.logLoss.toFixed(4))));
+  lab.append(el('p','Empirical baseline uses only prior outcomes at the selected line. Positive Brier skill means lower error than that baseline; it does not establish a betting edge.'));
+  const diagnostics=el('details');diagnostics.append(el('summary','Probability calibration · Over outcomes'));
+  for(const [name,score]of Object.entries(test.summary)){
+   diagnostics.append(el('p',name+' · Brier skill '+(score.brierSkill==null?'—':(score.brierSkill*100).toFixed(1)+'%')));
+   for(const bin of score.overCalibration.filter(b=>b.n))diagnostics.append(el('p',(bin.lower*100).toFixed(0)+'–'+(bin.upper*100).toFixed(0)+'% bin · '+bin.n+' tests · predicted '+(bin.predicted*100).toFixed(1)+'% · observed '+(bin.observed*100).toFixed(1)+'%'));
+  }
+  diagnostics.append(el('p','Descriptive held-out diagnostics only. These bins do not refit or recalibrate predictions. Over is scored against every outcome, including pushes.'));lab.append(diagnostics);
   lab.append(el('p','Unvalidated estimate, not a betting recommendation or strength rating. No automatic promotion. Missing: '+fit.missing.join(', ')+'.'),el('p','Comparisons use only this selected season, exclude the target date, and do not include historical sportsbook prices. Small samples may mislead.'));
  }
  results.append(lab);

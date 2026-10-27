@@ -34,6 +34,7 @@ export function fitCount(games,{stat='shots',before,distribution='negative-binom
 export function compareCounts(games,{stat='shots',line,before}={}){
  if(!finite(line)||line<0)throw Error('Valid market line required');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(before||''))throw Error('Explicit pregame cutoff required');
+ if(!['shots','points'].includes(stat))throw Error('Supported statistic required');
  const rows=history(games,stat,before),tests=[];
  for(let i=20;i<rows.length;i++){
   const target=rows[i],date=target.gameDate||target.date,train=rows.slice(0,i),actual=target[stat]>line?'over':target[stat]<line?'under':'push',scores={};
@@ -43,8 +44,20 @@ export function compareCounts(games,{stat='shots',line,before}={}){
    scores[distribution]={brier:['over','under','push'].reduce((s,k)=>s+(p[k]-Number(actual===k))**2,0)/2,logLoss:-Math.log(Math.max(1e-15,p[actual])),probability:p,trainingEnd:fit.trainingEnd};
   }
   if(stat==='shots'){const legacy=fitLegacy(history(train,stat,date),{venue:target.homeRoadFlag,opponent:target.opponentAbbrev});if(legacy){const p=probabilities(legacy.mean,legacy.alpha,line);scores['shots-v1']={brier:['over','under','push'].reduce((s,k)=>s+(p[k]-Number(actual===k))**2,0)/2,logLoss:-Math.log(Math.max(1e-15,p[actual])),probability:p,trainingEnd:history(train,stat,date).at(-1)?.gameDate||history(train,stat,date).at(-1)?.date}}}
-  if(scores.poisson&&scores['negative-binomial'])tests.push({date,actual,scores});
+  if(scores.poisson&&scores['negative-binomial']){
+   // Identical pregame window and target for every comparator; Jeffreys smoothing avoids zero probabilities.
+   const prior=history(train,stat,date).slice(-82),counts={over:.5,under:.5,push:Number.isInteger(line)?.5:0};
+   for(const g of prior)counts[g[stat]>line?'over':g[stat]<line?'under':'push']++;
+   const total=Object.values(counts).reduce((s,n)=>s+n,0),p=Object.fromEntries(Object.entries(counts).map(([k,n])=>[k,n/total]));
+   scores.empirical={brier:['over','under','push'].reduce((s,k)=>s+(p[k]-Number(actual===k))**2,0)/2,logLoss:-Math.log(Math.max(1e-15,p[actual])),probability:p,trainingEnd:prior.at(-1).gameDate||prior.at(-1).date};
+   tests.push({date,actual,scores});
+  }
  }
- const summary=Object.fromEntries(['poisson','negative-binomial',...(stat==='shots'?['shots-v1']:[])].map(d=>{const valid=tests.filter(t=>t.scores[d]);return [d,{n:valid.length,brier:valid.length?avg(valid.map(t=>t.scores[d].brier)):null,logLoss:valid.length?avg(valid.map(t=>t.scores[d].logLoss)):null}]} ));
+ const summary=Object.fromEntries(['poisson','negative-binomial',...(stat==='shots'?['shots-v1']:[]),'empirical'].map(d=>{
+  const valid=tests.filter(t=>t.scores[d]),bins=Array.from({length:5},()=>({n:0,predicted:0,observed:0}));
+  for(const t of valid){const p=t.scores[d].probability.over,bin=bins[Math.min(4,Math.floor(p*5))];bin.n++;bin.predicted+=p;bin.observed+=Number(t.actual==='over')}
+  const brier=valid.length?avg(valid.map(t=>t.scores[d].brier)):null,baseline=valid.length?avg(valid.map(t=>t.scores.empirical.brier)):null;
+  return [d,{n:valid.length,brier,logLoss:valid.length?avg(valid.map(t=>t.scores[d].logLoss)):null,baselineBrier:baseline,brierSkill:baseline>0?1-brier/baseline:null,overCalibration:bins.map((bin,i)=>({lower:i/5,upper:(i+1)/5,n:bin.n,predicted:bin.n?bin.predicted/bin.n:null,observed:bin.n?bin.observed/bin.n:null}))}];
+ }));
  return {version:COUNT_VERSION,stat,line,tests,summary,promoted:false,note:'Rolling origin evaluation; overlapping player games are not independent evidence. No automatic promotion.'};
 }
