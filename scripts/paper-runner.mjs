@@ -1,3 +1,5 @@
+import {openHostedClosingStore} from './hosted-closing-store.mjs';
+import {captureClosingPrices} from './closing-capture.mjs';
 import {openHostedPredictionLedger} from './hosted-prediction-ledger.mjs';
 import {normalizeLedgerGrade} from './prediction-ledger-schema.mjs';
 import {openHostedEvidenceStore} from './hosted-evidence-store.mjs';
@@ -16,7 +18,7 @@ import {freezeGame} from '../game-paper.js';
 
 const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
 const digest=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
-export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null,ledgerStore=null}={}){
+export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null,ledgerStore=null,closingStore=null}={}){
  const started=clock(),errors=[],notes=[],cache=new Map();
  const get=path=>{if(!cache.has(path))cache.set(path,client(path));return cache.get(path)};
  // Existing shots and new game snapshots are graded independently.
@@ -46,6 +48,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
    event.lastGradedAt=new Date(clock()).toISOString();
   }catch(e){errors.push('Grade '+event.id+': '+e.message)}
  }
+ const closing=await captureClosingPrices(ledger,client,{closingStore,clock});notes.push(...closing.notes,'Closing observations saved: '+closing.saved);errors.push(...closing.errors);
  // Event discovery itself uses no provider odds credits.
  let discovery;
  try{discovery=await get('/api/nhl-events');if(!Array.isArray(discovery.events))throw Error('Invalid event list')}
@@ -147,8 +150,9 @@ async function main(){
  await requireCollectionReadiness(client);
  const evidenceStore=openHostedEvidenceStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  const ledgerStore=openHostedPredictionLedger({token:process.env.EDGEBOARD_STORAGE_TOKEN});
+ const closingStore=openHostedClosingStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
- let result;try{const ledger=await ledgerStore.restore();result=await runPaper(ledger,client,{gameArchive,evidenceStore,ledgerStore,sourceCommit})}finally{evidenceStore.close();ledgerStore.close()}
+ let result;try{const ledger=await ledgerStore.restore();result=await runPaper(ledger,client,{gameArchive,evidenceStore,ledgerStore,closingStore,sourceCommit})}finally{evidenceStore.close();ledgerStore.close();closingStore.close()}
  const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),gamePredictions:result.events.reduce((n,e)=>n+(e.gameRecords||[]).length,0),errors:last.errors,notes:last.notes}));
  if(last.errors.length)process.exitCode=1;
 }

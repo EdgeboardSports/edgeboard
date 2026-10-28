@@ -3,7 +3,7 @@ export function closingValue(snapshot,observations,now=Date.now()){
  const start=Date.parse(snapshot.startTime),capture=Date.parse(snapshot.capturedAt),q=snapshot.quote;
  if(!Number.isFinite(start)||!Number.isFinite(capture)||capture>=start||now<start||!Number.isFinite(q?.decimal)||q.decimal<=1)return null;
  const same=o=>o.eventId===snapshot.eventId&&o.market===(snapshot.market||'player_shots_on_goal')&&o.side===snapshot.side&&(o.playerId??null)===(snapshot.playerId??null)&&(o.line??null)===(snapshot.line??null)&&o.bookmaker===q.bookmaker;
- const eligible=observations.filter(o=>same(o)&&Number.isFinite(o.decimal)&&o.decimal>1&&Date.parse(o.observedAt)<=now&&Date.parse(o.observedAt)>=capture&&Date.parse(o.observedAt)<start&&Date.parse(o.quoteAt)<=Date.parse(o.observedAt)&&Date.parse(o.quoteAt)>=Date.parse(o.observedAt)-15*60000).sort((a,b)=>Date.parse(a.observedAt)-Date.parse(b.observedAt));
+ const eligible=observations.filter(o=>same(o)&&((o.receivedAt===undefined||o.receivedAt===null)||(Number.isFinite(Date.parse(o.receivedAt))&&Date.parse(o.receivedAt)<=now))&&Number.isFinite(o.decimal)&&o.decimal>1&&Date.parse(o.observedAt)<=now&&Date.parse(o.observedAt)>=capture&&Date.parse(o.observedAt)<start&&Date.parse(o.quoteAt)<=Date.parse(o.observedAt)&&Date.parse(o.quoteAt)>=Date.parse(o.observedAt)-15*60000).sort((a,b)=>Date.parse(a.observedAt)-Date.parse(b.observedAt));
  const last=eligible.at(-1);if(!last||start-Date.parse(last.observedAt)>15*60000)return null;
  return {closingDecimal:last.decimal,observedAt:last.observedAt,priceRatio:q.decimal/last.decimal-1,impliedMovement:1/last.decimal-1/q.decimal,definition:'Same book/selection/line; last verified quote in final 15 pregame minutes. Positive means better recommendation price.'};
 }

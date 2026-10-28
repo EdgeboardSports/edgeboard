@@ -85,3 +85,11 @@ The live prediction write route remains disabled until LIVE_LEDGER_APPROVED is e
 ## Private performance dashboard connected
 
 The Performance page now links to the owner-only collector dashboard at /collector/performance. It reads verified private ledger history with live/test namespace separation, market/model/qualification filters, UTC windows/cutoffs, flat-unit paper outcomes, baseline Brier/log loss, calibration, cohort summaries and preserved grading revisions. The old saved archive stays available. Missing live captures remain an explicit empty state. Scheduled collection/grading remains paused; no prospective trial was started.
+
+## Protected closing-price capture and CLV proxy
+
+The collector now has a final-15-pregame-minute closing phase for already-frozen shots and supported game-market predictions. It first checks private closing-write readiness, verifies the upcoming NHL matchup, resolves prop IDs through the gated player-profile route, checks protected remaining budget and atomically claims one event/market-group attempt. Only the first claim requests odds. Failed/missing quotes are not silently retried; totals and new prop markets are not acquired. Existing server-side quota reservations remain authoritative. No schedule or source flag was enabled.
+
+Closing observations preserve the same bookmaker, event/player, market, side and line as the forecast, with price, quote time, observed time, source and server receipt. Private append-only storage rejects duplicates/conflicts and forbids live poststart backfill. LIVE_CLOSING_APPROVED is a separate disabled gate. Synthetic checks use an explicit fixture source and separate namespace. No test value enters live reporting.
+
+The dashboard reports matched/recorded coverage and frozen-price/last-observed-pregame-price minus one. Positive means better frozen price. Missing observations remain unknown. Report cutoffs include both observation and server receipt times. This is an observed final-window closing-price proxy; it is not a certified final market close. Cached prices/provider delays and correlated selections remain limitations. Actual prospective collection and closing coverage have not started.
