@@ -39,3 +39,16 @@ assert.equal(resultAsOf({...corrected,result:{state:'pending'}},Date.parse('2026
 assert.equal(evaluationWindow([],{start:'2026-01-03',now:Date.parse('2026-01-01')}).phase,'not_started');
 const invalid=evaluationWindow([{...corrected,snapshot:{...snapshot,quote:{decimal:NaN}}}],options);
 assert.equal(invalid.audit.invalidQuoteRecordsExcluded,1);assert.equal(invalid.metrics.predictions,0);assert.equal(invalid.metrics.roi,null);
+
+const {paperRisk}=await import('../evaluation-core.js');
+const riskRow=(id,day,state,decimal=2)=>({snapshot:{...snapshot,eventId:id,quote:{decimal}},result:{state,gradedAt:`2026-01-${day}T15:00:00Z`}});
+const riskRows=[riskRow('a','01','win',3),riskRow('b','02','loss'),riskRow('b','02','loss'),riskRow('c','03','loss'),riskRow('d','04','win')];
+const risk=paperRisk(riskRows);assert.equal(risk.maxDailyDrawdownUnits,3);assert.equal(risk.worstDayUnits,-2);assert.equal(risk.maxSelectionsPerEvent,2);assert.equal(risk.daily.at(-1).cumulativeUnits,0);
+assert.deepEqual(paperRisk([...riskRows].reverse()),risk);assert.equal(paperRisk([]).maxDailyDrawdownUnits,null);
+assert.equal(paperRisk([riskRow('a','01','loss')]).maxDailyDrawdownUnits,1);
+assert.equal(paperRisk([riskRow('a','01','push')]).maxDailyDrawdownUnits,0);
+assert.equal(paperRisk([{snapshot,result:{state:'win'}}]).excludedSettlements,1);
+assert.equal(evaluationWindow([corrected],options).risk.worstDayUnits,-1);
+assert.equal(evaluationWindow([corrected],{...options,now:Date.parse('2026-01-03')}).risk.worstDayUnits,1.2000000000000002);
+assert.equal(evaluationWindow([corrected],{...options,now:Date.parse('2026-01-01T11:00:00Z')}).risk.maxDailyDrawdownUnits,null);
+console.log('Passed daily paper drawdown, correlated game exposure, order invariance, empty history and correction cutoffs.');

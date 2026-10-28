@@ -16,6 +16,21 @@ export function paperMetrics(records){
  const units=settled.reduce((s,r)=>s+(r.result.state==='win'?r.snapshot.quote.decimal-1:r.result.state==='loss'?-1:0),0);
  return {predictions:records.length,settled:settled.length,decisions:decisions.length,pushes:settled.length-decisions.length,voids:records.filter(r=>r.result?.state==='void').length,unresolved:records.filter(r=>!['win','loss','push','void'].includes(r.result?.state)).length,independentEvents:new Set(settled.map(r=>r.snapshot.eventId)).size,winRate:decisions.length?decisions.filter(r=>r.result.state==='win').length/decisions.length:null,units,roi:settled.length?units/settled.length:null,scored:n,brier:n?score/n:null,logLoss:n?log/n:null};
 }
+// Daily settlement batches avoid inventing an order for correlated, simultaneous results.
+export function paperRisk(records){
+ const days=new Map(),events=new Map();let excluded=0;
+ for(const r of records){
+  const s=r.snapshot,t=Date.parse(r.result?.gradedAt),state=r.result?.state;
+  if(s?.eventId!==undefined)events.set(String(s.eventId),(events.get(String(s.eventId))||0)+1);
+  if(!['win','loss','push'].includes(state))continue;
+  if(!Number.isFinite(t)||!Number.isFinite(s?.quote?.decimal)||s.quote.decimal<=1){excluded++;continue}
+  const date=new Date(t).toISOString().slice(0,10),d=days.get(date)||{date,settled:0,units:0};
+  d.settled++;d.units+=state==='win'?s.quote.decimal-1:state==='loss'?-1:0;days.set(date,d);
+ }
+ let equity=0,peak=0,maxDrawdown=0;
+ const daily=[...days.values()].sort((a,b)=>a.date.localeCompare(b.date)).map(d=>{equity+=d.units;peak=Math.max(peak,equity);const drawdown=peak-equity;maxDrawdown=Math.max(maxDrawdown,drawdown);return {...d,cumulativeUnits:equity,drawdownUnits:drawdown}});
+ return {settlementDays:daily.length,excludedSettlements:excluded,maxDailyDrawdownUnits:daily.length?maxDrawdown:null,worstDayUnits:daily.length?Math.min(...daily.map(d=>d.units)):null,maxSelectionsPerEvent:events.size?Math.max(...events.values()):null,daily,definition:'One unit per settled selection; drawdown at UTC settlement-day closes from a zero starting profit. Corrections restate the as-of history; intraday drawdown and bankroll risk are not measured.'};
+}
 // Grade history is append-only in the collector; reports select only evidence known by the cutoff.
 export function resultAsOf(record,now){
  const start=Date.parse(record.snapshot.startTime);
@@ -40,5 +55,5 @@ export function evaluationWindow(records,{start,days=30,now=Date.now(),observati
  const values=rows.map(r=>closingValue(r.snapshot,observations,now)).filter(Boolean);
  const clv={matched:values.length,total:rows.length,coverage:rows.length?values.length/rows.length:null,averagePriceRatio:values.length?values.reduce((s,v)=>s+v.priceRatio,0)/values.length:null};
  const groups=key=>Object.fromEntries([...new Set(rows.map(key))].map(k=>[k,paperMetrics(rows.filter(r=>key(r)===k))]));
- return {asOf:new Date(now).toISOString(),audit:{input:candidates.length,duplicateCopiesExcluded:duplicates,conflictingRecordsExcluded:conflicts,invalidQuoteRecordsExcluded:invalidQuotes,unsettledAtCutoff:rows.filter(r=>r.result.state==='pending').length},byCaptureDay:groups(r=>new Date(r.snapshot.capturedAt).toISOString().slice(0,10)),start:new Date(begin).toISOString(),end:new Date(end).toISOString(),complete:now>=end,phase:now<begin?'not_started':now>=end?'ended':'in_progress',mode:'hypothetical flat-stake paper results',metrics:paperMetrics(rows),clv,byMarket:groups(r=>r.snapshot.market||'player_shots_on_goal'),byVersion:groups(r=>r.snapshot.modelVersion||'unknown'),limitations:['Window completion describes elapsed time, not collection completeness','Undated or future settlements remain unresolved at the report cutoff','Conflicting duplicate records are excluded, never selected for favorable results','Thirty days does not establish statistical significance','Multiple selections from one game are correlated','Missing closing observations remain unknown; no synthetic CLV','No comparison against sportsbook forecast accuracy without paired complete market snapshots']};
+ return {asOf:new Date(now).toISOString(),audit:{input:candidates.length,duplicateCopiesExcluded:duplicates,conflictingRecordsExcluded:conflicts,invalidQuoteRecordsExcluded:invalidQuotes,unsettledAtCutoff:rows.filter(r=>r.result.state==='pending').length},byCaptureDay:groups(r=>new Date(r.snapshot.capturedAt).toISOString().slice(0,10)),start:new Date(begin).toISOString(),end:new Date(end).toISOString(),complete:now>=end,phase:now<begin?'not_started':now>=end?'ended':'in_progress',mode:'hypothetical flat-stake paper results',risk:paperRisk(rows),metrics:paperMetrics(rows),clv,byMarket:groups(r=>r.snapshot.market||'player_shots_on_goal'),byVersion:groups(r=>r.snapshot.modelVersion||'unknown'),limitations:['Window completion describes elapsed time, not collection completeness','Undated or future settlements remain unresolved at the report cutoff','Conflicting duplicate records are excluded, never selected for favorable results','Thirty days does not establish statistical significance','Multiple selections from one game are correlated','Missing closing observations remain unknown; no synthetic CLV','No comparison against sportsbook forecast accuracy without paired complete market snapshots']};
 }

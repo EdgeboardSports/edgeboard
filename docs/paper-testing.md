@@ -107,3 +107,9 @@ The private ledger remains the source of frozen forecasts and grades. Reports re
 Trial results additionally require an exact frozen trialId on each private prediction. Existing untagged forecasts and captures assigned to another trial are excluded, even if their dates/models match. The optional allowlisted projection field leaves old records and hashes unchanged; no legacy records were retagged.
 
 Hosted synthetic verification passed on October 28, 2026: protocol/write readback, durable slot/completion readback, duplicate suppression, eight daily model/market grading views and receipt-cutoff behavior. No real provider requests were made. A separate live-status read returned not_configured with trialStarted=false. Companion deployment succeeded with owner-only access preserved. This verification does not start or qualify a real trial.
+
+## Daily paper risk diagnostics — October 28, 2026
+
+The evaluation window and Performance cards now include maximum daily drawdown, worst UTC settlement-day profit, and maximum qualifying selections on one event. Returns use one unit per settled selection and the selected as-of settlement corrections. Daily closes group simultaneous/correlated results without inventing an intraday order. Initial losses count as drawdown from zero starting profit; no settled evidence displays unknown. Voids and pending records do not contribute returns. The report includes the daily cumulative return series and excluded invalid/undated settlement count. These are hypothetical exposure diagnostics, not bankroll sizing, independent wagers, or profitability evidence. No collection or provider access is enabled.
+
+Validation: full npm test and private production build passed; synthetic tests cover input-order invariance, initial losses, pushes, empty history, same-game concentration, and settlement correction cutoffs.
