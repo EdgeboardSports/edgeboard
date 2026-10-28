@@ -1,10 +1,11 @@
+import {openHostedPredictionLedger} from './hosted-prediction-ledger.mjs';
+import {normalizeLedgerGrade} from './prediction-ledger-schema.mjs';
 import {openHostedEvidenceStore} from './hosted-evidence-store.mjs';
 import {requireCollectionReadiness} from './collection-readiness.mjs';
-import {openEvidenceStore} from './evidence-store.mjs';
 import {loadGameDay} from '../game-day.js';
 import {teamContext,playerResearch,gameResearch} from '../research-context.js';
 import {bestFreshQuotes} from '../quote-selection.js';
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {evaluate,VERSION} from '../shots-model.js';
@@ -15,11 +16,20 @@ import {freezeGame} from '../game-paper.js';
 
 const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
 const digest=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
-export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null}={}){
+export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null,ledgerStore=null}={}){
  const started=clock(),errors=[],notes=[],cache=new Map();
  const get=path=>{if(!cache.has(path))cache.set(path,client(path));return cache.get(path)};
  // Existing shots and new game snapshots are graded independently.
- const saveGrade=(record,result)=>{const old={...record.result};delete old.gradedAt;if(JSON.stringify(old)!==JSON.stringify(result)){if(record.result.state!=='pending')record.resultHistory=[...(record.resultHistory||[]),record.result];record.result={...result,...(result.state==='pending'?{}:{gradedAt:new Date(clock()).toISOString()})}}};
+ const saveGrade=async(record,result)=>{
+  const old={...record.result};delete old.gradedAt;
+  const gradedAt=new Date(clock()).toISOString();
+  const canonical=value=>ledgerStore?normalizeLedgerGrade({predictionId:record.ledgerId,previousGradeDigest:record.ledgerGradeDigest||null,gradedAt,result:value},record.snapshot).result:value;
+  if(JSON.stringify(canonical(old))===JSON.stringify(canonical(result)))return;
+  if(ledgerStore){const ack=await ledgerStore.appendGrade({predictionId:record.ledgerId,previousGradeDigest:record.ledgerGradeDigest||null,gradedAt,result},record.snapshot);record.ledgerGradeDigest=ack.digest}
+  if(record.result.state!=='pending')record.resultHistory=[...(record.resultHistory||[]),record.result];
+  record.result={...result,...(result.state==='pending'?{}:{gradedAt})};
+ };
+ const savePrediction=async(snapshot,records)=>{const record={snapshot,digest:digest(snapshot),result:{state:'pending'}};if(ledgerStore){const ack=await ledgerStore.appendPrediction(snapshot);record.ledgerId=ack.id;record.ledgerGradeDigest=null}records.push(record)};
  for(const event of ledger.events){
   const records=[...(event.records||[]),...(event.gameRecords||[])];if(!records.length||clock()-Date.parse(event.startTime)>14*86400000)continue;
   if(records.every(r=>r.result.state!=='pending')&&event.lastGradedAt&&clock()-Date.parse(event.lastGradedAt)<24*3600000)continue;
@@ -29,9 +39,9 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
    for(const record of records)try{
     if(digest(record.snapshot)!==record.digest)throw Error('Snapshot integrity check failed for '+event.id);
     const s=record.snapshot;
-    if(s.kind==='game'){saveGrade(record,gradeGame(s,game));continue}
+    if(s.kind==='game'){await saveGrade(record,gradeGame(s,game));continue}
     const season=seasonFor(event.startTime),log=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:s.playerId,season}));
-    if(!Array.isArray(log.games))throw Error('Invalid official game log');saveGrade(record,gradePrediction(s,game,log.games,clock()));
+    if(!Array.isArray(log.games))throw Error('Invalid official game log');await saveGrade(record,gradePrediction(s,game,log.games,clock()));
    }catch(e){errors.push('Grade '+event.id+': '+e.message)}
    event.lastGradedAt=new Date(clock()).toISOString();
   }catch(e){errors.push('Grade '+event.id+': '+e.message)}
@@ -79,7 +89,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
      try{prior=await get('/api/nhl-game-log?'+new URLSearchParams({playerId:player.id,season:previous}))}catch{event.excluded.push({player:quote.player,reason:'Prior-season feed unavailable; current history only',informational:true})}
      const games=completedBefore([...current.games,...(prior.games||[])],date),venue=player.team===game.homeTeam.abbrev?'H':player.team===game.awayTeam.abbrev?'R':null,context={venue,opponent:venue==='H'?game.awayTeam.abbrev:venue==='R'?game.homeTeam.abbrev:null};Object.assign(context,await verifyRoster(get,player,context,clock()));const [ownResearch,opponentResearch]=await Promise.all([teamContext(get,player.team,date),teamContext(get,context.opponent,date)]);context.playerId=player.id;context.research=playerResearch(player,games,event,ownResearch,opponentResearch,clock());const analysis={result:evaluate(games,quote.point,context),context};
      const snapshot=freezePrediction({analysis,quote,event:{...event,commenceTime:event.startTime},player,capturedAt:new Date(clock()).toISOString(),sourceCommit,games});
-     event.records.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
+     await savePrediction(snapshot,event.records);
     }catch(e){event.excluded.push({player:quote.player,line:quote.point,side:quote.side,reason:e.message})}
    }
    event.status=event.records.length?'captured':'no_predictions';
@@ -103,7 +113,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
 
     for(const quote of quotes)try{
      const analysis=analyzeGame(gameArchive,context,quote);if(analysis)analysis.research=context.research;const snapshot=freezeGame({analysis,quote,event:context,capturedAt:new Date(clock()).toISOString(),sourceCommit});
-     event.gameRecords.push({snapshot,digest:digest(snapshot),result:{state:'pending'}});
+     await savePrediction(snapshot,event.gameRecords);
     }catch(e){event.gameExcluded.push({market:quote.market,side:quote.side,line:quote.point,reason:e.message})}
     event.gameStatus=event.gameRecords.length?'captured':'no_predictions';
    }catch(e){event.gameStatus='feed_error';event.gameError=e.message;errors.push('Game capture '+event.id+': '+e.message)}
@@ -129,15 +139,16 @@ export function makeClient(base,{fetchImpl=fetch,collectorToken=null,pause=ms=>n
 async function main(){
  if(process.env.EDGEBOARD_COLLECTION_APPROVED!=='true'){console.log('Collection paused pending access and provider permission review.');return}
 
- if(!process.env.EDGEBOARD_EVIDENCE_PATH&&!process.env.EDGEBOARD_STORAGE_TOKEN)throw Error('Private evidence storage must be configured before collection');
+ if(!process.env.EDGEBOARD_STORAGE_TOKEN)throw Error('Private hosted prediction storage is required; public ledger writes are disabled');
+ const sourceCommit=process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA;
+ if(!/^[a-f0-9]{7,40}$/.test(sourceCommit||''))throw Error('Verified source commit required before collection');
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base,{collectorToken:process.env.EDGEBOARD_COLLECTOR_TOKEN||null});
  await requireCollectionReadiness(client);
- const evidenceStore=process.env.EDGEBOARD_STORAGE_TOKEN?openHostedEvidenceStore({token:process.env.EDGEBOARD_STORAGE_TOKEN}):openEvidenceStore(process.env.EDGEBOARD_EVIDENCE_PATH);
- const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
+ const evidenceStore=openHostedEvidenceStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
+ const ledgerStore=openHostedPredictionLedger({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
- let result;try{result=await runPaper(ledger,client,{gameArchive,evidenceStore,sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'})}finally{evidenceStore.close()}
- await mkdir(new URL('../data/',import.meta.url),{recursive:true});await writeFile(path,JSON.stringify(result,null,2)+'\n');
+ let result;try{const ledger=await ledgerStore.restore();result=await runPaper(ledger,client,{gameArchive,evidenceStore,ledgerStore,sourceCommit})}finally{evidenceStore.close();ledgerStore.close()}
  const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),gamePredictions:result.events.reduce((n,e)=>n+(e.gameRecords||[]).length,0),errors:last.errors,notes:last.notes}));
  if(last.errors.length)process.exitCode=1;
 }
