@@ -115,11 +115,13 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
  ledger.runs=[...(ledger.runs||[]),{at:ledger.lastRunAt,sourceCommit,errors,notes,capturedGames:ledger.events.filter(e=>Date.parse(e.capturedAt)>=started).length}].slice(-48);
  return ledger;
 }
-export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTimeout(r,ms))}={}){
+export function makeClient(base,{fetchImpl=fetch,collectorToken=null,pause=ms=>new Promise(r=>setTimeout(r,ms))}={}){
+ if(collectorToken&&(!/^[a-f0-9]{64}$/.test(collectorToken)||base!=='https://edgeboard-8fl.pages.dev'))throw Error('Collector credentials require the fixed production origin');
  return async path=>{
+  if(!/^\/api\/[a-z-]+(?:\?[^#]*)?$/.test(path))throw Error('Invalid collector API path');
   let last;const attempts=(path.startsWith('/api/nhl-props?')||path.startsWith('/api/nhl-game-odds?'))?1:3;
   for(let i=0;i<attempts;i++){
-   try{const r=await fetchImpl(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'},redirect:'manual'});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return await r.json()}catch(e){last=e;if(i+1<attempts)await pause(1000*(i+1))}
+   try{const r=await fetchImpl(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json',...(collectorToken?{'X-Edgeboard-Collector-Token':collectorToken}:{})},redirect:'manual'});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return await r.json()}catch(e){last=e;if(i+1<attempts)await pause(1000*(i+1))}
   }
   throw last;
  };
@@ -129,7 +131,7 @@ async function main(){
 
  if(!process.env.EDGEBOARD_EVIDENCE_PATH&&!process.env.EDGEBOARD_STORAGE_TOKEN)throw Error('Private evidence storage must be configured before collection');
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
- const client=makeClient(base);
+ const client=makeClient(base,{collectorToken:process.env.EDGEBOARD_COLLECTOR_TOKEN||null});
  await requireCollectionReadiness(client);
  const evidenceStore=process.env.EDGEBOARD_STORAGE_TOKEN?openHostedEvidenceStore({token:process.env.EDGEBOARD_STORAGE_TOKEN}):openEvidenceStore(process.env.EDGEBOARD_EVIDENCE_PATH);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
