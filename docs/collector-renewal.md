@@ -1,0 +1,28 @@
+# Collector credential renewal procedure
+
+Prepared October 28, 2026. No production credential was rotated, extended or installed by this work. The current credential remains subject to its November 27 expiry. This procedure applies to the Edgeboard collector service identity only, not the owner's password, Odds API key, or Sites service token.
+
+## Required production operations
+
+`scripts/collector-renewal.mjs` provides an in-memory handoff state machine. It is not a deployment CLI and has no automatic connector access. Production operations must be supplied through explicit adapters with independently checked receipts. Tests simulate those adapters and use the real collector authorization function. No production rotation has been exercised.
+
+1. Confirm source authorization and trial dates first. Call `prepareCollectorRenewal({through,now})` immediately before the intended handoff. It creates a unique 256-bit random token in a closure, exposes only a verification hash and timestamps, and requires a future coverage endpoint within the unchanged 31-day maximum. A delayed start or post-trial grading can require another renewal.
+2. `holdCollection` must pause the linked collector schedule, confirm no in-flight collector work remains, and return `{held:true}` only after readback. A prepared/paused collection setup is not source approval. Keep all existing feed, budget and live trial gates unchanged.
+3. Retain the previous server-only verification configuration and exact deployed Git commit for a possible pre-secret rollback. Check whether any Cloudflare verification environment overrides are in use; they override the packaged config as a complete group. Do not assume a Git deployment changes an explicit override.
+4. `publishVerification` commits only the new hash and bounded validity dates to the existing server-only configuration through GitHub. Wait for the exact commit's successful Cloudflare deployment check and confirm the intended verification configuration before returning `{deployed:true,verifierSha256}`. Never commit the raw token. The old private token may fail authentication during this deliberately paused handoff. Optional `verifierOnly:true` stops here so the previous configuration can be restored safely before any secret-write attempt.
+5. `storePrivateSecret` receives only `{name:'EDGEBOARD_COLLECTOR_TOKEN',value}` in memory. Use the supported Sites runtime secret update for the established owner-only project, preserving all other environment values and access policy. Confirm the runtime update before returning `{installed:true}`. No token in arguments, files, prompts, browser fields, outputs, PRs, or logs. Secret storage updates must not convert the value into a public variable. The integration must follow the native environment-update/deployment contract.
+6. `verifyPrivateAccess` invokes the existing private POST `/collector/api/source-readiness` using supported Sites service access. Confirm it reports authenticated collector identity, the exact replacement expiry, a persisted audit, zero provider requests, and a timestamp within the preceding minute. Authentication proves neither source rights nor permission to start collection. Return that sanitized proof to the state machine. Never expose token/hash in diagnostics.
+7. A successful result has `verified:true` but ALWAYS `collectionMayResume:false`. Run the full activation/source/budget/schedule checks separately before enabling anything. Dispose the handle after completion; no raw token should be saved as a recovery artifact.
+
+## Failure and recovery
+
+- Any unverified operation returns a sanitized failed stage, keeps collection held, and suppresses adapter exception text. Never log a caught exception that might contain a credential.
+- Retry the same still-live handle after transient failures. Publication must be idempotent to the same verifier; private-secret retries install the same replacement token. No new key is silently generated on retry.
+- Before the secret write has even been attempted, `rollbackBeforeSecret` may restore the exact prior verifier after independently confirmed collection hold and deployment readback. The rollback callback must return `{restored:true}` only once that deployment is verified. The handle then becomes unusable.
+- Once a secret write has been attempted, its outcome may be ambiguous even if transport failed. Automatic old-verifier rollback is prohibited. Reconcile the runtime state with a fresh server-side diagnostic and retry the same replacement while held. Do not assume the old private secret remains installed.
+- The token and retry state are intentionally not persisted. After a process loss before a secret-write attempt, restore the known prior verifier while held. After process loss with an ambiguous secret write, inspect the current protected authentication diagnostic: if the expected replacement is usable, verify it; otherwise perform a fresh controlled handoff while held. Do not extract private runtime secrets to reconstruct a lost handle. This is a recovery procedure, not crash-resumable secret storage.
+- Existing snapshots, journal records, historical grades, feed holds, quotas and model versions are unaffected. Expiry, emergency disable, route restrictions, and no-redirect enforcement remain unchanged.
+
+## Validation
+
+Tests cover real hashed authentication with a private in-memory replacement, retired-token rejection, 31-day coverage bounds, invalid receipts, stale or wrong-expiry proof, ambiguous secret-write retry, pre-secret rollback, denial of unsafe rollback, expired renewal, concurrent-operation rejection, disposal, secret-safe results, and no automatic resume. No provider calls or production rotation occur in these tests.
