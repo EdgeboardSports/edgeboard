@@ -1,3 +1,4 @@
+import {pausedFeedSources,requiredFeedSources} from '../lib/feed-access.js';
 import {passwordRoute} from '../lib/password-access.js';
 import {authenticate,ACCESS_IDENTITY,securityHeaders,denied} from '../lib/access.js';
 const pages=new Set(['','index','best-picks','game','game-markets','player','paper','props','odds','budget']);
@@ -11,6 +12,7 @@ export async function onRequest(context){
  if(!allowed)return denied('Not found.',404);
  const auth=await authenticate(context.request,context.env);if(auth.response)return auth.response;
  context.data[ACCESS_IDENTITY]=auth.identity;
- if(path.startsWith('/api/nhl-')&&!['/api/nhl-odds','/api/nhl-game-odds','/api/nhl-props','/api/nhl-events'].includes(path)&&(context.env.ALLOW_NHL_FEED!=='true'||context.env.ALLOW_ESPN_FEED!=='true'))return denied('Data collection paused pending provider permission review.');
+ const paused=requiredFeedSources(path).includes('odds')?[]:pausedFeedSources(path,context.env);
+ if(paused.length)return denied('Data collection paused: '+paused.map(source=>source.toUpperCase()).join(', ')+' source access is not enabled.');
  return securityHeaders(await context.next());
 }

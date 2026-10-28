@@ -9,7 +9,7 @@ let outbound=0;const oldFetch=globalThis.fetch;globalThis.fetch=()=>{outbound++;
 try{
  assert.equal((await onRequestGet({...context({}),data:{}})).status,503);
  const response=await onRequestGet(context({THE_ODDS_API_KEY:'must-never-appear'}));const text=await response.text();assert(!text.includes('must-never-appear'));assert.equal(response.headers.get('Cache-Control'),'private, no-store');
- const missing=JSON.parse(text);assert.equal(missing.schedule.state,'paused');assert.equal(missing.odds.state,'blocked');assert(missing.odds.blockers.some(x=>x.includes('database')));
+ const missing=JSON.parse(text);assert.equal(missing.schedule.state,'paused');assert.equal(missing.sources.nhl.state,'paused');assert.equal(missing.capabilities.grading,false);const nhlOnly=await (await onRequestGet(context({ALLOW_NHL_FEED:'true'}))).json();assert.equal(nhlOnly.capabilities.grading,true);assert.equal(nhlOnly.capabilities.schedule,true);assert.equal(nhlOnly.capabilities.lineupAndInjuryResearch,false);assert.equal(nhlOnly.capabilities.automatedCapture,false);assert.equal(missing.odds.state,'blocked');assert(missing.odds.blockers.some(x=>x.includes('database')));
  const env={ALLOW_NHL_FEED:'true',ALLOW_ESPN_FEED:'true',ALLOW_ODDS_FEED:'true',THE_ODDS_API_KEY:'secret',ODDS_BUDGET_PERIOD:'2026-10-27',SECURITY_DB:{prepare:()=>({first:async()=>({remaining_credits:120})})}};
  assert.equal((await (await onRequestGet(context(env))).json()).odds.state,'configured');
  env.SECURITY_DB.prepare=()=>({first:async()=>{throw Error('db down')}});assert.equal((await (await onRequestGet(context(env))).json()).odds.state,'blocked');assert.equal(outbound,0);

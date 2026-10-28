@@ -31,6 +31,11 @@ try{
  assert.equal(downstream,0);
  const ok=await onRequest({request:request('/best-picks'),env,data:{},next});assert.equal(ok.status,200);assert.equal(ok.headers.get('Cache-Control'),'private, no-store');
  assert.equal((await onRequest({request:request('/api/nhl-schedule'),env,data:{},next})).status,503);
+ for(const path of ['/api/nhl-schedule','/api/nhl-game-log','/api/nhl-roster','/api/nhl-player-profile']){
+  assert.equal((await onRequest({request:request(path),env:{...env,ALLOW_NHL_FEED:'true'},data:{},next})).status,200);
+  assert.equal((await onRequest({request:request(path),env:{...env,ALLOW_ESPN_FEED:'true'},data:{},next})).status,503);
+ }
+ for(const path of ['/api/nhl-team-context','/api/nhl-game-context','/api/nhl-unknown'])assert.equal((await onRequest({request:request(path),env:{...env,ALLOW_NHL_FEED:'true'},data:{},next})).status,503);
  const before=fetches;for(const handler of [props,odds,games,events]){const response=await handler({request:new Request('https://app/api/nhl-props?event='+id+'&market=player_shots_on_goal'),env:{THE_ODDS_API_KEY:'never-transmitted'}});assert.equal(response.status,503)}assert.equal(fetches,before);
  const sqlite=new DatabaseSync(':memory:');sqlite.exec(await readFile(new URL('../docs/security-schema.sql',import.meta.url),'utf8'));
  const db={prepare:sql=>({bind:(...args)=>({first:async()=>sqlite.prepare(sql).get(...args)||null,run:async()=>sqlite.prepare(sql).run(...args)})})};
