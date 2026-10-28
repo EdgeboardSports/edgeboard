@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {gameRobustness} from '../scripts/game-robustness.mjs';
+import {gameBacktest} from '../game-model.js';
+const games=Array.from({length:65},(_,i)=>{const h=i%5+1,a=i%3===h?0:i%3;return {id:2025020001+i,season:20252026,date:new Date(Date.UTC(2025,9,i+1)).toISOString().slice(0,10),home:'CAR',away:'TOR',homeGoals:h,awayGoals:a,finalHome:h,finalAway:a,endType:'REG'}}),archive={generatedAt:'2026-01-01T00:00:00Z',games},options={before:'2026-01-01',includeTests:true},frozen=JSON.stringify(archive),report=gameRobustness(archive,options);
+for(const m of report.markets){assert.equal(m.games,45);assert(m.tests.every(t=>t.trainingEnd<t.date));assert.equal(m.byMonth.reduce((n,s)=>n+s.games,0),m.games);assert.equal(m.calibration.reduce((n,b)=>n+b.n,0),m.games*(m.market==='h2h_3_way'?3:1));assert.equal(m.robustness.replicates,2000);const old=gameBacktest(archive,m.market,m.side,m.line,options.before);assert(Math.abs(old.brier-m.brier)<1e-12);assert(Math.abs(old.baseline-m.baseline)<1e-12)}
+assert.equal(report.audit.insufficientHistory,20);assert.equal(report.promoted,false);assert.equal(JSON.stringify(archive),frozen);assert.deepEqual(gameRobustness({...archive,games:[...games].reverse()},options),report);
+const changed=structuredClone(archive);Object.assign(changed.games.at(-1),{homeGoals:20,awayGoals:0,finalHome:20,finalAway:0});const updated=gameRobustness(changed,options);for(let i=0;i<4;i++)assert.deepEqual(updated.markets[i].tests.at(-1).probabilities,report.markets[i].tests.at(-1).probabilities);
+const duplicate=gameRobustness({...archive,games:[...games,games[0]]},options);assert.equal(duplicate.audit.duplicates,1);assert.equal(duplicate.markets[0].games,45);
+const conflict=gameRobustness({...archive,games:[...games,{...games[0],homeGoals:8,finalHome:8}]},options);assert.equal(conflict.audit.conflictingGames,1);
+for(const patch of [{homeGoals:NaN},{finalHome:-1},{date:'2025-02-30'},{endType:'BAD'},{season:20242025},{away:'CAR'}])assert.equal(gameRobustness({...archive,games:[{...games[0],...patch}]},options).audit.invalid,1);
+const empty=gameRobustness({...archive,games:games.slice(0,20)},options);assert.equal(empty.markets[0].brier,null);assert.equal(empty.markets[0].robustness.brierImprovement95,null);assert.throws(()=>gameRobustness(archive,{before:'2026-02-30'}));
+const cutoff=gameRobustness(archive,{before:'2025-11-01',includeTests:true});assert(cutoff.markets[0].tests.every(t=>t.date<'2025-11-01'));assert(cutoff.audit.excludedByCutoff>0);
+console.log('Game robustness: full paired sample, legacy score parity, target isolation, deterministic date bootstrap, calibration counts, monthly coverage, duplicate/conflict and invalid-data audit passed.');

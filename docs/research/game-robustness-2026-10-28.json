@@ -1,0 +1,548 @@
+{
+  "model": "goals-v1",
+  "cutoff": "2026-10-28",
+  "archiveAt": "2026-10-26T10:49:12.843Z",
+  "researchOnly": true,
+  "promoted": false,
+  "audit": {
+    "input": 1496,
+    "invalid": 0,
+    "duplicates": 0,
+    "conflictingGames": 0,
+    "excludedByCutoff": 0,
+    "insufficientHistory": 329
+  },
+  "markets": [
+    {
+      "market": "h2h",
+      "side": "Home",
+      "line": null,
+      "games": 1167,
+      "brier": 0.24598943641733095,
+      "baseline": 0.25,
+      "logLoss": 0.685055064381036,
+      "baselineLogLoss": 0.6931471805599262,
+      "first": "2025-11-20",
+      "last": "2026-10-25",
+      "chronologyValid": true,
+      "robustness": {
+        "method": "paired game-date cluster bootstrap percentile",
+        "seed": 20261028,
+        "distinctDates": 151,
+        "replicates": 2000,
+        "brierImprovement95": {
+          "lower": 0.00027106281279542626,
+          "upper": 0.00770076434879095
+        },
+        "logLossImprovement95": {
+          "lower": 0.00046525064509366946,
+          "upper": 0.015582453233297554
+        }
+      },
+      "calibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 47,
+          "predicted": 0.37621760084126393,
+          "observed": 0.3617021276595745
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 1048,
+          "predicted": 0.5055343921083237,
+          "observed": 0.5276717557251909
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 72,
+          "predicted": 0.629040044928974,
+          "observed": 0.6527777777777778
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        }
+      ],
+      "byMonth": [
+        {
+          "month": "2025-11",
+          "games": 76,
+          "brier": 0.2501427316781856,
+          "baseline": 0.25,
+          "logLoss": 0.6933351070044054,
+          "baselineLogLoss": 0.6931471805599454
+        },
+        {
+          "month": "2025-12",
+          "games": 226,
+          "brier": 0.25220115450986824,
+          "baseline": 0.25,
+          "logLoss": 0.6974416383715577,
+          "baselineLogLoss": 0.6931471805599465
+        },
+        {
+          "month": "2026-01",
+          "games": 240,
+          "brier": 0.24791254490783568,
+          "baseline": 0.25,
+          "logLoss": 0.6892144748827571,
+          "baselineLogLoss": 0.6931471805599466
+        },
+        {
+          "month": "2026-02",
+          "games": 74,
+          "brier": 0.2342365322500533,
+          "baseline": 0.25,
+          "logLoss": 0.6611793011958801,
+          "baselineLogLoss": 0.6931471805599454
+        },
+        {
+          "month": "2026-03",
+          "games": 242,
+          "brier": 0.24763752060373434,
+          "baseline": 0.25,
+          "logLoss": 0.688454053302646,
+          "baselineLogLoss": 0.6931471805599466
+        },
+        {
+          "month": "2026-04",
+          "games": 125,
+          "brier": 0.2425248874157515,
+          "baseline": 0.25,
+          "logLoss": 0.6778992541268704,
+          "baselineLogLoss": 0.6931471805599461
+        },
+        {
+          "month": "2026-09",
+          "games": 8,
+          "brier": 0.24730993210606106,
+          "baseline": 0.25,
+          "logLoss": 0.6885122826021908,
+          "baselineLogLoss": 0.6931471805599447
+        },
+        {
+          "month": "2026-10",
+          "games": 176,
+          "brier": 0.2386731774883364,
+          "baseline": 0.25,
+          "logLoss": 0.6701923496709585,
+          "baselineLogLoss": 0.6931471805599464
+        }
+      ]
+    },
+    {
+      "market": "h2h_3_way",
+      "side": "Draw",
+      "line": null,
+      "games": 1167,
+      "brier": 0.3243094937742073,
+      "baseline": 0.32913592531428787,
+      "logLoss": 1.0774071028591186,
+      "baselineLogLoss": 1.0885074589231285,
+      "first": "2025-11-20",
+      "last": "2026-10-25",
+      "chronologyValid": true,
+      "robustness": {
+        "method": "paired game-date cluster bootstrap percentile",
+        "seed": 20261028,
+        "distinctDates": 151,
+        "replicates": 2000,
+        "brierImprovement95": {
+          "lower": 0.0019297059513016296,
+          "upper": 0.007706061316299475
+        },
+        "logLossImprovement95": {
+          "lower": 0.0038370611644642934,
+          "upper": 0.018176532398905654
+        }
+      },
+      "calibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 1167,
+          "predicted": 0.16658234508470154,
+          "observed": 0.23564695801199656
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 933,
+          "predicted": 0.35798227285623035,
+          "observed": 0.3129689174705252
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 1398,
+          "predicted": 0.4554685303281427,
+          "observed": 0.4284692417739628
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 3,
+          "predicted": 0.6186457708486114,
+          "observed": 0.3333333333333333
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        }
+      ],
+      "byMonth": [
+        {
+          "month": "2025-11",
+          "games": 76,
+          "brier": 0.33370435065612475,
+          "baseline": 0.33575935822652875,
+          "logLoss": 1.1068395764430872,
+          "baselineLogLoss": 1.112512427534202
+        },
+        {
+          "month": "2025-12",
+          "games": 226,
+          "brier": 0.3276547983067256,
+          "baseline": 0.3288629837621738,
+          "logLoss": 1.0847212828890107,
+          "baselineLogLoss": 1.087518250837543
+        },
+        {
+          "month": "2026-01",
+          "games": 240,
+          "brier": 0.32524707815013376,
+          "baseline": 0.330585208442093,
+          "logLoss": 1.0815537908486705,
+          "baselineLogLoss": 1.0937600215220875
+        },
+        {
+          "month": "2026-02",
+          "games": 74,
+          "brier": 0.3157230555273752,
+          "baseline": 0.32771131498764,
+          "logLoss": 1.054046278704086,
+          "baselineLogLoss": 1.0833443166935188
+        },
+        {
+          "month": "2026-03",
+          "games": 242,
+          "brier": 0.3344983336748014,
+          "baseline": 0.33607352485199493,
+          "logLoss": 1.1111648336145672,
+          "baselineLogLoss": 1.1136510455413453
+        },
+        {
+          "month": "2026-04",
+          "games": 125,
+          "brier": 0.3047617699833423,
+          "baseline": 0.31284949011977514,
+          "logLoss": 1.0093878434839862,
+          "baselineLogLoss": 1.0294813661385278
+        },
+        {
+          "month": "2026-09",
+          "games": 8,
+          "brier": 0.3009174901215659,
+          "baseline": 0.33259151141973187,
+          "logLoss": 1.0267973409367601,
+          "baselineLogLoss": 1.101031362628826
+        },
+        {
+          "month": "2026-10",
+          "games": 176,
+          "brier": 0.31922557604582,
+          "baseline": 0.32711977602617365,
+          "logLoss": 1.063665840730116,
+          "baselineLogLoss": 1.0812004323377231
+        }
+      ]
+    },
+    {
+      "market": "spreads",
+      "side": "Home",
+      "line": -1.5,
+      "games": 1167,
+      "brier": 0.2088514771985646,
+      "baseline": 0.21596558013981756,
+      "logLoss": 0.6067986904690339,
+      "baselineLogLoss": 0.6245347601444257,
+      "first": "2025-11-20",
+      "last": "2026-10-25",
+      "chronologyValid": true,
+      "robustness": {
+        "method": "paired game-date cluster bootstrap percentile",
+        "seed": 20261028,
+        "distinctDates": 151,
+        "replicates": 2000,
+        "brierImprovement95": {
+          "lower": 0.003944764279124084,
+          "upper": 0.010226485818345956
+        },
+        "logLossImprovement95": {
+          "lower": 0.009842458645567558,
+          "upper": 0.025284632841410082
+        }
+      },
+      "calibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 91,
+          "predicted": 0.18005658019230403,
+          "observed": 0.14285714285714285
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 1056,
+          "predicted": 0.27662945951681656,
+          "observed": 0.3162878787878788
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 20,
+          "predicted": 0.41868114357832165,
+          "observed": 0.65
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        }
+      ],
+      "byMonth": [
+        {
+          "month": "2025-11",
+          "games": 76,
+          "brier": 0.15801232455642217,
+          "baseline": 0.1619773567080741,
+          "logLoss": 0.4960206854398476,
+          "baselineLogLoss": 0.5066086135283608
+        },
+        {
+          "month": "2025-12",
+          "games": 226,
+          "brier": 0.2155395314631717,
+          "baseline": 0.2187234220134827,
+          "logLoss": 0.6236253473367206,
+          "baselineLogLoss": 0.6305586973008106
+        },
+        {
+          "month": "2026-01",
+          "games": 240,
+          "brier": 0.21342960282225176,
+          "baseline": 0.2219661890222115,
+          "logLoss": 0.6162691649286537,
+          "baselineLogLoss": 0.6376418534672026
+        },
+        {
+          "month": "2026-02",
+          "games": 74,
+          "brier": 0.22481780671008872,
+          "baseline": 0.2433601228353605,
+          "logLoss": 0.6388013047810258,
+          "baselineLogLoss": 0.6843724923950361
+        },
+        {
+          "month": "2026-03",
+          "games": 242,
+          "brier": 0.19874938500659453,
+          "baseline": 0.200600291477507,
+          "logLoss": 0.5851307756040974,
+          "baselineLogLoss": 0.5909724539892557
+        },
+        {
+          "month": "2026-04",
+          "games": 125,
+          "brier": 0.2277469790578313,
+          "baseline": 0.2409963940866958,
+          "logLoss": 0.6468487121649391,
+          "baselineLogLoss": 0.679209414129863
+        },
+        {
+          "month": "2026-09",
+          "games": 8,
+          "brier": 0.221812478466883,
+          "baseline": 0.2482845577284129,
+          "logLoss": 0.6261117093586437,
+          "baselineLogLoss": 0.6951289054474779
+        },
+        {
+          "month": "2026-10",
+          "games": 176,
+          "brier": 0.2091418031722352,
+          "baseline": 0.2179172092212572,
+          "logLoss": 0.6071286628266129,
+          "baselineLogLoss": 0.6287976916240832
+        }
+      ]
+    },
+    {
+      "market": "totals",
+      "side": "Over",
+      "line": 6.5,
+      "games": 1167,
+      "brier": 0.24962832134278795,
+      "baseline": 0.2559940121079142,
+      "logLoss": 0.6925636055937783,
+      "baselineLogLoss": 0.7056742312664748,
+      "first": "2025-11-20",
+      "last": "2026-10-25",
+      "chronologyValid": true,
+      "robustness": {
+        "method": "paired game-date cluster bootstrap percentile",
+        "seed": 20261028,
+        "distinctDates": 151,
+        "replicates": 2000,
+        "brierImprovement95": {
+          "lower": 0.002921681403258384,
+          "upper": 0.009819571141697214
+        },
+        "logLossImprovement95": {
+          "lower": 0.006059134854849786,
+          "upper": 0.020179172365833074
+        }
+      },
+      "calibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 339,
+          "predicted": 0.3706582077879089,
+          "observed": 0.40117994100294985
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 828,
+          "predicted": 0.4475180073498427,
+          "observed": 0.49033816425120774
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 0,
+          "predicted": null,
+          "observed": null
+        }
+      ],
+      "byMonth": [
+        {
+          "month": "2025-11",
+          "games": 76,
+          "brier": 0.24756924027812258,
+          "baseline": 0.24869336971769845,
+          "logLoss": 0.6887048991807181,
+          "baselineLogLoss": 0.6907786754709186
+        },
+        {
+          "month": "2025-12",
+          "games": 226,
+          "brier": 0.2457028439501178,
+          "baseline": 0.2485527563276779,
+          "logLoss": 0.6845260759311864,
+          "baselineLogLoss": 0.6904917809094943
+        },
+        {
+          "month": "2026-01",
+          "games": 240,
+          "brier": 0.2568163065560298,
+          "baseline": 0.2676016522737668,
+          "logLoss": 0.7071724856737279,
+          "baselineLogLoss": 0.7293573871455703
+        },
+        {
+          "month": "2026-02",
+          "games": 74,
+          "brier": 0.24115908504665037,
+          "baseline": 0.2515276796170863,
+          "logLoss": 0.6751096989314153,
+          "baselineLogLoss": 0.6965615393603738
+        },
+        {
+          "month": "2026-03",
+          "games": 242,
+          "brier": 0.25019419440371443,
+          "baseline": 0.2516085990582409,
+          "logLoss": 0.6939525790871066,
+          "baselineLogLoss": 0.6967266399071793
+        },
+        {
+          "month": "2026-04",
+          "games": 125,
+          "brier": 0.25299922830361365,
+          "baseline": 0.26361661255522756,
+          "logLoss": 0.6992270854170934,
+          "baselineLogLoss": 0.7212266805169967
+        },
+        {
+          "month": "2026-09",
+          "games": 8,
+          "brier": 0.2708736502650982,
+          "baseline": 0.26458268279002467,
+          "logLoss": 0.7357535878130845,
+          "baselineLogLoss": 0.7231977609118033
+        },
+        {
+          "month": "2026-10",
+          "games": 176,
+          "brier": 0.2451793884119243,
+          "baseline": 0.2549768707963003,
+          "logLoss": 0.6833625535705535,
+          "baselineLogLoss": 0.703598950167995
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Full eligible saved sample; reused retrospective development data, not a new untouched holdout",
+    "Outcomes assumed available by next game date; actual publication/revision times unverified",
+    "Equal-strength baseline is not a sportsbook forecast; fixed illustrative -1.5 spread and 6.5 total",
+    "Brier uses half squared multiclass error; three-way and binary magnitudes are not directly comparable",
+    "Bootstrap groups whole dates but does not capture all cross-date/team dependence or model tuning",
+    "Four market comparisons use unadjusted descriptive intervals; no multiple-testing correction",
+    "No verified pregame goalie/lineup history, historical odds, ROI or prospective trial",
+    "Production formulas, model versions and source gates remain unchanged; no automatic promotion"
+  ],
+  "archiveSha256": "bc5c2f478da336fd6d4b3ea369650181d85ecf5da07cbc172c5fc2ebfac4d189"
+}
