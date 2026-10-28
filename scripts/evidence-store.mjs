@@ -5,7 +5,7 @@ import {mkdirSync,chmodSync,realpathSync,existsSync} from 'node:fs';
 import {resolve,relative,dirname,isAbsolute,basename,sep} from 'node:path';
 const hash=s=>createHash('sha256').update(s).digest('hex');
 const text=x=>typeof x==='string'?x.slice(0,200):null;
-function normalize({event,capturedAt,sourceCommit,phase='discovery'}){
+export function normalizeEvidence({event,capturedAt,sourceCommit,phase='discovery'}){
  if(!/^[a-f0-9]{32}$/.test(event?.id||'')||!/^\d{10}$/.test(String(event.nhlGameId||''))||!['homeAbbrev','awayAbbrev'].every(k=>/^[A-Z]{3}$/.test(event[k]||''))||!Number.isFinite(Date.parse(capturedAt))||!(Date.parse(capturedAt)<Date.parse(event.startTime))||!['discovery','game_capture'].includes(phase))throw Error('Verified pregame identity and capture time required');
  const d=event.gameDay;
  const side=k=>{const t=d?.[k],g=t?.goalie;return {team:text(t?.team),goalie:{status:['confirmed','projected'].includes(g?.status)?g.status:'unknown',name:text(g?.name),playerId:/^\d{7}$/.test(g?.playerId||'')?g.playerId:null,source:'ESPN pregame probable starters',sourceUpdatedAt:text(g?.sourceUpdatedAt)},lineup:{status:t?.lineup?.players?.length?'reported':'unknown',completeLineup:false,source:'NHL game report',players:(t?.lineup?.players||[]).filter(p=>/^\d{7}$/.test(String(p.id))).map(p=>({id:String(p.id),name:text(p.name)}))}}};
@@ -28,7 +28,7 @@ export function openEvidenceStore(filename,{repositoryRoot=new URL('../',import.
  function verify(){let previous='';const rows=db.prepare('SELECT * FROM evidence ORDER BY seq').all();for(const row of rows){if(row.previous_hash!==previous||hash(previous+'\n'+row.payload)!==row.entry_hash)throw Error('Evidence journal integrity failure');previous=row.entry_hash}return {entries:rows.length,head:previous||null}}
  try{verify()}catch(e){db.close();throw e}
  return {
-  append(input){const record=normalize(input),payload=JSON.stringify(record),key=hash(JSON.stringify([record.event.id,record.capturedAt,record.phase]));
+  append(input){const record=normalizeEvidence(input),payload=JSON.stringify(record),key=hash(JSON.stringify([record.event.id,record.capturedAt,record.phase]));
    db.exec('BEGIN IMMEDIATE');try{
     const old=db.prepare('SELECT payload FROM evidence WHERE observation_key = ?').get(key);if(old){if(old.payload!==payload)throw Error('Conflicting observation; original evidence preserved');db.exec('COMMIT');return {inserted:false}}
     const previous=db.prepare('SELECT entry_hash FROM evidence ORDER BY seq DESC LIMIT 1').get()?.entry_hash||'',entryHash=hash(previous+'\n'+payload);

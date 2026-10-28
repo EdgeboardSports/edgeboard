@@ -60,3 +60,8 @@ This supersedes the earlier statement that no hosted storage was provisioned. Lo
 ## Production quota binding configured
 
 The private setup verified the production SECURITY_DB binding and security_usage, provider_state, and security_events tables. A production redeployment is required to apply the binding. Provider balance initialization, budget-period configuration, and feed activation remain outstanding; no balance is assumed and no odds requests are authorized by this change.
+
+
+## Hosted collector transport
+
+The collector can select the fixed owner-private storage companion using EDGEBOARD_STORAGE_TOKEN supplied by its private host. Do not put this credential in Git or the browser. Local EDGEBOARD_EVIDENCE_PATH remains supported. The adapter normalizes evidence using the same field allowlist, rejects redirects, performs one POST, and requires a matching SHA-256 digest plus persisted/readBack acknowledgment. Refusals stop that event before odds requests. Live /collector/api/evidence remains disabled; this is tested transport wiring, not activated ingestion or a configured unattended credential. The existing synthetic hosted test does not validate real pregame ingestion.
