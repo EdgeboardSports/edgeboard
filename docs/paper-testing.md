@@ -65,3 +65,9 @@ The private setup verified the production SECURITY_DB binding and security_usage
 ## Hosted collector transport
 
 The collector can select the fixed owner-private storage companion using EDGEBOARD_STORAGE_TOKEN supplied by its private host. Do not put this credential in Git or the browser. Local EDGEBOARD_EVIDENCE_PATH remains supported. The adapter normalizes evidence using the same field allowlist, rejects redirects, performs one POST, and requires a matching SHA-256 digest plus persisted/readBack acknowledgment. Refusals stop that event before odds requests. Live /collector/api/evidence remains disabled; this is tested transport wiring, not activated ingestion or a configured unattended credential. The existing synthetic hosted test does not validate real pregame ingestion.
+
+## Hosted receiver and synthetic end-to-end verification
+
+The owner-private companion receiver validates the same normalized evidence schema, limits requests to 64 KiB, requires recent pregame timestamps, preserves append-only storage, and rejects conflicting payloads for the same event/time/phase. Live evidence POSTs remain disabled unless the separate LIVE_EVIDENCE_APPROVED runtime flag is explicitly configured after source review. No such flag was enabled.
+
+The collector's explicit synthetic transport mode uses /collector/api/synthetic-evidence and the synthetic-pregame namespace. It is not selected by the collection CLI. The deployed receiver was tested with the actual Node collector adapter: successful write/readback, duplicate detection, conflict rejection, original hash preservation, and rejection of live writes were all verified. These are synthetic transport checks, not real predictions or an activated 30-day trial. Unattended authentication is still unconfigured.
