@@ -1,0 +1,150 @@
+{
+  "cutoff": "2026-10-28",
+  "archiveAt": "2026-10-26T10:49:12.843Z",
+  "archiveAudit": {
+    "conflicts": 0,
+    "duplicates": 0
+  },
+  "eligibleForecasts": 1167,
+  "version": "moneyline-calibration-research-v1",
+  "experimental": true,
+  "promoted": false,
+  "audit": {
+    "invalid": 0,
+    "duplicateCopies": 0,
+    "conflictingIds": 0,
+    "insufficientTraining": 204
+  },
+  "base": {
+    "n": 200,
+    "brier": 0.23897680004236876,
+    "logLoss": 0.6707944741817274,
+    "calibration": [
+      {
+        "lower": 0,
+        "upper": 0.2,
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "n": 19,
+        "predicted": 0.3788965634335948,
+        "observed": 0.3684210526315789
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "n": 160,
+        "predicted": 0.5057644141694555,
+        "observed": 0.60625
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "n": 21,
+        "predicted": 0.6293052517666459,
+        "observed": 0.6666666666666666
+      },
+      {
+        "lower": 0.8,
+        "upper": 1,
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      }
+    ]
+  },
+  "challenger": {
+    "n": 200,
+    "brier": 0.2376050736164079,
+    "logLoss": 0.6679054846766417,
+    "calibration": [
+      {
+        "lower": 0,
+        "upper": 0.2,
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "n": 28,
+        "predicted": 0.3604869886133614,
+        "observed": 0.42857142857142855
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "n": 133,
+        "predicted": 0.5095414772792826,
+        "observed": 0.6090225563909775
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "n": 39,
+        "predicted": 0.6473134172397326,
+        "observed": 0.6410256410256411
+      },
+      {
+        "lower": 0.8,
+        "upper": 1,
+        "n": 0,
+        "predicted": null,
+        "observed": null
+      }
+    ]
+  },
+  "pairedBrierImprovement": 0.0013717264259608675,
+  "pairedLogLossImprovement": 0.0028889895050857595,
+  "robustness": {
+    "method": "paired game-date cluster bootstrap percentile",
+    "seed": 20261028,
+    "replicates": 2000,
+    "distinctDates": 30,
+    "minimumDates": 20,
+    "brierImprovement95": {
+      "lower": -0.0014618214785168174,
+      "upper": 0.004192001913863513
+    },
+    "logLossImprovement95": {
+      "lower": -0.0032386816395600974,
+      "upper": 0.008979504185626878
+    },
+    "monthly": [
+      {
+        "month": "2026-04",
+        "n": 16,
+        "brierImprovement": 0.0015198335320910214,
+        "logLossImprovement": 0.004772091446402241
+      },
+      {
+        "month": "2026-09",
+        "n": 8,
+        "brierImprovement": -0.004897629258810763,
+        "logLossImprovement": -0.01242577673159697
+      },
+      {
+        "month": "2026-10",
+        "n": 176,
+        "brierImprovement": 0.0016432328565295041,
+        "logLossImprovement": 0.003413924157542884
+      }
+    ],
+    "interpretation": "Positive improvement favors calibration. Intervals crossing zero are inconclusive. Archive development evidence only; no automatic promotion."
+  },
+  "limitations": [
+    "Saved final outcomes assumed available by the next game date",
+    "Same-day outcomes excluded from calibration fitting",
+    "Fixed research grid; no production model promotion",
+    "No sportsbook prices, ROI or profitability inference",
+    "Repeated evaluation of this archive is development evidence, not a new untouched holdout"
+  ],
+  "firstTest": "2026-04-14",
+  "lastTest": "2026-10-25",
+  "chronologyValid": true
+}

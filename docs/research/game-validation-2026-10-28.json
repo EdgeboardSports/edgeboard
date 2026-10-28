@@ -1,0 +1,57 @@
+{
+  "model": "goals-v1",
+  "cutoff": "2026-10-28",
+  "archiveAt": "2026-10-26T10:49:12.843Z",
+  "markets": [
+    {
+      "market": "h2h",
+      "side": "Home",
+      "line": null,
+      "games": 100,
+      "brier": 0.2379657014180606,
+      "baseline": 0.25,
+      "first": "2026-10-11",
+      "last": "2026-10-25",
+      "chronologyValid": true
+    },
+    {
+      "market": "h2h_3_way",
+      "side": "Draw",
+      "line": null,
+      "games": 100,
+      "brier": 0.32113169450011037,
+      "baseline": 0.3301839478465668,
+      "first": "2026-10-11",
+      "last": "2026-10-25",
+      "chronologyValid": true
+    },
+    {
+      "market": "spreads",
+      "side": "Home",
+      "line": -1.5,
+      "games": 100,
+      "brier": 0.20476022551588638,
+      "baseline": 0.21670251528097068,
+      "first": "2026-10-11",
+      "last": "2026-10-25",
+      "chronologyValid": true
+    },
+    {
+      "market": "totals",
+      "side": "Over",
+      "line": 6.5,
+      "games": 100,
+      "brier": 0.2459583205205869,
+      "baseline": 0.2645826827900249,
+      "first": "2026-10-11",
+      "last": "2026-10-25",
+      "chronologyValid": true
+    }
+  ],
+  "limitations": [
+    "At most 100 recent holdout games per market",
+    "Fixed illustrative total/spread; no historical odds or ROI",
+    "Equal-strength baseline is not a sportsbook baseline",
+    "No evidence of calibrated recommendation strength from this test alone"
+  ]
+}
