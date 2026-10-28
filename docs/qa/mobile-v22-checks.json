@@ -1,0 +1,152 @@
+{
+  "environment": "Chrome iframe preview, synthetic/held feeds; not Safari device testing",
+  "checks": [
+    {
+      "screen": "today",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "picks",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "game",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "props",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "player",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "performance",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "samples",
+      "frameWidth": 320,
+      "scrollWidth": 305,
+      "width": 305,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "today",
+      "frameWidth": 390,
+      "scrollWidth": 375,
+      "width": 375,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "picks",
+      "frameWidth": 390,
+      "scrollWidth": 375,
+      "width": 375,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "game",
+      "frameWidth": 390,
+      "scrollWidth": 390,
+      "width": 390,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "props",
+      "frameWidth": 390,
+      "scrollWidth": 375,
+      "width": 375,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "player",
+      "frameWidth": 390,
+      "scrollWidth": 375,
+      "width": 375,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "performance",
+      "frameWidth": 390,
+      "scrollWidth": 375,
+      "width": 375,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "samples",
+      "frameWidth": 390,
+      "scrollWidth": 375,
+      "width": 375,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "today",
+      "frameWidth": 430,
+      "scrollWidth": 415,
+      "width": 415,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "picks",
+      "frameWidth": 430,
+      "scrollWidth": 415,
+      "width": 415,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "game",
+      "frameWidth": 430,
+      "scrollWidth": 430,
+      "width": 430,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "props",
+      "frameWidth": 430,
+      "scrollWidth": 415,
+      "width": 415,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "player",
+      "frameWidth": 430,
+      "scrollWidth": 415,
+      "width": 415,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "performance",
+      "frameWidth": 430,
+      "scrollWidth": 415,
+      "width": 415,
+      "revision": "/assets/ui.css?v=22"
+    },
+    {
+      "screen": "samples",
+      "frameWidth": 430,
+      "scrollWidth": 415,
+      "width": 415,
+      "revision": "/assets/ui.css?v=22"
+    }
+  ]
+}

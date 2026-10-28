@@ -1,6 +1,6 @@
 import {gameDayLines,refreshGameDay,confirmedGoalies,gameDayEvidence} from '/game-day.js';
 import {researchLines,refreshResearch} from '/research-context.js';
-import {el,playerIdentity} from '/assets/ui.js?v=21';
+import {el,playerIdentity} from '/assets/ui.js?v=22';
 import {createScanner,decisionBoard,marketNames,day,marketComparison} from '/best-picks-engine.js';
 const $=id=>document.getElementById(id);let events=[],result=null,kind='all',busy=false;
 const money=n=>(n>0?'+':'')+n,pct=n=>Number.isFinite(n)?(n*100).toFixed(1)+'%':'—',signed=n=>(n>=0?'+':'')+pct(n),time=t=>new Date(t).toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+' ET';

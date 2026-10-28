@@ -20,6 +20,8 @@ class Preview(SimpleHTTPRequestHandler):
   if path=='/':self.path='/index.html'
   elif '.' not in path.rsplit('/',1)[-1]:self.path=path+'.html'
   return super().do_GET()
+ def end_headers(self):
+  self.send_header('Cache-Control','no-store');super().end_headers()
  def do_HEAD(self):self.send_error(405)
  def log_message(self,*args):pass
 parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=4173);parser.add_argument('--host',default='0.0.0.0');parser.add_argument('--strictPort',action='store_true');args=parser.parse_args()
