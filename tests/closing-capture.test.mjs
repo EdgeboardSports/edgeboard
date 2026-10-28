@@ -17,3 +17,14 @@ console.log('Closing collector: matched book/line/player, protected budget, once
 const gameSnapshot={...snapshot,kind:'game',playerId:null,market:'h2h',side:'Home',line:null},gameLedger={events:[{records:[],gameRecords:[{ledgerId:'c'.repeat(64),snapshot:gameSnapshot}]}]};let gameCalls=0;
 const gameClient=async path=>{if(path.startsWith('/api/nhl-schedule'))return {games:[{id:snapshot.nhlGameId,gameState:'FUT',startTimeUTC:snapshot.startTime,homeTeam:{abbrev:'TOR'},awayTeam:{abbrev:'CAR'}}]};if(path==='/api/budget-status')return {availableCredits:3};if(path.startsWith('/api/nhl-game-odds')){gameCalls++;return {status:'live',eventId:id,commenceTime:snapshot.startTime,odds:[{market:'h2h',side:'Home',point:null,bookmaker:'test_book',decimal:1.9,lastUpdate:new Date(now).toISOString()}]}}throw Error('Unsupported game source')};
 const gameReport=await captureClosingPrices(gameLedger,gameClient,{clock:()=>now,closingStore:{status:async()=>({writesEnabled:true}),claim:async()=>({claimed:true}),append:async(input,s)=>normalizeClosingObservation(input,s)}});assert.equal(gameReport.saved,1);assert.equal(gameCalls,1);
+
+// A durable claim may take long enough to cross the earlier official start.
+let movingClock=now,lateCalls=0;
+const slowClaimStore={status:async()=>({writesEnabled:true}),claim:async()=>{movingClock=now+300000;return {claimed:true}},append:async()=>assert.fail('No late persistence')};
+const slowClient=async path=>{if(path.startsWith('/api/nhl-props'))lateCalls++;return client(path)};
+balance=12;priceTime=new Date(now).toISOString();
+const stopped=await captureClosingPrices(ledger,slowClient,{closingStore:slowClaimStore,clock:()=>movingClock});assert.equal(stopped.attemptedGroups,1);assert.equal(lateCalls,0);assert(stopped.notes.some(n=>n.includes('start reached')));
+// Even if the snapshot start remains future, the earlier verified NHL time wins.
+movingClock=now;const earlierClient=async path=>path.startsWith('/api/nhl-schedule')?{games:[{id:snapshot.nhlGameId,gameState:'PRE',startTimeUTC:new Date(now+1000).toISOString(),homeTeam:{abbrev:'TOR'},awayTeam:{abbrev:'CAR'}}]}:slowClient(path);
+const earlier=await captureClosingPrices(ledger,earlierClient,{closingStore:{...slowClaimStore,claim:async()=>{movingClock=now+1001;return {claimed:true}}},clock:()=>movingClock});assert.equal(lateCalls,0);assert.equal(earlier.saved,0);
+console.log('Closing capture rechecks earliest verified start after durable claim; no post-start provider request.');

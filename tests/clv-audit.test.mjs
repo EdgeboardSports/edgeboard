@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {closingValue,evaluationWindow} from '../evaluation-core.js';
+const start=Date.parse('2026-01-01T12:00:00Z'),snapshot={eventId:'game',market:'player_shots_on_goal',playerId:7,side:'Over',line:2.5,startTime:new Date(start).toISOString(),capturedAt:'2026-01-01T11:00:00Z',candidate:true,quote:{bookmaker:'book',decimal:2.1}},o={eventId:'game',market:snapshot.market,playerId:7,side:'Over',line:2.5,bookmaker:'book',decimal:1.9,observedAt:'2026-01-01T11:59:00Z',quoteAt:'2026-01-01T11:58:00Z',receivedAt:'2026-01-01T11:59:01Z'};
+const before=JSON.stringify({snapshot,o});
+for(const patch of [{eventId:'other'},{playerId:8},{market:'h2h'},{side:'Under'},{line:3.5},{bookmaker:'other'},{decimal:1},{decimal:NaN},{quoteAt:'2026-01-01T12:01:00Z'},{quoteAt:'2026-01-01T11:40:00Z'},{observedAt:'2026-01-01T12:00:00Z'},{receivedAt:'invalid'}])assert.equal(closingValue(snapshot,[{...o,...patch}],start+1),null);
+assert.equal(closingValue(snapshot,[o],start-1),null);
+assert.equal(closingValue(snapshot,[{...o,receivedAt:new Date(start+1000).toISOString()}],start+1),null);
+assert.equal(closingValue(snapshot,[],start+1),null);
+const conflict={...o,decimal:2};assert.equal(closingValue(snapshot,[o,conflict],start+1),null);assert.equal(closingValue(snapshot,[conflict,o],start+1),null);
+assert.equal(closingValue(snapshot,[o,{...o}],start+1).closingDecimal,1.9);
+const earlier={...o,decimal:1.8,observedAt:'2026-01-01T11:57:00Z',quoteAt:'2026-01-01T11:56:00Z'};
+assert.equal(closingValue(snapshot,[o,earlier],start+1).closingDecimal,1.9);assert.equal(closingValue(snapshot,[earlier,o,conflict],start+1),null);
+const record={snapshot,result:{state:'pending'}},opts={start:'2026-01-01',now:start+1,observations:[o]};
+assert.equal(evaluationWindow([record],opts).clv.coverage,1);assert.equal(evaluationWindow([record],{...opts,observations:[o,conflict]}).clv.averagePriceRatio,null);
+assert.equal(JSON.stringify({snapshot,o}),before);
+console.log('CLV audit: exact identity, freshness, pregame/receipt cutoffs, missing prices, deterministic duplicate/conflict handling and immutable inputs passed.');
+
+// Exercise capture -> hosted-client canonical envelope -> readback digest -> report.
+const {captureClosingPrices}=await import('../scripts/closing-capture.mjs');
+const {openHostedClosingStore}=await import('../scripts/hosted-closing-store.mjs');
+const {createHash}=await import('node:crypto');
+const predictionId='b'.repeat(64),ss={...snapshot,eventId:'a'.repeat(32),nhlGameId:11,date:'2026-01-01'},stored=[];
+const transport=async(url,options)=>{assert.equal(new URL(url).origin,'https://edgeboard-research-preview.speedystone18.chatgpt.site');assert.equal(options.redirect,'manual');if(options.method==='GET')return Response.json({synthetic:true,writesEnabled:true});const body=JSON.parse(options.body),digest=createHash('sha256').update(options.body).digest('hex');if(body.type==='observation')stored.push(body.observation);return Response.json({synthetic:true,claimed:true,persisted:true,readBack:true,digest})};
+const store=openHostedClosingStore({token:'synthetic-test-only',synthetic:true,fetchImpl:transport});let providerRequests=0;
+const client=async path=>{if(path.startsWith('/api/nhl-schedule'))return {games:[{id:11,gameState:'PRE',startTimeUTC:ss.startTime,homeTeam:{abbrev:'CAR'},awayTeam:{abbrev:'TOR'}}]};if(path.startsWith('/api/nhl-player-profile'))return {id:7,name:'Test Player',team:'CAR'};if(path==='/api/budget-status')return {availableCredits:1};if(path.startsWith('/api/nhl-props')){providerRequests++;return {status:'live',eventId:ss.eventId,commenceTime:ss.startTime,odds:[{player:'Test Player',bookmaker:'book',side:'Over',point:2.5,decimal:1.9,lastUpdate:o.quoteAt}]}}throw Error('Unexpected mock route')};
+const captured=await captureClosingPrices({events:[{records:[{ledgerId:predictionId,snapshot:ss}]}]},client,{closingStore:store,clock:()=>start-60000});
+assert.equal(providerRequests,1);assert.equal(captured.saved,1);assert.equal(stored[0].source,'synthetic-fixture');assert.equal(stored[0].predictionId,predictionId);assert.equal(closingValue(ss,stored,start+1).closingDecimal,1.9);store.close();
+console.log('Synthetic CLV pipeline: capture, exact match, hosted protocol, canonical persistence acknowledgement and reporting passed; all provider calls mocked.');
+const mismatchStore=openHostedClosingStore({token:'synthetic-test-only',synthetic:true,fetchImpl:transport});
+const mismatchClient=async path=>{const response=await client(path);return path.startsWith('/api/nhl-props')?{...response,odds:response.odds.map(q=>({...q,market:'player_points'}))}:response};
+const mismatched=await captureClosingPrices({events:[{records:[{ledgerId:predictionId,snapshot:ss}]}]},mismatchClient,{closingStore:mismatchStore,clock:()=>start-60000});assert.equal(mismatched.saved,0);assert.equal(mismatched.missing,1);mismatchStore.close();
