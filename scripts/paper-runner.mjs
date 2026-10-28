@@ -1,3 +1,4 @@
+import {requireCollectionReadiness} from './collection-readiness.mjs';
 import {openEvidenceStore} from './evidence-store.mjs';
 import {loadGameDay} from '../game-day.js';
 import {teamContext,playerResearch,gameResearch} from '../research-context.js';
@@ -136,9 +137,10 @@ async function main(){
  if(process.env.EDGEBOARD_COLLECTION_APPROVED!=='true'){console.log('Collection paused pending access and provider permission review.');return}
 
  if(!process.env.EDGEBOARD_EVIDENCE_PATH)throw Error('Private evidence storage must be configured before collection');
- const evidenceStore=openEvidenceStore(process.env.EDGEBOARD_EVIDENCE_PATH);
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base);
+ await requireCollectionReadiness(client);
+ const evidenceStore=openEvidenceStore(process.env.EDGEBOARD_EVIDENCE_PATH);
  const path=new URL('../data/paper-ledger.json',import.meta.url);const ledger=JSON.parse(await readFile(path,'utf8'));
  let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
  let result;try{result=await runPaper(ledger,client,{gameArchive,evidenceStore,sourceCommit:process.env.PAPER_SOURCE_COMMIT||process.env.GITHUB_SHA||'local'})}finally{evidenceStore.close()}
