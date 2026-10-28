@@ -1,0 +1,9 @@
+# Historical calibration validation
+
+Run `npm run report:calibration -- 2026-10-28` with an exclusive UTC date cutoff. The report rebuilds frozen historical home-moneyline forecasts from strictly earlier games, fits a fixed calibration grid on strictly prior dates, and evaluates raw and calibrated forecasts on the same latest 200 eligible games. No production probability changes or automatic promotion occur.
+
+The robustness section resamples whole game dates (2,000 deterministic bootstrap replicates), retaining all games within each sampled date and weighting results by game count. It reports paired Brier and log-loss improvement percentile intervals and monthly comparisons. Positive values favor calibration. Fewer than 20 distinct dates produce no interval. This is a descriptive sampling check, not an independence guarantee across dates, a hypothesis test, or a profitability estimate.
+
+On the saved archive through October 27, 2026, 1,167 forecasts were eligible; the final evaluation contained 200 games on 30 dates. Brier decreased from 0.23897680 to 0.23760507. The paired Brier improvement interval was approximately -0.001462 to +0.004192; the log-loss improvement interval was -0.003239 to +0.008980. Both cross zero, so the improvement is inconclusive. September's eight-game subset deteriorated; October dominates the sample. Neither the monthly slices nor this reused development archive constitute an untouched prospective holdout.
+
+Outcome publication times are absent; availability is assumed by the next game date. Same-date outcomes are excluded. Bootstrap intervals do not account for repeated archive tuning, calendar regime shifts, model selection, or every source of dependence. Real pregame goalie-quality history remains insufficient to validate the goalie challenger. Do not infer betting ROI or launch the paper trial from these results.

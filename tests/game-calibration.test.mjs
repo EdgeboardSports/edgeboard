@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {walkForwardCalibration} from '../game-calibration.js';
+import {walkForwardCalibration,calibrationRobustness} from '../game-calibration.js';
 const rows=Array.from({length:80},(_,i)=>({id:String(i),date:new Date(Date.UTC(2026,0,1+Math.floor(i/2))).toISOString().slice(0,10),trainingEnd:'2025-12-01',probability:.8,outcome:i%2}));
 const options={minTraining:20,window:40,maxTests:20},frozen=JSON.stringify(rows),report=walkForwardCalibration(rows,options);
 assert.equal(report.tests.length,20);assert.equal(report.promoted,false);assert(report.pairedLogLossImprovement>0);assert(report.tests.every(r=>r.calibrationTrainingEnd<r.date&&r.calibrationSample<=40));assert.equal(JSON.stringify(rows),frozen);
@@ -11,3 +11,17 @@ const empty=walkForwardCalibration([]);assert.equal(empty.pairedBrierImprovement
 console.log('Walk-forward calibration: paired metrics, prior-day-only fitting, target isolation, duplicates/conflicts, missing evidence and frozen inputs passed');
 const sameDay=structuredClone(rows);sameDay.at(-2).outcome=1-sameDay.at(-2).outcome;const sameDayReport=walkForwardCalibration(sameDay,options);assert.equal(sameDayReport.tests.at(-1).calibrated,report.tests.at(-1).calibrated);
 const future={id:'future',date:'2027-01-01',trainingEnd:'2026-12-01',probability:.2,outcome:1};const futureReport=walkForwardCalibration([...rows,future],{...options,maxTests:1000});assert.equal(futureReport.tests.find(r=>r.id===rows.at(-1).id).calibrated,report.tests.at(-1).calibrated);
+
+const identity=rows.map(r=>({...r,calibrated:r.probability}));
+const robust=calibrationRobustness(identity);
+assert.deepEqual(robust.brierImprovement95,{lower:0,upper:0});
+assert.deepEqual(robust.logLossImprovement95,{lower:0,upper:0});
+assert.deepEqual(calibrationRobustness([...identity].reverse()),robust);
+assert.equal(robust.distinctDates,40);
+assert.equal(robust.monthly.reduce((n,m)=>n+m.n,0),identity.length);
+assert.equal(calibrationRobustness(identity.slice(0,20)).brierImprovement95,null);
+const superior=identity.map(r=>({...r,calibrated:r.outcome?.9:.1}));
+assert(calibrationRobustness(superior).brierImprovement95.lower>0);
+assert(calibrationRobustness(superior).logLossImprovement95.lower>0);
+assert.throws(()=>calibrationRobustness([{...identity[0],calibrated:NaN}]));
+console.log('Date-cluster uncertainty: identity, deterministic reordering, insufficient dates, paired improvement and monthly coverage passed');
