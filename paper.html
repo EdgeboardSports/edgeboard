@@ -45,7 +45,7 @@ function render(){
 async function load(){ $('refresh').disabled=true;try{const r=await fetch('/api/paper-ledger',{cache:'no-store'});const d=await r.json();if(!r.ok||d.schemaVersion!==1)throw Error(d.message||'Ledger unavailable');ledger=d;fillVersions();
  $('status').textContent=d.lastRunAt?'Last automation run: '+new Date(d.lastRunAt).toLocaleString()+' · '+d.events.length+' sampled games':'Collection is paused; no verified run is recorded.';
  $('health').replaceChildren();if(d.lastRunAt&&Date.now()-Date.parse(d.lastRunAt)>3*3600000){const p=make('p','Automation heartbeat is over three hours old. Check the workflow before trusting coverage.');p.className='warning';$('health').append(p)}const last=d.runs?.at(-1);if(last?.errors?.length){const p=make('p','Latest run reported: '+last.errors.join('; '));p.className='warning';$('health').append(p)}render();
- }catch(e){$('status').textContent='Could not load paper results: '+e.message}finally{$('refresh').disabled=false}}
+ }catch{ledger=null;for(const id of ['metrics','accuracy','calibration','records','audit','health','program-metrics','program-groups','program-daily'])$(id).replaceChildren();for(const id of ['program-status','program-clv','program-audit'])$(id).textContent='';$('status').textContent='Could not load paper results. No previous results are being shown.'}finally{$('refresh').disabled=false}}
  try{$('program-start').value=localStorage.getItem('edgeboard-paper-window')||new Date().toISOString().slice(0,10)}catch{$('program-start').value=new Date().toISOString().slice(0,10)}
  $('program-start').onchange=()=>{try{localStorage.setItem('edgeboard-paper-window',$('program-start').value)}catch{}renderProgram()};
  $('program-cutoff').onchange=renderProgram;

@@ -16,5 +16,6 @@ class PreviewTest(unittest.TestCase):
    request=Request(path);request.do_GET();self.assertEqual(request.code,503);self.assertIn(b'no provider contacted',request.wfile.getvalue())
   for path in ['/lib/collector-configuration.js','/scripts/paper-runner.mjs','/docs/security-schema.sql','/.git/config','/../package.json']:
    request=Request(path);request.do_GET();self.assertEqual(request.code,404)
-  request=Request('/api/paper-ledger');request.do_GET();self.assertEqual(request.code,200);self.assertIn(b'"events": []',request.wfile.getvalue())
+  request=Request('/api/paper-ledger');request.do_GET();self.assertEqual(request.code,200);self.assertIn(b'"events": []',request.wfile.getvalue());self.assertIn(b'"schemaVersion": 1',request.wfile.getvalue())
+  request=Request('/api/paper-ledger');request.headers={'Referer':'http://preview.test/paper?qaLedger=error'};request.do_GET();self.assertEqual(request.code,503)
 if __name__=='__main__':unittest.main()

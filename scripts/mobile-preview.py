@@ -1,5 +1,5 @@
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
-from urllib.parse import urlparse
+from urllib.parse import urlparse,parse_qs
 import os,json,argparse
 from pathlib import Path
 os.chdir(Path(__file__).resolve().parents[1])
@@ -7,7 +7,8 @@ class Preview(SimpleHTTPRequestHandler):
  def do_GET(self):
   path=urlparse(self.path).path
   if path.startswith('/api/'):
-   if path=='/api/paper-ledger': body={'events':[],'runs':[],'lastRunAt':None};status=200
+   if path=='/api/paper-ledger' and parse_qs(urlparse(self.headers.get('Referer','')).query).get('qaLedger')==['error']: body={'message':'Synthetic unavailable ledger'};status=503
+   elif path=='/api/paper-ledger': body={'schemaVersion':1,'events':[],'runs':[],'lastRunAt':None};status=200
    elif path=='/api/game-archive': body={'games':[],'teamNames':{}};status=200
    elif path=='/api/feed-status': body={'schedule':{'state':'paused'},'odds':{'state':'blocked','blockers':['Synthetic preview: live feeds paused.']},'automation':{'state':'paused','message':'Collection paused · local UI preview'}};status=200
    else: body={'message':'Synthetic preview: source unavailable; no provider contacted.'};status=503

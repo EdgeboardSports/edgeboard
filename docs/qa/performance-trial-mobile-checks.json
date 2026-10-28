@@ -1,0 +1,265 @@
+{
+  "environment": "Chrome same-origin responsive iframe preview; synthetic local SQLite only",
+  "frameWidths": [
+    320,
+    390,
+    430
+  ],
+  "physicalIPhoneSafariTested": false,
+  "results": [
+    {
+      "cards": 9,
+      "page": "performance",
+      "scrollWidth": 305,
+      "viewport": 305
+    },
+    {
+      "calibrationRows": 5,
+      "page": "performance-expanded",
+      "scrollWidth": 305,
+      "status": "Collection is paused; no verified run is recorded.",
+      "viewport": 305
+    },
+    {
+      "cards": 9,
+      "page": "performance",
+      "scrollWidth": 375,
+      "status": "Collection is paused; no verified run is recorded.",
+      "viewport": 375
+    },
+    {
+      "cards": 9,
+      "page": "performance",
+      "scrollWidth": 415,
+      "status": "Collection is paused; no verified run is recorded.",
+      "viewport": 415
+    },
+    {
+      "cutoffStatus": "Choose a valid report cutoff at or before the current time.",
+      "market": "h2h",
+      "page": "performance-controls",
+      "scrollWidth": 415,
+      "viewport": 415
+    },
+    {
+      "page": "performance-error",
+      "resultCards": 0,
+      "scrollWidth": 305,
+      "status": "Could not load paper results. No previous results are being shown.",
+      "viewport": 305
+    },
+    {
+      "gradingCards": 8,
+      "overflows": [],
+      "page": "trial-populated",
+      "scrollWidth": 305,
+      "table": {
+        "scrollWidth": 815,
+        "viewport": 227
+      },
+      "viewport": 305
+    },
+    {
+      "dailyRows": 0,
+      "gradingCards": 0,
+      "page": "trial-error-after-populated",
+      "reportHidden": true,
+      "scrollWidth": 320,
+      "status": "Private trial report unavailable. No previous results are being shown.",
+      "viewport": 320
+    },
+    {
+      "dailyRows": 30,
+      "gradingCards": 8,
+      "page": "trial-populated",
+      "scrollWidth": 375,
+      "viewport": 375
+    },
+    {
+      "dailyRows": 30,
+      "gradingCards": 8,
+      "page": "trial-populated",
+      "scrollWidth": 415,
+      "viewport": 415
+    },
+    {
+      "page": "trial-empty",
+      "reportHidden": true,
+      "scrollWidth": 320,
+      "status": "No live trial has been configured. Collection has not started.",
+      "viewport": 320
+    },
+    {
+      "page": "trial-empty",
+      "reportHidden": true,
+      "scrollWidth": 390,
+      "status": "No live trial has been configured. Collection has not started.",
+      "viewport": 390
+    },
+    {
+      "page": "trial-empty",
+      "reportHidden": true,
+      "scrollWidth": 430,
+      "status": "No live trial has been configured. Collection has not started.",
+      "viewport": 430
+    },
+    {
+      "count": "0",
+      "overflows": [
+        "asOf"
+      ],
+      "page": "private-performance-default-before-fix",
+      "scrollWidth": 307,
+      "uncertainty": "ROI uncertainty: insufficient evidence (at least 20 settled games and varying game returns required).",
+      "viewport": 305
+    },
+    {
+      "count": "0",
+      "overflows": [],
+      "page": "private-performance-default-before-fix",
+      "scrollWidth": 375,
+      "uncertainty": "ROI uncertainty: insufficient evidence (at least 20 settled games and varying game returns required).",
+      "viewport": 375
+    },
+    {
+      "count": "0",
+      "overflows": [],
+      "page": "private-performance-default-before-fix",
+      "scrollWidth": 415,
+      "uncertainty": "ROI uncertainty: insufficient evidence (at least 20 settled games and varying game returns required).",
+      "viewport": 415
+    },
+    {
+      "count": "3",
+      "overflowControls": [
+        "",
+        "",
+        ""
+      ],
+      "page": "private-performance-populated-after-fix",
+      "refreshHeight": 45,
+      "scope": "SYNTHETIC TEST DATA \u00b7 Storage and grading fixtures only. These are not actual predictions or betting performance.",
+      "scrollWidth": 311,
+      "viewport": 305
+    },
+    {
+      "count": "3",
+      "overflowControls": [
+        "",
+        "",
+        ""
+      ],
+      "page": "private-performance-populated-after-fix",
+      "refreshHeight": 45,
+      "scope": "SYNTHETIC TEST DATA \u00b7 Storage and grading fixtures only. These are not actual predictions or betting performance.",
+      "scrollWidth": 375,
+      "viewport": 375
+    },
+    {
+      "count": "3",
+      "overflowControls": [
+        "",
+        "",
+        ""
+      ],
+      "page": "private-performance-populated-after-fix",
+      "refreshHeight": 45,
+      "scope": "SYNTHETIC TEST DATA \u00b7 Storage and grading fixtures only. These are not actual predictions or betting performance.",
+      "scrollWidth": 415,
+      "viewport": 415
+    },
+    {
+      "count": "3",
+      "filterX": [
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31
+      ],
+      "overflowOutsideTables": [
+        "DIV",
+        "H3",
+        "DIV",
+        "H3"
+      ],
+      "page": "private-performance-final",
+      "scrollWidth": 311,
+      "viewport": 305
+    },
+    {
+      "count": "3",
+      "filterX": [
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31
+      ],
+      "overflowOutsideTables": [],
+      "page": "private-performance-final",
+      "scrollWidth": 375,
+      "viewport": 375
+    },
+    {
+      "count": "3",
+      "filterX": [
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31
+      ],
+      "overflowOutsideTables": [],
+      "page": "private-performance-final",
+      "scrollWidth": 415,
+      "viewport": 415
+    },
+    {
+      "count": "3",
+      "filterColumns": 1,
+      "overflowOutsideTables": 0,
+      "page": "private-performance-verified",
+      "scrollWidth": 305,
+      "viewport": 305
+    },
+    {
+      "count": "3",
+      "filterColumns": 1,
+      "overflowOutsideTables": 0,
+      "page": "private-performance-verified",
+      "scrollWidth": 375,
+      "viewport": 375
+    },
+    {
+      "count": "3",
+      "filterColumns": 1,
+      "overflowOutsideTables": 0,
+      "page": "private-performance-verified",
+      "scrollWidth": 415,
+      "viewport": 415
+    },
+    {
+      "count": "\u2014",
+      "page": "private-performance-error-after-populated",
+      "roi": "\u2014",
+      "scrollWidth": 415,
+      "status": "Valid report filters and nonfuture UTC cutoff required",
+      "uncertainty": "ROI uncertainty: \u2014",
+      "viewport": 415
+    }
+  ],
+  "trialTableKeyboardScroll": {
+    "testedAtFrameWidth": 320,
+    "viewport": 227,
+    "contentWidth": 815,
+    "afterArrowRight": 51,
+    "focusable": true
+  }
+}
