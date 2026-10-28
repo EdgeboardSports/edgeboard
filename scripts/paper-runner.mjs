@@ -154,7 +154,7 @@ async function main(){
  const ledgerStore=openHostedPredictionLedger({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  const closingStore=openHostedClosingStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
- let execution;try{execution=await executeTrialSlot({store:trialStore,trialId:process.env.EDGEBOARD_TRIAL_ID,sourceCommit,checkReady:()=>requireCollectionReadiness(client),collect:async()=>{
+ let execution;try{execution=await executeTrialSlot({store:trialStore,trialId:process.env.EDGEBOARD_TRIAL_ID,sourceCommit,checkReady:({through})=>requireCollectionReadiness(client,Date.now(),{through}),collect:async()=>{
   const ledger=await ledgerStore.restore(),before=new Map(ledger.events.flatMap(e=>[...(e.records||[]),...(e.gameRecords||[])]).map(r=>[r.ledgerId,r.ledgerGradeDigest]));
   const result=await runPaper(ledger,client,{gameArchive,evidenceStore,ledgerStore,closingStore,sourceCommit,trialId:process.env.EDGEBOARD_TRIAL_ID});const records=result.events.flatMap(e=>[...(e.records||[]),...(e.gameRecords||[])]),last=result.runs.at(-1);
   return {result,counts:{capturedGames:last.capturedGames,newPredictions:records.filter(r=>!before.has(r.ledgerId)).length,gradeChanges:records.filter(r=>before.has(r.ledgerId)&&before.get(r.ledgerId)!==r.ledgerGradeDigest).length,errors:last.errors.length}};

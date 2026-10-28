@@ -9,3 +9,5 @@ status.schedule.state='paused';paths=[];await assert.rejects(requireCollectionRe
 for(const patch of [{availableCredits:0},{oddsFeedEnabled:false},{protectedRemainingCredits:100},{accountingPeriod:'wrong'},{checkedAt:new Date(now-61000).toISOString()}]){const bad=async path=>path==='/api/feed-status'?status:{...budget,...patch};await assert.rejects(requireCollectionReadiness(bad,now))}
 await assert.rejects(requireCollectionReadiness(async()=>{throw Error('unavailable')},now));
 console.log('Collector preflight stops paused, stale, exhausted and unavailable runs');
+status.authentication={method:'collector',credentialExpiresAt:new Date(now+31*86400000).toISOString()};const through=new Date(now+30*86400000).toISOString();assert((await requireCollectionReadiness(client,now,{through})).availableCredits>0);
+for(const credentialExpiresAt of [undefined,'invalid',new Date(now+29*86400000).toISOString()]){const bad=async path=>path==='/api/feed-status'?{...status,authentication:{method:'collector',credentialExpiresAt}}:budget;await assert.rejects(requireCollectionReadiness(bad,now,{through}))}

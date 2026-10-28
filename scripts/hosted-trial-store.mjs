@@ -24,7 +24,7 @@ export async function executeTrialSlot({store,trialId,sourceCommit,checkReady,co
  if(p.sourceCommit!==sourceCommit||JSON.stringify(p.modelVersions)!==JSON.stringify(['goals-v1','shots-v1'])||JSON.stringify(p.markets)!==JSON.stringify(['h2h','h2h_3_way','player_shots_on_goal','spreads']))throw Error('Collector does not match frozen trial protocol');
  const claim=await store.claim({trialId,slotAt,type:'start'});if(!claim.claimed)return {skipped:true,reason:'slot_already_claimed'};
  let outcome='held',counts={capturedGames:0,newPredictions:0,gradeChanges:0,errors:0},result;
- try{await checkReady()}catch{await store.complete({trialId,slotAt,type:'finish',outcome,counts});return {outcome,counts}}
+ try{await checkReady({through:new Date(start+30*86400000).toISOString(),protocol:p})}catch{await store.complete({trialId,slotAt,type:'finish',outcome,counts});return {outcome,counts}}
  try{const collected=await collect();counts=collected.counts;result=collected.result;outcome=counts.errors?'error':'success'}catch{outcome='error';counts={capturedGames:0,newPredictions:0,gradeChanges:0,errors:1}}
  await store.complete({trialId,slotAt,type:'finish',outcome,counts});return {outcome,counts,result};
 }
