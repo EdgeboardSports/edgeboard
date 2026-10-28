@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {parseCsv,importMoneyPuck,priorSeasonResearch} from '../scripts/moneypuck-import.mjs';
+const header='playerId,season,name,team,position,situation,games_played,icetime,xGoals,goals';
+const row='8470001,2025,"Test, Goalie",NYR,G,all,30,72000,60.5,50';
+const source=header+'\r\n'+row+'\r\n'+row.replace(',all,',',5on5,')+'\r\n';
+const options={kind:'goalies',season:2025,retrievedAt:'2026-10-28T12:00:00Z'};
+const result=importMoneyPuck(source,options);assert.equal(result.players.length,1);assert.equal(result.players[0].name,'Test, Goalie');assert.equal(result.players[0].minutes,1200);assert.equal(result.players[0].goalsSavedAboveExpectedPer60,.525);assert.equal(result.audit.otherSituations,1);assert.match(result.sha256,/^[a-f0-9]{64}$/);assert.match(result.attribution,/MoneyPuck.com/);assert.equal(result.researchOnly,true);assert.equal(result.historicalPublicationVerified,false);
+assert.equal(priorSeasonResearch(result,{targetDate:'2026-10-28'}).eligible600MinuteGoalies,1);
+for(const targetDate of ['2025-11-01','2026-06-30','2026-02-30'])assert.throws(()=>priorSeasonResearch(result,{targetDate}));
+assert.equal(importMoneyPuck(source+row+'\n',options).audit.duplicateCopies,1);
+const second=row.replace('8470001','8470002');const conflict=importMoneyPuck(source+row.replace(',60.5,',',61.5,')+'\n'+second+'\n',options);assert.equal(conflict.audit.conflictingPlayers,1);assert.equal(conflict.players.length,1);assert.equal(conflict.players[0].playerId,'8470002');
+for(const text of [source.replace('xGoals','other'),source.replace('2025','2024'),source.replace('72000',''),source.replace('72000','NaN'),source.replace('72000','-10'),source.replace('72000','Infinity'),source.replace('8470001','bad-id')])assert.throws(()=>importMoneyPuck(text,options));
+assert.deepEqual(parseCsv('\uFEFFa,b\r\n"two\nlines","a""b"\r\n').rows,[{a:'two\nlines',b:'a"b'}]);
+for(const text of ['a,a\n1,2','a,b\n1','a,b\n"bad,2','a,b\n"closed"x,2','a,b\nno"quote,2'])assert.throws(()=>parseCsv(text));
+const skater='playerId,season,name,team,position,situation,games_played,icetime,I_F_shotsOnGoal,I_F_xGoals,I_F_goals\n8470003,2025,Skater,NYR,C,all,20,24000,60,8.2,10\n';
+const s=importMoneyPuck(skater,{...options,kind:'skaters'});assert.equal(s.players[0].shotsPerGame,3);assert.equal(s.players[0].shotsPer60,9);assert.equal(priorSeasonResearch(s,{targetDate:'2026-10-28'}).eligible20GameSkaters,1);assert.throws(()=>importMoneyPuck(skater.replace(',60,8.2,10',',6,8.2,10'),{...options,kind:'skaters'}));
+console.log('MoneyPuck importer: all-situation selection, CSV quoting/schema/numeric validation, duplicate/conflict audit, goalie seconds conversion, shots exposure, season cutoff and attribution passed');
