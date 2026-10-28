@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {trialReadiness} from '../scripts/trial-readiness.mjs';
+const now=Date.parse('2026-10-28T12:00:00Z'),start='2026-10-28';
+const source={verified:true,authentication:'collector',auditPersisted:true,checkedAt:new Date(now).toISOString(),schedule:'paused',odds:'blocked',availableCredits:12,protectedRemainingCredits:431};
+const report={scope:'live',synthetic:false,asOf:new Date(now).toISOString(),window:{start:start+'T00:00:00.000Z',end:'2026-11-27T00:00:00.000Z'},audit:{integrityVerified:true,providerRequests:0},summary:{predictions:0,settled:0,unresolved:0},byCaptureDay:[],clv:{matched:0}};
+let calls=[];
+const client=(patch={},sourcePatch={})=>async(url,options)=>{calls.push({url,options});const body=url.includes('source-readiness')?{...source,...sourcePatch}:url.includes('prediction-ledger')?{synthetic:false,items:[]}:url.includes('closing-observations')?{synthetic:false,writesEnabled:false}:{...report,...patch};return Response.json(body)};
+const options={token:'test-only-secret',start,clock:()=>now};
+const held=await trialReadiness({...options,fetchImpl:client()});
+assert.equal(held.trialStarted,false);assert.equal(held.readyForScheduledTrial,false);assert.equal(held.gates.authenticatedSources,true);assert.equal(held.gates.budget,true);assert(held.blockers.includes('feeds'));assert(held.blockers.includes('controlledCaptureVerified'));assert.equal(held.evidence.livePredictions,0);
+assert(!JSON.stringify(held).includes(options.token));assert(calls.every(c=>c.url.startsWith('https://edgeboard-research-preview.speedystone18.chatgpt.site/collector/api/')&&c.options.redirect==='manual'));assert.equal(calls.filter(c=>c.options.method==='POST').length,1);
+for(const patch of [{synthetic:true},{audit:{integrityVerified:false}},{asOf:'2026-10-29T00:00:00Z'},{byCaptureDay:[{name:'2026-10-29',predictions:1}]}])await assert.rejects(trialReadiness({...options,fetchImpl:client(patch)}));
+const stale=await trialReadiness({...options,fetchImpl:client({},{checkedAt:'2026-10-27T12:00:00Z'})});assert.equal(stale.gates.authenticatedSources,false);
+await assert.rejects(trialReadiness({...options,fetchImpl:async()=>new Response('',{status:302})}));
+await assert.rejects(trialReadiness({...options,start:'2026-02-30',fetchImpl:client()}));
+assert.equal((await trialReadiness({...options,fetchImpl:client({},{protectedRemainingCredits:100})})).gates.budget,false);
+console.log('Trial readiness: private origin, no redirects/provider calls, stale/failed diagnostics, live-only evidence, cutoff, reserve and no false trial start passed');
