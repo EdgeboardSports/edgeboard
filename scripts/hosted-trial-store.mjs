@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import {normalizeTrialProtocol,normalizeTrialRun} from './trial-schema.mjs';
+import {normalizeTrialProtocol,normalizeTrialRun,trialSlotTimely} from './trial-schema.mjs';
 const trialDigest=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
 const trialOrigin='https://edgeboard-research-preview.speedystone18.chatgpt.site';
 export function openHostedTrialStore({token,synthetic=false,fetchImpl=fetch}={}){
@@ -20,11 +20,15 @@ export function openHostedTrialStore({token,synthetic=false,fetchImpl=fetch}={})
 }
 export async function executeTrialSlot({store,trialId,sourceCommit,checkReady,collect,clock=()=>Date.now()}={}){
  const report=await store.read(trialId),p=report.protocol,now=clock(),start=Date.parse(p.startAt),slotAt=new Date(Math.floor(now/3600000)*3600000).toISOString();
- if(!report.trialStarted||now<start||now>=start+30*86400000||now-Date.parse(slotAt)>15*60000)throw Error('No timely active trial slot; no backfill');
+ if(!report.trialStarted||!trialSlotTimely(p,slotAt,now))throw Error('No timely active trial slot; no backfill');
  if(p.sourceCommit!==sourceCommit||JSON.stringify(p.modelVersions)!==JSON.stringify(['goals-v1','shots-v1'])||JSON.stringify(p.markets)!==JSON.stringify(['h2h','h2h_3_way','player_shots_on_goal','spreads']))throw Error('Collector does not match frozen trial protocol');
  const claim=await store.claim({trialId,slotAt,type:'start'});if(!claim.claimed)return {skipped:true,reason:'slot_already_claimed'};
+ const timely=()=>trialSlotTimely(p,slotAt,clock());
+ const expired=async()=>{const counts={capturedGames:0,newPredictions:0,gradeChanges:0,errors:0};await store.complete({trialId,slotAt,type:'finish',outcome:'held',counts});return {outcome:'held',counts,reason:'slot_expired_before_collection'}};
+ if(!timely())return expired();
  let outcome='held',counts={capturedGames:0,newPredictions:0,gradeChanges:0,errors:0},result;
  try{await checkReady({through:new Date(start+30*86400000).toISOString(),protocol:p})}catch{await store.complete({trialId,slotAt,type:'finish',outcome,counts});return {outcome,counts}}
+ if(!timely())return expired();
  try{const collected=await collect();counts=collected.counts;result=collected.result;outcome=counts.errors?'error':'success'}catch{outcome='error';counts={capturedGames:0,newPredictions:0,gradeChanges:0,errors:1}}
  await store.complete({trialId,slotAt,type:'finish',outcome,counts});return {outcome,counts,result};
 }

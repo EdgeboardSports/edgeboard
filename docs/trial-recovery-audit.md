@@ -1,0 +1,9 @@
+# Trial downtime and recovery audit — October 28, 2026
+
+Fixed the slot window to be half-open: an hourly slot can start at :00 through just before :15. At exactly :15 an unclaimed slot is missing and cannot start. The main runner and private server now use the same trialSlotTimely predicate; existing synthetic server fixtures may deliberately backdate slots without enabling live backfill.
+
+The runner rechecks the same frozen slot immediately after a durable claim and again after readiness, before entering collection. If either step consumes the grace period, it records a held completion with zero captures and makes no collection call. A consumed claim is never recycled. After a crash or lost completion acknowledgement, retrying that slot does not recollect; a later timely slot can proceed independently. No missed-slot catch-up loop was introduced. Failure to save a completion remains an error/unfinished record, not a falsely successful run.
+
+Coverage now exposes overdue=true for started slots with no completion receipt once grace expires, plus daily overdueUnfinished counts. The private dashboard displays this count alongside unfinished, missing, held, errors and success. Overdue is an observation about missing completion evidence, not worker liveness. In-flight work is not cancelled automatically, and the new pre-collection checks cannot eliminate every scheduling/network race. Existing pregame checks within capture and closing acquisition still apply.
+
+Tests cover the exact grace boundary, slow claim, slow readiness across the hour, restart after completion failure, later-slot progression without backfill, as-of missing/due/unfinished distinctions, real SQLite journal reporting and UI column rendering. Full main/private tests and builds passed. These synthetic checks do not start or operationally validate the live 30-day trial, create a schedule, fetch sports data or place wagers.

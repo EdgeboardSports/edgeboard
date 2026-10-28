@@ -14,3 +14,28 @@ const run={value:{trialId:p.id,slotAt:p.startAt,type:'start'},receivedAt:p.start
 const ended=trialCoverage(p,activation,[],{asOf:Date.parse('2026-11-28T00:00:00Z')});assert.equal(ended.expectedSlots,720);assert.equal(ended.slots.length,720);assert.equal(ended.daily.reduce((n,d)=>n+d.missing,0),720);
 assert.throws(()=>normalizeTrialProtocol({...p,days:31}));assert.throws(()=>normalizeTrialProtocol({...p,stakeUnits:2}));
 console.log('Trial system: fixed 30-day protocol, no-backfill slots, durable claim before collection, held/error outcomes, no duplicate collection, failed persistence and missing-run coverage passed');
+
+// Grace is a half-open window: exactly :15 is missing and cannot be started.
+const hour=Date.parse('2026-10-28T01:00:00.000Z');
+await assert.rejects(executeTrialSlot({...config,clock:()=>hour+15*60000}));
+assert.equal(trialCoverage(p,activation,[],{asOf:hour+15*60000}).slots.at(-1).status,'missing');
+let current=hour+5*60000,lateSources=0,readyCalls=0,finishes=[];
+const delayed={read:async()=>({protocol:p,trialStarted:true}),claim:async()=>{current=hour+15*60000;return {claimed:true}},complete:async r=>finishes.push(r)};
+const delayedConfig={...config,store:delayed,clock:()=>current,checkReady:async()=>{readyCalls++},collect:async()=>{lateSources++;return {counts:{capturedGames:0,newPredictions:0,gradeChanges:0,errors:0}}}};
+assert.equal((await executeTrialSlot(delayedConfig)).reason,'slot_expired_before_collection');assert.equal(readyCalls,0);assert.equal(lateSources,0);assert.equal(finishes[0].outcome,'held');
+current=hour+5*60000;delayed.claim=async()=>({claimed:true});
+assert.equal((await executeTrialSlot({...delayedConfig,checkReady:async()=>{current=hour+60*60000}})).outcome,'held');assert.equal(lateSources,0);
+// Durable claim survives process restart even when its completion acknowledgement is lost.
+let durableClaim=false,collections=0,completionFailed=true;
+const persistent={read:async()=>({protocol:p,trialStarted:true}),claim:async()=>{if(durableClaim)return {claimed:false};durableClaim=true;return {claimed:true}},complete:async()=>{if(completionFailed)throw Error('lost completion')}};
+const restartConfig={...config,store:persistent,collect:async()=>{collections++;return {counts:{capturedGames:0,newPredictions:0,gradeChanges:0,errors:0}}}};
+await assert.rejects(executeTrialSlot(restartConfig));completionFailed=false;assert.equal((await executeTrialSlot({...restartConfig,store:{...persistent}})).skipped,true);assert.equal(collections,1);
+const unfinished=trialCoverage(p,activation,[{value:{trialId:p.id,slotAt:new Date(hour).toISOString(),type:'start'},receivedAt:new Date(hour+60000).toISOString()}],{asOf:hour+15*60000});assert.equal(unfinished.slots.at(-1).status,'unfinished');assert.equal(unfinished.slots.at(-1).overdue,true);assert.equal(unfinished.daily[0].overdueUnfinished,1);
+assert.equal(trialCoverage(p,activation,[],{asOf:hour+15*60000-1}).slots.at(-1).status,'due');
+console.log('Trial recovery audit: exact grace boundary, delayed claim/readiness, durable restart exclusion and overdue unfinished detection passed.');
+const {trialSlotTimely}=await import('../scripts/trial-schema.mjs');
+assert.equal(trialSlotTimely(p,new Date(hour).toISOString(),hour+15*60000-1),true);
+for(const time of [hour-1,hour+15*60000,NaN,Infinity])assert.equal(trialSlotTimely(p,new Date(hour).toISOString(),time),false);
+const claimedSlots=new Set([new Date(hour).toISOString()]),seen=[];
+const resumed={read:async()=>({protocol:p,trialStarted:true}),claim:async r=>{seen.push(r.slotAt);if(claimedSlots.has(r.slotAt))return {claimed:false};claimedSlots.add(r.slotAt);return {claimed:true}},complete:async()=>{}};
+await executeTrialSlot({...config,store:resumed,clock:()=>hour+3600000+60000});assert.deepEqual(seen,[new Date(hour+3600000).toISOString()]);assert.equal(claimedSlots.size,2);
