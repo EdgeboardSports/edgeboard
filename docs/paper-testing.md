@@ -55,3 +55,8 @@ This supplies a storage adapter, not a hosted durable service. The private colle
 The existing owner-only preview now has a managed private D1 collector companion at https://edgeboard-research-preview.speedystone18.chatgpt.site/collector (Site project appgprj_6ae0acd669388191b7b30615f3e57a7c, source commit 794692be907e5ea2338732970b22bd9f88b4d8eb). Sites confirmed successful deployment and the DB/collector_evidence binding/table. An authenticated synthetic self-test was written, read back through the service API, and independently verified through the database reader. Anonymous API requests returned 401. The test namespace is separate from predictions.
 
 This supersedes the earlier statement that no hosted storage was provisioned. Local SQLite collection and this managed D1 companion are separate adapters; live ingestion into the companion is still disabled. No live feed or collection schedule is enabled. The production Edgeboard diagnostics endpoint requires app authentication; the attempted secure app sign-in was rejected. Verify source access and a real pregame writer before scheduling collection. No password or service credential is stored in these notes.
+
+
+## Production quota binding configured
+
+The private setup verified the production SECURITY_DB binding and security_usage, provider_state, and security_events tables. A production redeployment is required to apply the binding. Provider balance initialization, budget-period configuration, and feed activation remain outstanding; no balance is assumed and no odds requests are authorized by this change.
