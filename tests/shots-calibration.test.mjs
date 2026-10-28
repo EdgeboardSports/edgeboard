@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {calibrateShots} from '../scripts/shots-calibration.mjs';
+const rows=Array.from({length:100},(_,i)=>({playerId:String(8470001+i%2),date:new Date(Date.UTC(2026,0,1+Math.floor(i/2))).toISOString().slice(0,10),trainingEnd:'2025-12-01',predicted:.8,baselinePredicted:.5,outcome:i%2}));
+const options={minTraining:20,window:40,minDates:10,includeTests:true},frozen=JSON.stringify(rows),r=calibrateShots(rows,options);
+assert.equal(r.model.n,80);assert.equal(r.baseline.n,r.challenger.n);assert.equal(r.promoted,false);assert(r.challenger.brier<r.model.brier);assert(r.tests.every(t=>t.calibrationTrainingEnd<t.date&&t.trainingEnd<t.date&&t.calibrationSample<=40));assert.equal(JSON.stringify(rows),frozen);
+assert.deepEqual(calibrateShots([...rows].reverse(),options),r);
+const changed=structuredClone(rows);changed.at(-1).outcome=1-changed.at(-1).outcome;changed.at(-2).outcome=1-changed.at(-2).outcome;const revised=calibrateShots(changed,options);assert.deepEqual(revised.tests.slice(-2).map(t=>t.calibrated),r.tests.slice(-2).map(t=>t.calibrated));
+const dup=calibrateShots([...rows,rows[0]],options);assert.equal(dup.audit.duplicateCopies,1);assert.deepEqual(dup.tests,r.tests);
+const conflict=calibrateShots([...rows,{...rows.at(-1),outcome:0}],options);assert.equal(conflict.audit.conflictingIds,1);assert(!conflict.tests.some(t=>t.id===r.tests.at(-1).id));
+const bad=calibrateShots([{...rows[0],baselinePredicted:NaN},{...rows[0],trainingEnd:rows[0].date}],options);assert.equal(bad.audit.invalid,2);
+assert.equal(calibrateShots([],options).challenger.brier,null);assert.equal(r.calibration.challenger.reduce((n,b)=>n+b.n,0),r.challenger.n);
+assert.equal(calibrateShots(rows,{...options,minDates:100}).challenger.n,0);
+console.log('Shots calibration: prior-date-only daily fit, same-day isolation, matched baseline/model population, deterministic ordering, duplicate/conflict audit, warmup and empty evidence passed');

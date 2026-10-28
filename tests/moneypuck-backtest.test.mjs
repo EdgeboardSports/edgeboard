@@ -14,3 +14,5 @@ const prior=moneyPuckShotBacktest(normalized,{before:'2025-11-01',includeTests:t
 assert.equal(moneyPuckShotBacktest(normalizeGameRows(rows.slice(0,20),options),{before:'2026-01-01'}).modelBrier,null);
 assert.throws(()=>moneyPuckShotBacktest(normalized,{before:'2026-02-30'}));assert.throws(()=>moneyPuckShotBacktest(normalized,{before:'2026-01-01',line:2}));
 console.log('MoneyPuck game backtest: zero-shot retention, no-appearance/conflict handling, prior-date fitting, target isolation, duplicate audit, cutoff and matching baseline coverage passed');
+const all=moneyPuckShotBacktest(normalized,{before:'2026-01-01',includeTests:true,allTests:true});assert.equal(all.forecasts,45);for(const t of report.tests){const paired=all.tests.find(r=>r.playerId===t.playerId&&r.date===t.date);assert.equal(paired.predicted,t.predicted);assert.equal(paired.baselinePredicted,t.baselinePredicted)}
+assert.throws(()=>moneyPuckShotBacktest(normalized,{before:'2026-01-01',line:2.2}));

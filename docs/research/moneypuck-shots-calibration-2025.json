@@ -1,0 +1,383 @@
+{
+  "attribution": "Historical research data: MoneyPuck.com — https://moneypuck.com/data.htm",
+  "sourceUrl": "https://peter-tanner.com/moneypuck/downloads/seasonPlayersSummary/skaters/2025.zip",
+  "archiveSha256": "358d4fe42277ddbd7489152cb0f0d1033abf2a9df305b77ac65a9cffeedb62d1",
+  "before": "2026-10-28",
+  "line": 2.5,
+  "sourceForecasts": 31406,
+  "sampling": "Every eligible appearance after 20 prior games; no latest-game truncation",
+  "version": "shots-calibration-research-v1",
+  "researchOnly": true,
+  "promoted": false,
+  "settings": {
+    "minTraining": 500,
+    "window": 5000,
+    "minDates": 10,
+    "objective": "prior-date log loss",
+    "fitFrequency": "daily"
+  },
+  "audit": {
+    "invalid": 0,
+    "duplicateCopies": 0,
+    "conflictingIds": 0,
+    "warmup": 1258
+  },
+  "model": {
+    "n": 30148,
+    "brier": 0.15580813552493458,
+    "logLoss": 0.48097760795498157
+  },
+  "baseline": {
+    "n": 30148,
+    "brier": 0.15500675256147883,
+    "logLoss": 0.4793330954692646
+  },
+  "challenger": {
+    "n": 30148,
+    "brier": 0.15512814460669214,
+    "logLoss": 0.47786826082733613
+  },
+  "firstTest": "2025-11-28",
+  "lastTest": "2026-04-16",
+  "chronologyValid": true,
+  "robustnessAgainstModel": {
+    "method": "paired game-date cluster bootstrap percentile",
+    "seed": 20261028,
+    "replicates": 2000,
+    "distinctDates": 117,
+    "minimumDates": 20,
+    "brierImprovement95": {
+      "lower": 0.00021538138606886986,
+      "upper": 0.0011579537026667266
+    },
+    "logLossImprovement95": {
+      "lower": 0.0018757029725469147,
+      "upper": 0.0044022424219057445
+    },
+    "monthly": [
+      {
+        "month": "2025-11",
+        "n": 766,
+        "brierImprovement": 0.0029510972384411372,
+        "logLossImprovement": 0.007048193298891153
+      },
+      {
+        "month": "2025-12",
+        "n": 6649,
+        "brierImprovement": 0.001319098074033478,
+        "logLossImprovement": 0.004636073286766668
+      },
+      {
+        "month": "2026-01",
+        "n": 7898,
+        "brierImprovement": 0.00043877887685638716,
+        "logLossImprovement": 0.0024170431757252254
+      },
+      {
+        "month": "2026-02",
+        "n": 2512,
+        "brierImprovement": 0.000627589642341578,
+        "logLossImprovement": 0.0039243644017412
+      },
+      {
+        "month": "2026-03",
+        "n": 8195,
+        "brierImprovement": 0.00037877532469236715,
+        "logLossImprovement": 0.002706172253007512
+      },
+      {
+        "month": "2026-04",
+        "n": 4128,
+        "brierImprovement": 0.00032051794754710933,
+        "logLossImprovement": 0.0015483376601560601
+      }
+    ],
+    "interpretation": "Positive improvement favors calibration. Intervals crossing zero are inconclusive. Archive development evidence only; no automatic promotion."
+  },
+  "robustnessAgainstBaseline": {
+    "method": "paired game-date cluster bootstrap percentile",
+    "seed": 20261028,
+    "replicates": 2000,
+    "distinctDates": 117,
+    "minimumDates": 20,
+    "brierImprovement95": {
+      "lower": -0.0008576364573785322,
+      "upper": 0.0005854083890579592
+    },
+    "logLossImprovement95": {
+      "lower": -0.0008130997473878054,
+      "upper": 0.003698932092843875
+    },
+    "monthly": [
+      {
+        "month": "2025-11",
+        "n": 766,
+        "brierImprovement": 0.00017827132908986975,
+        "logLossImprovement": -0.0011148714376760637
+      },
+      {
+        "month": "2025-12",
+        "n": 6649,
+        "brierImprovement": 0.00028606371212335223,
+        "logLossImprovement": 0.0049714803041632765
+      },
+      {
+        "month": "2026-01",
+        "n": 7898,
+        "brierImprovement": -0.00039174468406638456,
+        "logLossImprovement": 0.0017139327470181143
+      },
+      {
+        "month": "2026-02",
+        "n": 2512,
+        "brierImprovement": -0.0011959560225042623,
+        "logLossImprovement": -0.0017963170954225084
+      },
+      {
+        "month": "2026-03",
+        "n": 8195,
+        "brierImprovement": 0.00014342910112245534,
+        "logLossImprovement": 0.001686384108043175
+      },
+      {
+        "month": "2026-04",
+        "n": 4128,
+        "brierImprovement": -0.0001878588370830694,
+        "logLossImprovement": -0.002636568869540367
+      }
+    ],
+    "interpretation": "Positive improvement favors calibration. Intervals crossing zero are inconclusive. Archive development evidence only; no automatic promotion."
+  },
+  "byMonth": [
+    {
+      "month": "2025-11",
+      "model": {
+        "n": 766,
+        "brier": 0.16501835852233554,
+        "logLoss": 0.5006309808865722
+      },
+      "baseline": {
+        "n": 766,
+        "brier": 0.16224553261298433,
+        "logLoss": 0.4924679161500044
+      },
+      "challenger": {
+        "n": 766,
+        "brier": 0.16206726128389431,
+        "logLoss": 0.49358278758768104
+      }
+    },
+    {
+      "month": "2025-12",
+      "model": {
+        "n": 6649,
+        "brier": 0.16614631382257317,
+        "logLoss": 0.5056735999990848
+      },
+      "baseline": {
+        "n": 6649,
+        "brier": 0.1651132794606642,
+        "logLoss": 0.5060090070164855
+      },
+      "challenger": {
+        "n": 6649,
+        "brier": 0.16482721574853973,
+        "logLoss": 0.5010375267123207
+      }
+    },
+    {
+      "month": "2026-01",
+      "model": {
+        "n": 7898,
+        "brier": 0.15485283832107574,
+        "logLoss": 0.47772365531990474
+      },
+      "baseline": {
+        "n": 7898,
+        "brier": 0.15402231476015632,
+        "logLoss": 0.47702054489120566
+      },
+      "challenger": {
+        "n": 7898,
+        "brier": 0.15441405944421951,
+        "logLoss": 0.47530661214418135
+      }
+    },
+    {
+      "month": "2026-02",
+      "model": {
+        "n": 2512,
+        "brier": 0.15458731721886254,
+        "logLoss": 0.4802727704503454
+      },
+      "baseline": {
+        "n": 2512,
+        "brier": 0.15276377155401663,
+        "logLoss": 0.47455208895317885
+      },
+      "challenger": {
+        "n": 2512,
+        "brier": 0.15395972757652088,
+        "logLoss": 0.4763484060486042
+      }
+    },
+    {
+      "month": "2026-03",
+      "model": {
+        "n": 8195,
+        "brier": 0.1529551385905696,
+        "logLoss": 0.47515883715514295
+      },
+      "baseline": {
+        "n": 8195,
+        "brier": 0.15271979236700292,
+        "logLoss": 0.47413904901018605
+      },
+      "challenger": {
+        "n": 8195,
+        "brier": 0.15257636326587828,
+        "logLoss": 0.47245266490213533
+      }
+    },
+    {
+      "month": "2026-04",
+      "model": {
+        "n": 4128,
+        "brier": 0.1456817703265402,
+        "logLoss": 0.4557588486674992
+      },
+      "baseline": {
+        "n": 4128,
+        "brier": 0.14517339354190983,
+        "logLoss": 0.4515739421377956
+      },
+      "challenger": {
+        "n": 4128,
+        "brier": 0.14536125237899303,
+        "logLoss": 0.4542105110073422
+      }
+    }
+  ],
+  "calibration": {
+    "model": [
+      {
+        "lower": 0,
+        "upper": 0.2,
+        "n": 15863,
+        "predicted": 0.0975108855590769,
+        "observed": 0.11611927126016516
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "n": 8759,
+        "predicted": 0.287593693472562,
+        "observed": 0.27777143509533053
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "n": 4169,
+        "predicted": 0.48521232860044305,
+        "observed": 0.4360757975533701
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "n": 1284,
+        "predicted": 0.6693809632659389,
+        "observed": 0.5942367601246106
+      },
+      {
+        "lower": 0.8,
+        "upper": 1,
+        "n": 73,
+        "predicted": 0.8356140599898982,
+        "observed": 0.6027397260273972
+      }
+    ],
+    "baseline": [
+      {
+        "lower": 0,
+        "upper": 0.2,
+        "n": 15143,
+        "predicted": 0.10380576964921227,
+        "observed": 0.1092253846661824
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "n": 9240,
+        "predicted": 0.2845757222785635,
+        "observed": 0.2726190476190476
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "n": 4681,
+        "predicted": 0.47690883255386235,
+        "observed": 0.4400769066438795
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "n": 1041,
+        "predicted": 0.6762242996994345,
+        "observed": 0.611911623439001
+      },
+      {
+        "lower": 0.8,
+        "upper": 1,
+        "n": 43,
+        "predicted": 0.8349523079099577,
+        "observed": 0.6976744186046512
+      }
+    ],
+    "challenger": [
+      {
+        "lower": 0,
+        "upper": 0.2,
+        "n": 15176,
+        "predicted": 0.11372550035765874,
+        "observed": 0.1121507643647865
+      },
+      {
+        "lower": 0.2,
+        "upper": 0.4,
+        "n": 11072,
+        "predicted": 0.2851347807978161,
+        "observed": 0.2894689306358382
+      },
+      {
+        "lower": 0.4,
+        "upper": 0.6,
+        "n": 3513,
+        "predicted": 0.4749807738314024,
+        "observed": 0.5035582123541132
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.8,
+        "n": 377,
+        "predicted": 0.652368205760757,
+        "observed": 0.5755968169761273
+      },
+      {
+        "lower": 0.8,
+        "upper": 1,
+        "n": 10,
+        "predicted": 0.8286515113148644,
+        "observed": 0.7
+      }
+    ]
+  },
+  "limitations": [
+    "Same reused retrospective development archive; not a new untouched holdout",
+    "Pooled player calibration; repeated players and game dates are correlated",
+    "Bootstrap resamples dates and cannot account for all serial dependence or archive tuning",
+    "All comparisons use identical post-warmup forecasts; not directly comparable with the earlier full sample",
+    "Prior-date availability assumed; historical publication/revision times unverified",
+    "Conditional on eventual player appearances, not verified pregame roster selection",
+    "No historical sportsbook prices, ROI, live trial or production model promotion"
+  ]
+}
