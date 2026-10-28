@@ -1,3 +1,4 @@
+import {openHostedTrialStore,executeTrialSlot} from './hosted-trial-store.mjs';
 import {openHostedClosingStore} from './hosted-closing-store.mjs';
 import {captureClosingPrices} from './closing-capture.mjs';
 import {openHostedPredictionLedger} from './hosted-prediction-ledger.mjs';
@@ -18,7 +19,7 @@ import {freezeGame} from '../game-paper.js';
 
 const day=time=>new Date(time).toLocaleDateString('en-CA',{timeZone:'America/New_York'});
 const digest=s=>createHash('sha256').update(JSON.stringify(s)).digest('hex');
-export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null,ledgerStore=null,closingStore=null}={}){
+export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit='local',maxGamesPerDay=2,gameArchive=null,evidenceStore=null,ledgerStore=null,closingStore=null,trialId=null}={}){
  const started=clock(),errors=[],notes=[],cache=new Map();
  const get=path=>{if(!cache.has(path))cache.set(path,client(path));return cache.get(path)};
  // Existing shots and new game snapshots are graded independently.
@@ -31,7 +32,7 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
   if(record.result.state!=='pending')record.resultHistory=[...(record.resultHistory||[]),record.result];
   record.result={...result,...(result.state==='pending'?{}:{gradedAt})};
  };
- const savePrediction=async(snapshot,records)=>{const record={snapshot,digest:digest(snapshot),result:{state:'pending'}};if(ledgerStore){const ack=await ledgerStore.appendPrediction(snapshot);record.ledgerId=ack.id;record.ledgerGradeDigest=null}records.push(record)};
+ const savePrediction=async(snapshot,records)=>{if(trialId)snapshot={...snapshot,trialId};const record={snapshot,digest:digest(snapshot),result:{state:'pending'}};if(ledgerStore){const ack=await ledgerStore.appendPrediction(snapshot);record.ledgerId=ack.id;record.ledgerGradeDigest=null}records.push(record)};
  for(const event of ledger.events){
   const records=[...(event.records||[]),...(event.gameRecords||[])];if(!records.length||clock()-Date.parse(event.startTime)>14*86400000)continue;
   if(records.every(r=>r.result.state!=='pending')&&event.lastGradedAt&&clock()-Date.parse(event.lastGradedAt)<24*3600000)continue;
@@ -147,14 +148,19 @@ async function main(){
  if(!/^[a-f0-9]{7,40}$/.test(sourceCommit||''))throw Error('Verified source commit required before collection');
  const base=(process.env.EDGEBOARD_URL||'https://edgeboard-8fl.pages.dev').replace(/\/$/,'');
  const client=makeClient(base,{collectorToken:process.env.EDGEBOARD_COLLECTOR_TOKEN||null});
- await requireCollectionReadiness(client);
+ if(!process.env.EDGEBOARD_TRIAL_ID)throw Error('Frozen private trial protocol required before collection');
+ const trialStore=openHostedTrialStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  const evidenceStore=openHostedEvidenceStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  const ledgerStore=openHostedPredictionLedger({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  const closingStore=openHostedClosingStore({token:process.env.EDGEBOARD_STORAGE_TOKEN});
  let gameArchive=null;try{gameArchive=JSON.parse(await readFile(new URL('../data/game-archive.json',import.meta.url),'utf8'))}catch{}
- let result;try{const ledger=await ledgerStore.restore();result=await runPaper(ledger,client,{gameArchive,evidenceStore,ledgerStore,closingStore,sourceCommit})}finally{evidenceStore.close();ledgerStore.close();closingStore.close()}
- const last=result.runs.at(-1);console.log(JSON.stringify({lastRunAt:result.lastRunAt,capturedGames:last.capturedGames,totalEvents:result.events.length,totalPredictions:result.events.reduce((n,e)=>n+e.records.length,0),gamePredictions:result.events.reduce((n,e)=>n+(e.gameRecords||[]).length,0),errors:last.errors,notes:last.notes}));
- if(last.errors.length)process.exitCode=1;
+ let execution;try{execution=await executeTrialSlot({store:trialStore,trialId:process.env.EDGEBOARD_TRIAL_ID,sourceCommit,checkReady:()=>requireCollectionReadiness(client),collect:async()=>{
+  const ledger=await ledgerStore.restore(),before=new Map(ledger.events.flatMap(e=>[...(e.records||[]),...(e.gameRecords||[])]).map(r=>[r.ledgerId,r.ledgerGradeDigest]));
+  const result=await runPaper(ledger,client,{gameArchive,evidenceStore,ledgerStore,closingStore,sourceCommit,trialId:process.env.EDGEBOARD_TRIAL_ID});const records=result.events.flatMap(e=>[...(e.records||[]),...(e.gameRecords||[])]),last=result.runs.at(-1);
+  return {result,counts:{capturedGames:last.capturedGames,newPredictions:records.filter(r=>!before.has(r.ledgerId)).length,gradeChanges:records.filter(r=>before.has(r.ledgerId)&&before.get(r.ledgerId)!==r.ledgerGradeDigest).length,errors:last.errors.length}};
+ }})}finally{evidenceStore.close();ledgerStore.close();closingStore.close();trialStore.close()}
+ console.log(JSON.stringify({outcome:execution.outcome||execution.reason,counts:execution.counts||null}));
+ if(execution.outcome==='error')process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
 

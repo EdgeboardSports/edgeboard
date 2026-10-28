@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {normalizeTrialProtocol,trialCoverage} from '../scripts/trial-schema.mjs';
+import {executeTrialSlot} from '../scripts/hosted-trial-store.mjs';
+const p=normalizeTrialProtocol({id:'synthetic-trial-001',startAt:'2026-10-28T00:00:00.000Z',days:30,cadenceMinutes:60,graceMinutes:15,sourceCommit:'a'.repeat(40),modelVersions:['shots-v1','goals-v1'],markets:['player_shots_on_goal','h2h','h2h_3_way','spreads'],stakeUnits:1,maxGamesPerDay:2});
+const now=Date.parse('2026-10-28T01:05:00.000Z'),activation={receivedAt:p.startAt},events=[];let paid=0,claimed=true,failComplete=false;
+const store={read:async()=>({protocol:p,trialStarted:true}),claim:async()=>{events.push('claim');return {claimed}},complete:async r=>{events.push(r.outcome);if(failComplete)throw Error('storage down')}};
+const config={store,trialId:p.id,sourceCommit:p.sourceCommit,clock:()=>now,checkReady:async()=>events.push('ready'),collect:async()=>{paid++;events.push('collect');return {result:{},counts:{capturedGames:1,newPredictions:2,gradeChanges:1,errors:0}}}};
+assert.equal((await executeTrialSlot(config)).outcome,'success');assert.deepEqual(events,['claim','ready','collect','success']);
+claimed=false;assert.equal((await executeTrialSlot(config)).skipped,true);assert.equal(paid,1);claimed=true;
+assert.equal((await executeTrialSlot({...config,checkReady:async()=>{throw Error('held')}})).outcome,'held');assert.equal(paid,1);
+failComplete=true;await assert.rejects(executeTrialSlot(config));failComplete=false;
+await assert.rejects(executeTrialSlot({...config,sourceCommit:'b'.repeat(40)}));await assert.rejects(executeTrialSlot({...config,clock:()=>now+20*60000}));
+const run={value:{trialId:p.id,slotAt:p.startAt,type:'start'},receivedAt:p.startAt};const report=trialCoverage(p,activation,[run],{asOf:now});assert.equal(report.daily[0].unfinished,1);assert.equal(report.slots.length,2);assert.equal(trialCoverage(p,null,[],{asOf:now}).trialStarted,false);
+const ended=trialCoverage(p,activation,[],{asOf:Date.parse('2026-11-28T00:00:00Z')});assert.equal(ended.expectedSlots,720);assert.equal(ended.slots.length,720);assert.equal(ended.daily.reduce((n,d)=>n+d.missing,0),720);
+assert.throws(()=>normalizeTrialProtocol({...p,days:31}));assert.throws(()=>normalizeTrialProtocol({...p,stakeUnits:2}));
+console.log('Trial system: fixed 30-day protocol, no-backfill slots, durable claim before collection, held/error outcomes, no duplicate collection, failed persistence and missing-run coverage passed');
