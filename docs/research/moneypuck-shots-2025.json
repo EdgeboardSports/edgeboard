@@ -1,0 +1,123 @@
+{
+  "attribution": "Historical research data: MoneyPuck.com — https://moneypuck.com/data.htm",
+  "sourceUrl": "https://peter-tanner.com/moneypuck/downloads/seasonPlayersSummary/skaters/2025.zip",
+  "modelVersion": "shots-v1",
+  "before": "2026-10-28",
+  "line": 2.5,
+  "researchOnly": true,
+  "promoted": false,
+  "historicalPublicationVerified": false,
+  "audit": {
+    "input": 47212,
+    "nonRegular": 0,
+    "noIceTime": 0,
+    "zeroShotAppearances": 12837,
+    "duplicateCopies": 0,
+    "conflictingAppearances": 0,
+    "players": 940,
+    "insufficientPlayers": 229,
+    "evaluatedPlayers": 711,
+    "distinctDates": 127,
+    "chronologyValid": true
+  },
+  "forecasts": 24307,
+  "modelBrier": 0.15070937663399867,
+  "baselineBrier": 0.15010326488820552,
+  "pairedBrierImprovement": -0.0006061117457881365,
+  "firstTest": "2025-11-17",
+  "lastTest": "2026-04-16",
+  "byMonth": [
+    {
+      "month": "2025-11",
+      "forecasts": 217,
+      "modelBrier": 0.11011971273512985,
+      "baselineBrier": 0.11254752134517425,
+      "pairedBrierImprovement": 0.0024278086100444044
+    },
+    {
+      "month": "2025-12",
+      "forecasts": 1881,
+      "modelBrier": 0.14112173657025676,
+      "baselineBrier": 0.14207994156207338,
+      "pairedBrierImprovement": 0.0009582049918164223
+    },
+    {
+      "month": "2026-01",
+      "forecasts": 7374,
+      "modelBrier": 0.1533471391617801,
+      "baselineBrier": 0.15220068026787764,
+      "pairedBrierImprovement": -0.001146458893905123
+    },
+    {
+      "month": "2026-02",
+      "forecasts": 2512,
+      "modelBrier": 0.15458731721886254,
+      "baselineBrier": 0.15276377155401663,
+      "pairedBrierImprovement": -0.001823545664845869
+    },
+    {
+      "month": "2026-03",
+      "forecasts": 8195,
+      "modelBrier": 0.1529551385905696,
+      "baselineBrier": 0.15271979236700292,
+      "pairedBrierImprovement": -0.00023534622356995974
+    },
+    {
+      "month": "2026-04",
+      "forecasts": 4128,
+      "modelBrier": 0.1456817703265402,
+      "baselineBrier": 0.14517339354190983,
+      "pairedBrierImprovement": -0.0005083767846302245
+    }
+  ],
+  "calibration": [
+    {
+      "lower": 0,
+      "upper": 0.2,
+      "n": 13310,
+      "predicted": 0.0955479120185748,
+      "observed": 0.11059353869271224
+    },
+    {
+      "lower": 0.2,
+      "upper": 0.4,
+      "n": 6772,
+      "predicted": 0.28651100373805666,
+      "observed": 0.2761370348493798
+    },
+    {
+      "lower": 0.4,
+      "upper": 0.6,
+      "n": 3156,
+      "predicted": 0.4844984515757148,
+      "observed": 0.44328263624841574
+    },
+    {
+      "lower": 0.6,
+      "upper": 0.8,
+      "n": 1017,
+      "predicted": 0.6704483421530857,
+      "observed": 0.6027531956735497
+    },
+    {
+      "lower": 0.8,
+      "upper": 1,
+      "n": 52,
+      "predicted": 0.8290260237510785,
+      "observed": 0.5769230769230769
+    }
+  ],
+  "limitations": [
+    "Retrospective development archive; historical revisions/publication timing unverified",
+    "Conditional on recorded positive-ice-time appearances, not a pregame roster-selection test",
+    "Zero-shot appearances retained; no missing or scratched games invented",
+    "Existing fixed shots-v1 model; minimum 20 prior games, rolling 40-game fit, last 40 tests per player",
+    "Baseline uses smoothed empirical probabilities from the same prior games",
+    "Fixed half-shot threshold; no historical odds, EV or ROI claim",
+    "Player selections from one game and repeated dates are correlated",
+    "No starter/injury evidence reconstructed; no production promotion or live trial"
+  ],
+  "archiveSha256": "358d4fe42277ddbd7489152cb0f0d1033abf2a9df305b77ac65a9cffeedb62d1",
+  "sourceRows": 236060,
+  "otherSituations": 188848
+}

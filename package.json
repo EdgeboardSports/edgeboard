@@ -2,11 +2,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/shots-model.test.mjs && node tests/paper-test.mjs && node tests/game-model.test.mjs && node tests/game-paper.test.mjs && node tests/player-profile.test.mjs && node tests/best-picks.test.mjs && node tests/verification.test.mjs && node tests/research-context.test.mjs && node tests/game-day.test.mjs && node tests/security.test.mjs && node tests/feed-status.test.mjs && node tests/count-model.test.mjs && node tests/evaluation.test.mjs && node tests/goalie-backtest.test.mjs && node tests/evidence-store.test.mjs && node tests/provider-balance.test.mjs && node tests/budget-status.test.mjs && node tests/collection-readiness.test.mjs && node tests/collector-client.test.mjs && node tests/hosted-evidence-store.test.mjs && node tests/unattended-preflight.test.mjs && node tests/collector-access.test.mjs && node tests/game-calibration.test.mjs && node tests/hosted-prediction-ledger.test.mjs && node tests/closing-capture.test.mjs && node tests/hosted-closing-store.test.mjs && node tests/trial-readiness.test.mjs && node tests/moneypuck-import.test.mjs",
+    "test": "node tests/shots-model.test.mjs && node tests/paper-test.mjs && node tests/game-model.test.mjs && node tests/game-paper.test.mjs && node tests/player-profile.test.mjs && node tests/best-picks.test.mjs && node tests/verification.test.mjs && node tests/research-context.test.mjs && node tests/game-day.test.mjs && node tests/security.test.mjs && node tests/feed-status.test.mjs && node tests/count-model.test.mjs && node tests/evaluation.test.mjs && node tests/goalie-backtest.test.mjs && node tests/evidence-store.test.mjs && node tests/provider-balance.test.mjs && node tests/budget-status.test.mjs && node tests/collection-readiness.test.mjs && node tests/collector-client.test.mjs && node tests/hosted-evidence-store.test.mjs && node tests/unattended-preflight.test.mjs && node tests/collector-access.test.mjs && node tests/game-calibration.test.mjs && node tests/hosted-prediction-ledger.test.mjs && node tests/closing-capture.test.mjs && node tests/hosted-closing-store.test.mjs && node tests/trial-readiness.test.mjs && node tests/moneypuck-import.test.mjs && node tests/moneypuck-backtest.test.mjs && python3 tests/moneypuck-zip.test.py",
     "build:private": "node scripts/build-private.mjs",
     "preflight:unattended": "node scripts/unattended-preflight.mjs",
     "report:calibration": "node scripts/calibration-report.mjs",
     "preflight:trial": "node scripts/trial-readiness.mjs",
-    "report:moneypuck": "node scripts/moneypuck-import.mjs"
+    "report:moneypuck": "node scripts/moneypuck-import.mjs",
+    "report:moneypuck-games": "node scripts/moneypuck-backtest.mjs"
   }
 }

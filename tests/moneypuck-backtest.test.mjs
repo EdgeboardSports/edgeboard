@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {normalizeGameRows,moneyPuckShotBacktest} from '../scripts/moneypuck-backtest.mjs';
+const rows=Array.from({length:65},(_,i)=>({playerId:'8470001',season:'2025',gameId:'202502'+String(i+1).padStart(4,'0'),gameDate:new Date(Date.UTC(2025,9,i+1)).toISOString().slice(0,10).replaceAll('-',''),playerTeam:'NYR',opposingTeam:'BOS',home_or_away:i%2?'HOME':'AWAY',icetime:'1200',I_F_shotsOnGoal:String(i%5)}));
+const options={season:2025},input=JSON.stringify(rows),normalized=normalizeGameRows(rows,options),report=moneyPuckShotBacktest(normalized,{before:'2026-01-01',includeTests:true});
+assert.equal(report.forecasts,40);assert.equal(report.audit.evaluatedPlayers,1);assert(report.audit.zeroShotAppearances>0);assert.equal(report.audit.chronologyValid,true);assert(report.tests.every(t=>t.trainingEnd<t.date));assert.equal(report.calibration.reduce((n,b)=>n+b.n,0),40);assert.equal(JSON.stringify(rows),input);
+const changed=structuredClone(rows);changed.at(-1).I_F_shotsOnGoal='20';const revised=moneyPuckShotBacktest(normalizeGameRows(changed,options),{before:'2026-01-01',includeTests:true});assert.equal(revised.tests.at(-1).predicted,report.tests.at(-1).predicted);
+assert.deepEqual(normalizeGameRows([...rows].reverse(),options),normalized);
+const duplicate=normalizeGameRows([...rows,rows[0]],options);assert.equal(duplicate.audit.duplicateCopies,1);assert.deepEqual(duplicate.games,normalized.games);
+const conflicting=normalizeGameRows([...rows,{...rows[0],I_F_shotsOnGoal:'1'}],options);assert.equal(conflicting.audit.conflictingAppearances,1);assert.equal(conflicting.games.length,64);
+const scratch={...rows[0],icetime:'0'};assert.equal(normalizeGameRows([scratch],options).audit.noIceTime,1);assert.equal(normalizeGameRows([scratch,rows[0]],options).audit.conflictingAppearances,1);
+assert.throws(()=>normalizeGameRows([{...scratch,I_F_shotsOnGoal:'1'}],options));
+for(const patch of [{gameDate:'20250230'},{I_F_shotsOnGoal:''},{I_F_shotsOnGoal:'-1'},{gameId:'bad'},{season:'2024'},{home_or_away:'maybe'},{icetime:'NaN'}])assert.throws(()=>normalizeGameRows([{...rows[0],...patch}],options));
+const prior=moneyPuckShotBacktest(normalized,{before:'2025-11-01',includeTests:true});assert(prior.tests.every(t=>t.date<'2025-11-01'));assert(prior.forecasts<report.forecasts);
+assert.equal(moneyPuckShotBacktest(normalizeGameRows(rows.slice(0,20),options),{before:'2026-01-01'}).modelBrier,null);
+assert.throws(()=>moneyPuckShotBacktest(normalized,{before:'2026-02-30'}));assert.throws(()=>moneyPuckShotBacktest(normalized,{before:'2026-01-01',line:2}));
+console.log('MoneyPuck game backtest: zero-shot retention, no-appearance/conflict handling, prior-date fitting, target isolation, duplicate audit, cutoff and matching baseline coverage passed');
