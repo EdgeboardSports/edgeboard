@@ -16,6 +16,27 @@ export function paperMetrics(records){
  const units=settled.reduce((s,r)=>s+(r.result.state==='win'?r.snapshot.quote.decimal-1:r.result.state==='loss'?-1:0),0);
  return {predictions:records.length,settled:settled.length,decisions:decisions.length,pushes:settled.length-decisions.length,voids:records.filter(r=>r.result?.state==='void').length,unresolved:records.filter(r=>!['win','loss','push','void'].includes(r.result?.state)).length,independentEvents:new Set(settled.map(r=>r.snapshot.eventId)).size,winRate:decisions.length?decisions.filter(r=>r.result.state==='win').length/decisions.length:null,units,roi:settled.length?units/settled.length:null,scored:n,brier:n?score/n:null,logLoss:n?log/n:null};
 }
+// Deterministic percentile bootstrap of whole games, retaining all selections per game.
+// This describes sampling variability, not model validity or future betting profitability.
+export function paperUncertainty(records){
+ const grouped=new Map();let excluded=0;
+ for(const r of records){
+  if(!['win','loss','push'].includes(r.result?.state))continue;
+  const s=r.snapshot,id=s?.eventId,price=s?.quote?.decimal;
+  if(!['string','number'].includes(typeof id)||String(id).trim()===''||(typeof id==='number'&&!Number.isFinite(id))||!Number.isFinite(price)||price<=1){excluded++;continue}
+  const key=String(id);if(!grouped.has(key))grouped.set(key,[]);
+  grouped.get(key).push(r.result.state==='win'?price-1:r.result.state==='loss'?-1:0);
+ }
+ const clusters=[...grouped].sort(([a],[b])=>a.localeCompare(b)).map(([,returns])=>({stakes:returns.length,units:returns.sort((a,b)=>a-b).reduce((a,b)=>a+b,0)}));
+ const stakes=clusters.reduce((n,g)=>n+g.stakes,0),units=clusters.reduce((n,g)=>n+g.units,0),roi=stakes?units/stakes:null;
+ const base={method:'game-cluster percentile bootstrap',confidenceLevel:.95,minimumGames:20,games:clusters.length,settledSelections:stakes,excludedSettlements:excluded,roi,replicates:0,interval:null,status:'insufficient_games',limitations:['At least 20 settled games is a reporting threshold, not evidence of adequate power','Games on different dates or involving the same teams may still be dependent','Intervals omit selection bias, model tuning, feed errors and future regime changes','No automatic model promotion or profitability claim']};
+ if(clusters.length<20)return base;
+ if(clusters.every(g=>Math.abs(g.units/g.stakes-roi)<1e-12))return {...base,status:'insufficient_variation'};
+ let state=0x6e686c31;const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296},values=[];
+ for(let b=0;b<2000;b++){let u=0,n=0;for(let i=0;i<clusters.length;i++){const g=clusters[Math.floor(random()*clusters.length)];u+=g.units;n+=g.stakes}values.push(u/n)}
+ values.sort((a,b)=>a-b);const quantile=p=>{const x=(values.length-1)*p,i=Math.floor(x);return values[i]+(values[Math.min(i+1,values.length-1)]-values[i])*(x-i)},interval={lower:quantile(.025),upper:quantile(.975)};
+ return {...base,replicates:2000,interval,status:interval.lower>0?'positive_interval':interval.upper<0?'negative_interval':'inconclusive'};
+}
 // Daily settlement batches avoid inventing an order for correlated, simultaneous results.
 export function paperRisk(records){
  const days=new Map(),events=new Map();let excluded=0;
@@ -55,5 +76,5 @@ export function evaluationWindow(records,{start,days=30,now=Date.now(),observati
  const values=rows.map(r=>closingValue(r.snapshot,observations,now)).filter(Boolean);
  const clv={matched:values.length,total:rows.length,coverage:rows.length?values.length/rows.length:null,averagePriceRatio:values.length?values.reduce((s,v)=>s+v.priceRatio,0)/values.length:null};
  const groups=key=>Object.fromEntries([...new Set(rows.map(key))].map(k=>[k,paperMetrics(rows.filter(r=>key(r)===k))]));
- return {asOf:new Date(now).toISOString(),audit:{input:candidates.length,duplicateCopiesExcluded:duplicates,conflictingRecordsExcluded:conflicts,invalidQuoteRecordsExcluded:invalidQuotes,unsettledAtCutoff:rows.filter(r=>r.result.state==='pending').length},byCaptureDay:groups(r=>new Date(r.snapshot.capturedAt).toISOString().slice(0,10)),start:new Date(begin).toISOString(),end:new Date(end).toISOString(),complete:now>=end,phase:now<begin?'not_started':now>=end?'ended':'in_progress',mode:'hypothetical flat-stake paper results',risk:paperRisk(rows),metrics:paperMetrics(rows),clv,byMarket:groups(r=>r.snapshot.market||'player_shots_on_goal'),byVersion:groups(r=>r.snapshot.modelVersion||'unknown'),limitations:['Window completion describes elapsed time, not collection completeness','Undated or future settlements remain unresolved at the report cutoff','Conflicting duplicate records are excluded, never selected for favorable results','Thirty days does not establish statistical significance','Multiple selections from one game are correlated','Missing closing observations remain unknown; no synthetic CLV','No comparison against sportsbook forecast accuracy without paired complete market snapshots']};
+ return {asOf:new Date(now).toISOString(),audit:{input:candidates.length,duplicateCopiesExcluded:duplicates,conflictingRecordsExcluded:conflicts,invalidQuoteRecordsExcluded:invalidQuotes,unsettledAtCutoff:rows.filter(r=>r.result.state==='pending').length},byCaptureDay:groups(r=>new Date(r.snapshot.capturedAt).toISOString().slice(0,10)),start:new Date(begin).toISOString(),end:new Date(end).toISOString(),complete:now>=end,phase:now<begin?'not_started':now>=end?'ended':'in_progress',mode:'hypothetical flat-stake paper results',uncertainty:paperUncertainty(rows),risk:paperRisk(rows),metrics:paperMetrics(rows),clv,byMarket:groups(r=>r.snapshot.market||'player_shots_on_goal'),byVersion:groups(r=>r.snapshot.modelVersion||'unknown'),limitations:['Window completion describes elapsed time, not collection completeness','Undated or future settlements remain unresolved at the report cutoff','Conflicting duplicate records are excluded, never selected for favorable results','Thirty days does not establish statistical significance','Multiple selections from one game are correlated','Missing closing observations remain unknown; no synthetic CLV','No comparison against sportsbook forecast accuracy without paired complete market snapshots']};
 }

@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {paperUncertainty,evaluationWindow} from '../evaluation-core.js';
+const row=(id,state='win',price=2)=>({snapshot:{eventId:id,candidate:true,capturedAt:'2026-01-01T10:00:00Z',startTime:'2026-01-01T12:00:00Z',market:'h2h',side:'Home',quote:{decimal:price},probability:{win:.5,loss:.5,push:0}},result:{state,gradedAt:'2026-01-02T10:00:00Z'}});
+assert.equal(paperUncertainty([]).status,'insufficient_games');
+assert.equal(paperUncertainty(Array.from({length:100},()=>row('same'))).games,1);
+assert.equal(paperUncertainty(Array.from({length:19},(_,i)=>row(i))).interval,null);
+assert.equal(paperUncertainty(Array.from({length:20},(_,i)=>row(i))).status,'insufficient_variation');
+const rows=Array.from({length:40},(_,i)=>row(i,i%2?'win':'loss'));
+const original=JSON.stringify(rows),a=paperUncertainty(rows);
+assert.equal(a.status,'inconclusive');assert(a.interval.lower<0&&a.interval.upper>0);assert.equal(a.replicates,2000);assert.equal(a.roi,0);
+assert.deepEqual(paperUncertainty([...rows].reverse()),a);
+const doubled=paperUncertainty(rows.flatMap(r=>[r,structuredClone(r)]));assert.equal(doubled.games,40);assert.deepEqual(doubled.interval,a.interval);
+assert.equal(JSON.stringify(rows),original);
+const uneven=[...Array.from({length:20},(_,i)=>row(i,'win',3)),...Array.from({length:10},()=>row('loss-game','loss'))];
+assert.equal(paperUncertainty(uneven).roi,1); // Stake-weighted, not a mean of game ROIs.
+assert.equal(paperUncertainty([...rows,row(null),row('', 'win'),row('bad','win',NaN),row('pending','pending'),row('void','void')]).excludedSettlements,3);
+assert.equal(paperUncertainty([...rows,row('push','push')]).settledSelections,41);
+assert.equal(paperUncertainty(Array.from({length:100},(_,i)=>row(i,i===0?'loss':'win'))).status,'positive_interval');
+assert.equal(paperUncertainty(Array.from({length:100},(_,i)=>row(i,i===0?'win':'loss'))).status,'negative_interval');
+const corrected=row('c');corrected.resultHistory=[{state:'loss',gradedAt:'2026-01-01T15:00:00Z'}];
+const opts={start:'2026-01-01',now:Date.parse('2026-01-01T16:00:00Z')};
+assert.equal(evaluationWindow([corrected],opts).uncertainty.roi,-1);
+assert.equal(evaluationWindow([corrected],{...opts,now:Date.parse('2026-01-03')}).uncertainty.roi,1);
+assert.equal(evaluationWindow([corrected],{...opts,now:Date.parse('2026-01-01T11:00:00Z')}).uncertainty.settledSelections,0);
+console.log('Passed game-cluster uncertainty, sample gates, stake weighting, order invariance, pushes and as-of corrections.');
