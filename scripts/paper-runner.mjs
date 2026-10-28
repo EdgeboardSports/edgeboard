@@ -115,21 +115,11 @@ export async function runPaper(ledger,client,{clock=()=>Date.now(),sourceCommit=
  return ledger;
 }
 export function makeClient(base,{fetchImpl=fetch,pause=ms=>new Promise(r=>setTimeout(r,ms))}={}){
- const official=path=>{
-  const u=new URL(path,'https://edgeboard.invalid'),p=u.searchParams;
-  if(u.pathname==='/api/nhl-schedule'&&/^\d{4}-\d{2}-\d{2}$/.test(p.get('date')||''))return {url:'https://api-web.nhle.com/v1/score/'+p.get('date'),normalize:d=>({games:d.games||[]})};
-  if(u.pathname==='/api/nhl-roster'&&/^[A-Z]{3}$/.test(p.get('team')||''))return {url:'https://api-web.nhle.com/v1/roster/'+p.get('team')+'/current',normalize:d=>{if(!['forwards','defensemen','goalies'].every(k=>Array.isArray(d[k])))throw Error('Invalid official roster');return {team:p.get('team'),playerIds:[...d.forwards,...d.defensemen,...d.goalies].map(x=>String(x.id)),checkedAt:new Date().toISOString(),lineupConfirmed:false}}};
-  if(u.pathname==='/api/nhl-game-log'&&/^\d{7}$/.test(p.get('playerId')||'')&&/^\d{8}$/.test(p.get('season')||''))return {url:'https://api-web.nhle.com/v1/player/'+p.get('playerId')+'/game-log/'+p.get('season')+'/2',normalize:d=>({games:d.gameLog||[]})};
-  if(u.pathname==='/api/nhl-player-search'&&(p.get('q')||'').length>=2)return {url:'https://search.d3.nhle.com/api/v1/search/player?culture=en-us&limit=50&q='+encodeURIComponent(p.get('q')),normalize:d=>({players:(Array.isArray(d)?d:[]).map(x=>({id:String(x.playerId||''),name:x.name||'',team:x.teamAbbrev||'',position:x.positionCode||'',active:x.active===true})).filter(x=>/^\d{7}$/.test(x.id)&&x.name.toLowerCase().includes(p.get('q').toLowerCase()))})};
-  return null;
- };
  return async path=>{
   let last;const attempts=(path.startsWith('/api/nhl-props?')||path.startsWith('/api/nhl-game-odds?'))?1:3;
   for(let i=0;i<attempts;i++){
-   try{const r=await fetchImpl(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return await r.json()}catch(e){last=e;if(i+1<attempts)await pause(1000*(i+1))}
+   try{const r=await fetchImpl(base+path,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'},redirect:'manual'});if(!r.ok)throw Error('HTTP '+r.status+' for '+path.split('?')[0]);return await r.json()}catch(e){last=e;if(i+1<attempts)await pause(1000*(i+1))}
   }
-  const fallback=official(path);
-  if(fallback){const r=await fetchImpl(fallback.url,{signal:AbortSignal.timeout(20000),headers:{Accept:'application/json'}});if(!r.ok)throw Error('Both app and official NHL feeds unavailable: official HTTP '+r.status);return fallback.normalize(await r.json())}
   throw last;
  };
 }

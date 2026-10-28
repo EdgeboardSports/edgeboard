@@ -49,9 +49,9 @@ console.log('Passed daily two-game cap, snapshot tamper detection, and target-da
 
 const {makeClient}=await import('../scripts/paper-runner.mjs');let attempts=0;
 const retry=makeClient('https://app.test',{pause:async()=>{},fetchImpl:async url=>{attempts++;return url.startsWith('https://api-web.nhle.com')?new Response(JSON.stringify({games:[{id:7}]}),{status:200}):new Response('{}',{status:502})}});
-assert.equal((await retry('/api/nhl-schedule?date=2026-10-25')).games[0].id,7);assert.equal(attempts,4);
+await assert.rejects(()=>retry('/api/nhl-schedule?date=2026-10-25'));assert.equal(attempts,3);
 attempts=0;await assert.rejects(()=>retry('/api/nhl-props?event=x&market=y'));assert.equal(attempts,1);
-console.log('Passed bounded retries, official NHL fallback and no automatic paid-odds retry.');
+console.log('Passed bounded retries, no direct NHL fallback and no automatic paid-odds retry.');
 
 
 const freshLedger={schemaVersion:1,events:[],runs:[],remainingCredits:400};
