@@ -94,3 +94,13 @@ Added offline chronological goalie-challenger validation with paired base/challe
 Added a private local SQLite journal with append-only triggers, chained hashes, conflict rejection, reopen verification and repository/symlink path protections. The collector CLI requires configured private evidence storage and saves allowlisted pregame context before odds requests. Storage failure prevents that capture. Tests cover persistence, tampering, duplicate/conflicting writes, late captures, permissions, credential-field exclusion and collector failure behavior.
 
 No private collector host or durable volume was provisioned; no collection flag or schedule was enabled. The adapter records starter/scratch context but has no goalie-quality source. This closes a code-level evidence-preservation gap, not the operational prerequisites for a live 30-day trial.
+
+## Offline chronological moneyline calibration experiment
+
+Production service authentication code is deployed but its production credential/validity window is not configured. Available integrations cannot modify the external Cloudflare Pages project's environment, and no Cloudflare token is retained. This remains an operational blocker; no collection schedule or feed flag was enabled.
+
+Added an offline logistic slope/intercept calibration grid for home moneyline probability. Each target uses at least 200 prior-date out-of-sample forecasts, capped at the latest 500. Same-day outcomes never enter the calibration fit. A fixed grid is selected on prior log loss; raw production probabilities remain untouched. Duplicate copies are deduplicated and conflicting game IDs excluded. Reports include paired Brier/log loss, probability-bin coverage and explicit chronology checks.
+
+Reproduce: `node scripts/calibration-report.mjs 2026-10-28`. Saved archive generated 2026-10-26 10:49 UTC supplied 1,167 eligible forecasts. The latest 200 paired evaluations span 2026-04-14 through 2026-10-25. Base Brier 0.2389768000 versus experimental calibrated 0.2376050736; base log loss 0.6707944742 versus 0.6679054847. All model-training and calibration-training dates precede target dates. No archive duplicates or conflicts occurred.
+
+The small improvement is development evidence, not an untouched prospective result or a profitability claim. Completed outcomes are assumed available by the next game date; actual publication timestamps are unavailable. There are no paired historical sportsbook prices, and no automatic promotion, live calibrated recommendations or new provider requests. Future unseen evaluation remains necessary. Tests cover target/same-day/future-outcome isolation, paired comparison, sample limits, duplicate/conflict exclusion and immutable input records.
