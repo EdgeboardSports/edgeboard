@@ -32,6 +32,11 @@ export function marketProbabilities(model,market,side,point=null){
 export function gameValue(probability,decimal){if(!Number.isFinite(decimal)||decimal<=1)throw Error('Invalid decimal odds');const settled=probability.win+probability.loss;return {ev:probability.win*(decimal-1)-probability.loss,conditional:settled?probability.win/settled:null,breakEven:1/decimal,push:probability.push}}
 export function gradeGame(snapshot,g){
  if(!g||!['OFF','FINAL'].includes(g.gameState))return {state:'pending'};
+ if(g.id!=null&&snapshot.nhlGameId!=null&&String(g.id)!==String(snapshot.nhlGameId))return {state:'pending',reason:'Official game identity mismatch'};
+ const sides={h2h:['Home','Away'],spreads:['Home','Away'],h2h_3_way:['Home','Away','Draw'],totals:['Over','Under']};
+ if(!sides[snapshot.market]?.includes(snapshot.side)||!Number.isFinite(snapshot.quote?.decimal)||snapshot.quote.decimal<=1||(snapshot.market==='spreads'&&!Number.isFinite(snapshot.line)))return {state:'pending',reason:'Invalid settlement selection or price'};
+ const validScore=v=>(typeof v==='number'||typeof v==='string'&&/^\d+$/.test(v))&&Number.isSafeInteger(Number(v))&&Number(v)>=0;
+ if(!validScore(g.homeTeam?.score)||!validScore(g.awayTeam?.score))return {state:'pending',reason:'Waiting for valid official final score'};
  const h=Number(g.homeTeam?.score),a=Number(g.awayTeam?.score);
  if(g.homeTeam?.score==null||g.awayTeam?.score==null||!Number.isInteger(h)||!Number.isInteger(a)||h===a)return {state:'pending',reason:'Waiting for official final score'};
  let result,regulation=null;const type=g.gameOutcome?.lastPeriodType||g.periodDescriptor?.periodType;

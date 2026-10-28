@@ -31,11 +31,13 @@ export function freezePrediction({analysis,quote,event,player,capturedAt,sourceC
 }
 export function gradePrediction(snapshot,nhlGame,playerGames,now=Date.now()){
  if(!nhlGame||!['OFF','FINAL'].includes(nhlGame.gameState))return {state:'pending'};
+ if(nhlGame.id!=null&&snapshot.nhlGameId!=null&&String(nhlGame.id)!==String(snapshot.nhlGameId))return {state:'pending',reason:'Official game identity mismatch'};
+ if((snapshot.market&&snapshot.market!=='player_shots_on_goal')||!['Over','Under'].includes(snapshot.side)||!Number.isFinite(snapshot.line)||snapshot.line<0||!Number.isFinite(snapshot.quote?.decimal)||snapshot.quote.decimal<=1)return {state:'pending',reason:'Invalid shots selection or price'};
  const matches=playerGames.filter(g=>String(g.gameId)===String(snapshot.nhlGameId));
  if(matches.length!==1){
   return !matches.length&&now-Date.parse(snapshot.startTime)>24*3600000?{state:'void',reason:'No player appearance in official game log 24 hours after final game start',units:0}:{state:'pending',reason:'Waiting for player game log'};
  }
- const value=matches[0].shots;if(value===null||value===undefined||value===''||!Number.isInteger(Number(value))||Number(value)<0)return {state:'pending',reason:'Waiting for valid shot count'};
+ const value=matches[0].shots;if(!(typeof value==='number'||typeof value==='string'&&/^\d+$/.test(value))||!Number.isSafeInteger(Number(value))||Number(value)<0)return {state:'pending',reason:'Waiting for valid shot count'};
  const shots=Number(value),state=shots===snapshot.line?'push':(snapshot.side==='Over'?shots>snapshot.line:shots<snapshot.line)?'win':'loss';
  return {state,shots,units:state==='win'?snapshot.quote.decimal-1:state==='loss'?-1:0};
 }

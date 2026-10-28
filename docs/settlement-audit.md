@@ -1,0 +1,9 @@
+# Prediction-to-grade consistency audit — October 28, 2026
+
+Audited moneyline, regulation three-way, puck line, totals and player shots with synthetic official-final inputs. Valid wins, losses, integer pushes, OT/SO conventions, unresolved metadata, missing-player timing, duplicate player logs, corrections at report cutoffs and frozen snapshot hashes are covered by tests/settlement-audit.test.mjs.
+
+Found and fixed permissive grading paths: malformed/negative/noninteger final scores, blank/boolean shot counts, invalid sides, invalid decimal prices and missing spread lines could previously become misleading grades. They now remain pending. Numeric digit strings remain accepted as provider data. An official game ID supplied by the result must match the snapshot NHL game ID when both exist. Historical backtests without an explicit NHL ID retain their existing behavior. Unknown or postponed game states remain pending; no unverified game voids are invented. The existing shots rule still waits more than 24 hours after the scheduled start, with an official final and no matching player appearance, before producing a paper void. These are the project's paper settlement conventions, not a guarantee of any sportsbook's rules.
+
+A pre-existing game-model fixture used a result ID different from its forecast; the fixture was corrected to the intended ID. No stored forecast, historical grade, production probability formula, provider flag, credential or schedule was rewritten. Previously stored grades are not automatically regraded by this deployment while collection remains paused.
+
+Validation: full npm test and private production build passed. Tests demonstrate corrections are selected by their timestamps and grading leaves frozen snapshot hashes unchanged. No live provider requests, wager placement or data-source authorization was required.

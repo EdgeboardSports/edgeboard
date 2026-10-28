@@ -27,7 +27,7 @@ const a=analyzeGame(archive,event,quote);assert(a);assert.equal(a.test.games,Mat
 assert.equal(fitGame(games.slice(0,19),'HOM','AWY',event.date),null);
 const changed={...archive,generatedAt:'2026-10-25T15:00:01Z',games:games.map((g,i)=>({...g,homeGoals:i===games.length-1?10:g.homeGoals}))},test=gameBacktest(archive,'h2h','Home',null,event.date),changedTest=gameBacktest(changed,'h2h','Home',null,event.date);near(test.tests[0].loss,changedTest.tests[0].loss);
 const snapshot=freezeGame({analysis:a,quote,event,capturedAt:'2026-10-25T15:00:00Z',sourceCommit:'test'});assert.throws(()=>freezeGame({analysis:a,quote,event,capturedAt:event.startTime}),/after start/);assert.equal(snapshot.modelVersion,'goals-v1');
-const record={snapshot,result:gradeGame(snapshot,raw('SO',2,1))};const metrics=aggregateGames([record]);assert.equal(metrics.wins,1);assert.equal(metrics.uniqueTests,1);assert.equal(metrics.roi,1);
+const record={snapshot,result:gradeGame(snapshot,{...raw('SO',2,1),id:event.nhlGameId})};const metrics=aggregateGames([record]);assert.equal(metrics.wins,1);assert.equal(metrics.uniqueTests,1);assert.equal(metrics.roi,1);
 assert(gameChecks(a,quote,{...event,verified:false},Date.parse('2026-10-25T15:00:00Z')).includes('Upcoming NHL matchup unverified'));
 console.log('Passed: regulation/OT/SO normalization and grading; puck-line pushes; probability mass; symmetric moneylines; push-aware value; training minimum; time-ordered test; frozen capture and game metrics.');
 
