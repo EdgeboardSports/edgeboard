@@ -16,3 +16,6 @@ assert.throws(()=>makeClient('https://other.test',{collectorToken:token}),/fixed
 let calls=0;const client=makeClient('https://edgeboard-8fl.pages.dev',{collectorToken:token,fetchImpl:async(url,options)=>{calls++;assert.equal(new URL(url).origin,'https://edgeboard-8fl.pages.dev');assert.equal(options.headers['X-Edgeboard-Collector-Token'],token);assert.equal(options.redirect,'manual');return Response.json({ok:true})}});
 assert.equal((await client('/api/feed-status')).ok,true);await assert.rejects(client('//other.test/api/feed-status'));assert.equal(calls,1);
 console.log('Scoped collector identity: hash, expiry, methods, paths, origin, held feeds and credential-isolated client passed');
+assert.equal((await authenticate(request(),{...env,EDGEBOARD_COLLECTOR_DISABLED:'true'},now)).response.status,401);
+assert.equal((await authenticate(request(),{EDGEBOARD_COLLECTOR_EXPIRES_AT:env.EDGEBOARD_COLLECTOR_EXPIRES_AT},now)).response.status,401);
+const preview=new Request('https://preview.edgeboard-8fl.pages.dev/api/feed-status',{headers:{'X-Edgeboard-Collector-Token':token}});assert.equal((await authenticate(preview,env,now)).response.status,401);
