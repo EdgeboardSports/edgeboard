@@ -3,8 +3,8 @@ import {execFileSync} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 const validDate=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&Number.isFinite(Date.parse(d))&&new Date(d).toISOString().slice(0,10)===d;
 const avg=xs=>xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null;
-export function normalizeGameRows(rows,{season}={}){
- if(!Array.isArray(rows)||rows.length>100000||!Number.isInteger(season)||season<2008||season>2100)throw Error('Bounded game rows and season required');
+export function normalizeGameRows(rows,{season,stat='shots'}={}){
+ if(!['shots','points'].includes(stat)||!Array.isArray(rows)||rows.length>100000||!Number.isInteger(season)||season<2008||season>2100)throw Error('Bounded game rows and season required');
  const audit={input:rows.length,nonRegular:0,noIceTime:0,zeroShotAppearances:0,duplicateCopies:0,conflictingAppearances:0},groups=new Map();
  const number=(r,key)=>{if(typeof r[key]!=='string'||!r[key].trim()||!Number.isFinite(Number(r[key]))||Number(r[key])<0)throw Error('Invalid game number');return Number(r[key])};
  for(const r of rows){
@@ -13,13 +13,15 @@ export function normalizeGameRows(rows,{season}={}){
   const raw=r.gameDate,date=typeof raw==='string'?raw.replace(/^(\d{4})(\d{2})(\d{2})$/,'$1-$2-$3'):null;
   if(!validDate(date)||date<`${season}-07-01`||date>=`${season+1}-07-01`||!['HOME','AWAY'].includes(r.home_or_away)||![r.playerTeam,r.opposingTeam].every(t=>/^[A-Z]{2,4}$/.test(t||''))||r.playerTeam===r.opposingTeam)throw Error('Invalid game context');
   const seconds=number(r,'icetime'),shots=number(r,'I_F_shotsOnGoal');if(!Number.isInteger(shots)||shots>50||seconds>7200)throw Error('Invalid game stats');
-  if(!seconds&&shots)throw Error('Shots without ice time');
+  let points;
+  if(stat==='points'){const values=['I_F_points','I_F_goals','I_F_primaryAssists','I_F_secondaryAssists'].map(k=>number(r,k));if(values.some(v=>!Number.isInteger(v)||v>20)||values[1]>shots||values[0]!==values.slice(1).reduce((a,b)=>a+b,0))throw Error('Invalid point components');points=values[0]}
+  if(!seconds&&(shots||points))throw Error('Production without ice time');
   const toi=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');if(!Number.isInteger(seconds))throw Error('Whole source seconds required');
-  const game={playerId:r.playerId,gameId:r.gameId,gameDate:date,team:r.playerTeam,opponentAbbrev:r.opposingTeam,homeRoadFlag:r.home_or_away==='HOME'?'H':'R',toi,shots};
+  const game={playerId:r.playerId,gameId:r.gameId,gameDate:date,team:r.playerTeam,opponentAbbrev:r.opposingTeam,homeRoadFlag:r.home_or_away==='HOME'?'H':'R',toi,shots,...(stat==='points'?{points}:{})};
   const key=r.playerId+':'+r.gameId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(game);
  }
  const games=[];for(const copies of groups.values()){if(new Set(copies.map(g=>JSON.stringify(g))).size>1){audit.conflictingAppearances++;continue}audit.duplicateCopies+=copies.length-1;if(copies[0].toi==='0:00'){audit.noIceTime++;continue}games.push(copies[0])}
- games.sort((a,b)=>a.gameDate.localeCompare(b.gameDate)||a.playerId.localeCompare(b.playerId)||a.gameId.localeCompare(b.gameId));audit.zeroShotAppearances=games.filter(g=>g.shots===0).length;
+ games.sort((a,b)=>a.gameDate.localeCompare(b.gameDate)||a.playerId.localeCompare(b.playerId)||a.gameId.localeCompare(b.gameId));audit.zeroShotAppearances=games.filter(g=>g.shots===0).length;if(stat==='points')audit.zeroPointAppearances=games.filter(g=>g.points===0).length;
  return {games,audit,season};
 }
 function allChronologicalTests(games,line){

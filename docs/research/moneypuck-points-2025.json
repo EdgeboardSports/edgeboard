@@ -1,0 +1,987 @@
+{
+  "version": "points-research-v1",
+  "modelVersion": "count-challenger-v2",
+  "stat": "points",
+  "line": 0.5,
+  "before": "2026-10-28",
+  "researchOnly": true,
+  "promoted": false,
+  "historicalPublicationVerified": false,
+  "attribution": "Historical research data: MoneyPuck.com — https://moneypuck.com/data.htm",
+  "sourceUrl": "https://peter-tanner.com/moneypuck/downloads/seasonPlayersSummary/skaters/2025.zip",
+  "audit": {
+    "input": 47212,
+    "nonRegular": 0,
+    "noIceTime": 0,
+    "zeroShotAppearances": 12837,
+    "duplicateCopies": 0,
+    "conflictingAppearances": 0,
+    "zeroPointAppearances": 30810,
+    "players": 940,
+    "evaluatedPlayers": 711,
+    "distinctDates": 127,
+    "chronologyValid": true
+  },
+  "forecasts": 31406,
+  "firstTest": "2025-11-17",
+  "lastTest": "2026-04-16",
+  "summary": {
+    "poisson": {
+      "n": 31406,
+      "brier": 0.21033398367404993,
+      "logLoss": 0.6114777866395928,
+      "overCalibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 6220,
+          "predicted": 0.1394581665195298,
+          "observed": 0.18713826366559486
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 13470,
+          "predicted": 0.2985837540722019,
+          "observed": 0.303637713437268
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 8597,
+          "predicted": 0.49027921627572596,
+          "observed": 0.47679423054553915
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 2980,
+          "predicted": 0.6631362851569853,
+          "observed": 0.6348993288590604
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 139,
+          "predicted": 0.8260236094741493,
+          "observed": 0.7913669064748201
+        }
+      ]
+    },
+    "negative-binomial": {
+      "n": 31406,
+      "brier": 0.21035260452827545,
+      "logLoss": 0.6116303507361556,
+      "overCalibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 6441,
+          "predicted": 0.13910604355203401,
+          "observed": 0.1878590281012265
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 13623,
+          "predicted": 0.29790476463122045,
+          "observed": 0.30712765176539675
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 8368,
+          "predicted": 0.4907593737103478,
+          "observed": 0.48446462715105165
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 2837,
+          "predicted": 0.6628134954845208,
+          "observed": 0.6337680648572436
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 137,
+          "predicted": 0.8260669735316014,
+          "observed": 0.7956204379562044
+        }
+      ]
+    },
+    "empirical": {
+      "n": 31406,
+      "brier": 0.21095996025787045,
+      "logLoss": 0.611796561325598,
+      "overCalibration": [
+        {
+          "lower": 0,
+          "upper": 0.2,
+          "n": 5683,
+          "predicted": 0.14832634949415635,
+          "observed": 0.18722505718810487
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.4,
+          "n": 13566,
+          "predicted": 0.2984913984028672,
+          "observed": 0.29581306206693203
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.6,
+          "n": 8612,
+          "predicted": 0.489432557426584,
+          "observed": 0.47329307942405946
+        },
+        {
+          "lower": 0.6,
+          "upper": 0.8,
+          "n": 3386,
+          "predicted": 0.6729990080123274,
+          "observed": 0.6184288245717661
+        },
+        {
+          "lower": 0.8,
+          "upper": 1,
+          "n": 159,
+          "predicted": 0.8309785095136909,
+          "observed": 0.6792452830188679
+        }
+      ]
+    }
+  },
+  "robustness": {
+    "poisson": {
+      "method": "paired game-date cluster bootstrap percentile",
+      "seed": 20261028,
+      "distinctDates": 127,
+      "replicates": 2000,
+      "brierImprovement95": {
+        "lower": 0.00014569919536292988,
+        "upper": 0.0011133111915999055
+      },
+      "logLossImprovement95": {
+        "lower": -0.0008932780271480228,
+        "upper": 0.0015066894403809792
+      }
+    },
+    "negative-binomial": {
+      "method": "paired game-date cluster bootstrap percentile",
+      "seed": 20261028,
+      "distinctDates": 127,
+      "replicates": 2000,
+      "brierImprovement95": {
+        "lower": 0.00012993833461264707,
+        "upper": 0.0010879209037884497
+      },
+      "logLossImprovement95": {
+        "lower": -0.0010215248203937653,
+        "upper": 0.0013527229613158902
+      }
+    }
+  },
+  "byMonth": [
+    {
+      "month": "2025-11",
+      "summary": {
+        "poisson": {
+          "n": 2024,
+          "brier": 0.21344448234286661,
+          "logLoss": 0.6159499806689687,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 372,
+              "predicted": 0.13310322804509336,
+              "observed": 0.1639784946236559
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 809,
+              "predicted": 0.2980910934884886,
+              "observed": 0.33127317676143386
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 584,
+              "predicted": 0.48627071581283354,
+              "observed": 0.4366438356164384
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 254,
+              "predicted": 0.6689721933811507,
+              "observed": 0.65748031496063
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 5,
+              "predicted": 0.8376970963081426,
+              "observed": 0.8
+            }
+          ]
+        },
+        "negative-binomial": {
+          "n": 2024,
+          "brier": 0.21333996897345134,
+          "logLoss": 0.6157124782722168,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 382,
+              "predicted": 0.13288533051346396,
+              "observed": 0.1649214659685864
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 817,
+              "predicted": 0.29795149935403376,
+              "observed": 0.3329253365973072
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 586,
+              "predicted": 0.48751348358645374,
+              "observed": 0.447098976109215
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 234,
+              "predicted": 0.6711064662874737,
+              "observed": 0.6581196581196581
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 5,
+              "predicted": 0.8356648632821377,
+              "observed": 0.8
+            }
+          ]
+        },
+        "empirical": {
+          "n": 2024,
+          "brier": 0.21537815165856003,
+          "logLoss": 0.6192853212976984,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 304,
+              "predicted": 0.1428027427087067,
+              "observed": 0.15789473684210525
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 809,
+              "predicted": 0.2970755813140397,
+              "observed": 0.3065512978986403
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 622,
+              "predicted": 0.4887350942495637,
+              "observed": 0.454983922829582
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 267,
+              "predicted": 0.6873406533246142,
+              "observed": 0.6142322097378277
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 22,
+              "predicted": 0.8274959789880739,
+              "observed": 0.5454545454545454
+            }
+          ]
+        }
+      }
+    },
+    {
+      "month": "2025-12",
+      "summary": {
+        "poisson": {
+          "n": 6649,
+          "brier": 0.2143417198516584,
+          "logLoss": 0.6213056958975872,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1249,
+              "predicted": 0.13479976608718627,
+              "observed": 0.20256204963971178
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 2877,
+              "predicted": 0.29930519627900204,
+              "observed": 0.3058741744873132
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 1853,
+              "predicted": 0.489343493894758,
+              "observed": 0.4624932541824069
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 644,
+              "predicted": 0.6688471035890993,
+              "observed": 0.6149068322981367
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 26,
+              "predicted": 0.8267128745128959,
+              "observed": 0.9230769230769231
+            }
+          ]
+        },
+        "negative-binomial": {
+          "n": 6649,
+          "brier": 0.2142685781749321,
+          "logLoss": 0.6212616609958667,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1297,
+              "predicted": 0.1347683477934217,
+              "observed": 0.20431765612952968
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 2909,
+              "predicted": 0.2990262228950047,
+              "observed": 0.30732210381574426
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 1792,
+              "predicted": 0.4891827549615101,
+              "observed": 0.47098214285714285
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 625,
+              "predicted": 0.6681154797980899,
+              "observed": 0.6128
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 26,
+              "predicted": 0.8265361548651047,
+              "observed": 0.9230769230769231
+            }
+          ]
+        },
+        "empirical": {
+          "n": 6649,
+          "brier": 0.21507690283449646,
+          "logLoss": 0.6213599303512705,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1112,
+              "predicted": 0.145430336374857,
+              "observed": 0.19784172661870503
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 2860,
+              "predicted": 0.29863834758592545,
+              "observed": 0.2923076923076923
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 1866,
+              "predicted": 0.48988256625920595,
+              "observed": 0.46516613076098606
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 750,
+              "predicted": 0.6789424632679748,
+              "observed": 0.5906666666666667
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 61,
+              "predicted": 0.8222288520481271,
+              "observed": 0.7049180327868853
+            }
+          ]
+        }
+      }
+    },
+    {
+      "month": "2026-01",
+      "summary": {
+        "poisson": {
+          "n": 7898,
+          "brier": 0.21182557946750225,
+          "logLoss": 0.6149968102472951,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1553,
+              "predicted": 0.13980044183528023,
+              "observed": 0.18609143593045718
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 3404,
+              "predicted": 0.298827974420374,
+              "observed": 0.31139835487661577
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 2218,
+              "predicted": 0.49122961503651785,
+              "observed": 0.48016230838593327
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 675,
+              "predicted": 0.6643744515337713,
+              "observed": 0.6533333333333333
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 48,
+              "predicted": 0.8277307798757428,
+              "observed": 0.75
+            }
+          ]
+        },
+        "negative-binomial": {
+          "n": 7898,
+          "brier": 0.21203424337031457,
+          "logLoss": 0.6156082408051645,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1607,
+              "predicted": 0.13938993533156116,
+              "observed": 0.1879278158058494
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 3469,
+              "predicted": 0.298359223929419,
+              "observed": 0.31767079850100893
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 2130,
+              "predicted": 0.49200379302244845,
+              "observed": 0.48450704225352115
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 645,
+              "predicted": 0.6636123262936661,
+              "observed": 0.6511627906976745
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 47,
+              "predicted": 0.8282060160393142,
+              "observed": 0.7446808510638298
+            }
+          ]
+        },
+        "empirical": {
+          "n": 7898,
+          "brier": 0.21201400009945479,
+          "logLoss": 0.6142285373144166,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1416,
+              "predicted": 0.14751719428932653,
+              "observed": 0.1850282485875706
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 3493,
+              "predicted": 0.29781081392341097,
+              "observed": 0.30833094760950475
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 2118,
+              "predicted": 0.49081647224452823,
+              "observed": 0.4754485363550519
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 832,
+              "predicted": 0.6694536605055053,
+              "observed": 0.6225961538461539
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 39,
+              "predicted": 0.8507055305391191,
+              "observed": 0.6923076923076923
+            }
+          ]
+        }
+      }
+    },
+    {
+      "month": "2026-02",
+      "summary": {
+        "poisson": {
+          "n": 2512,
+          "brier": 0.2017368840993001,
+          "logLoss": 0.5929487373979228,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 497,
+              "predicted": 0.13874432818845475,
+              "observed": 0.18309859154929578
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 1103,
+              "predicted": 0.30318320002861204,
+              "observed": 0.28377153218495016
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 649,
+              "predicted": 0.49196900590386744,
+              "observed": 0.48073959938366717
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 254,
+              "predicted": 0.6637419240749346,
+              "observed": 0.6850393700787402
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 9,
+              "predicted": 0.8356833313060851,
+              "observed": 0.6666666666666666
+            }
+          ]
+        },
+        "negative-binomial": {
+          "n": 2512,
+          "brier": 0.20170109683861914,
+          "logLoss": 0.5930292480920268,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 513,
+              "predicted": 0.1383687190959772,
+              "observed": 0.18128654970760233
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 1120,
+              "predicted": 0.30183110513437555,
+              "observed": 0.28214285714285714
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 627,
+              "predicted": 0.49317786361308324,
+              "observed": 0.5039872408293461
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 244,
+              "predicted": 0.6628707423722753,
+              "observed": 0.6762295081967213
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 8,
+              "predicted": 0.8400920781465236,
+              "observed": 0.75
+            }
+          ]
+        },
+        "empirical": {
+          "n": 2512,
+          "brier": 0.20285221095989311,
+          "logLoss": 0.5939542051580214,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 452,
+              "predicted": 0.14808134555775082,
+              "observed": 0.1836283185840708
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 1106,
+              "predicted": 0.2994485779935105,
+              "observed": 0.2739602169981917
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 671,
+              "predicted": 0.4895081467782663,
+              "observed": 0.46795827123695977
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 272,
+              "predicted": 0.6685638087032695,
+              "observed": 0.6911764705882353
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 11,
+              "predicted": 0.8265617084138885,
+              "observed": 0.7272727272727273
+            }
+          ]
+        }
+      }
+    },
+    {
+      "month": "2026-03",
+      "summary": {
+        "poisson": {
+          "n": 8195,
+          "brier": 0.20679404549186708,
+          "logLoss": 0.6031286820599432,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1656,
+              "predicted": 0.1432762072213433,
+              "observed": 0.17995169082125603
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 3546,
+              "predicted": 0.2979874708127887,
+              "observed": 0.2918781725888325
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 2184,
+              "predicted": 0.4906558357453608,
+              "observed": 0.4803113553113553
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 770,
+              "predicted": 0.6570028303257172,
+              "observed": 0.6298701298701299
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 39,
+              "predicted": 0.8209186168898207,
+              "observed": 0.7948717948717948
+            }
+          ]
+        },
+        "negative-binomial": {
+          "n": 8195,
+          "brier": 0.20673736691194455,
+          "logLoss": 0.6030832932139863,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1725,
+              "predicted": 0.1429560785449548,
+              "observed": 0.18028985507246376
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 3569,
+              "predicted": 0.297198203050274,
+              "observed": 0.2978425329223872
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 2134,
+              "predicted": 0.49150515689051755,
+              "observed": 0.48500468603561386
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 728,
+              "predicted": 0.6567626150123772,
+              "observed": 0.6291208791208791
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 39,
+              "predicted": 0.8205677574067459,
+              "observed": 0.7948717948717948
+            }
+          ]
+        },
+        "empirical": {
+          "n": 8195,
+          "brier": 0.20758990672866756,
+          "logLoss": 0.6041403608179121,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 1569,
+              "predicted": 0.15120620402618204,
+              "observed": 0.18546845124282982
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 3541,
+              "predicted": 0.3002383481870471,
+              "observed": 0.28833662807116633
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 2215,
+              "predicted": 0.4886927606076095,
+              "observed": 0.4717832957110609
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 853,
+              "predicted": 0.6707998689333988,
+              "observed": 0.6201641266119577
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 17,
+              "predicted": 0.8285270034649072,
+              "observed": 0.7058823529411765
+            }
+          ]
+        }
+      }
+    },
+    {
+      "month": "2026-04",
+      "summary": {
+        "poisson": {
+          "n": 4128,
+          "brier": 0.21175888600143222,
+          "logLoss": 0.614572540975818,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 893,
+              "predicted": 0.14134274427481175,
+              "observed": 0.19260918253079506
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 1731,
+              "predicted": 0.29542539397170037,
+              "observed": 0.30849220103986136
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 1109,
+              "predicted": 0.49032219463504156,
+              "observed": 0.5058611361587015
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 383,
+              "predicted": 0.6594106399125208,
+              "observed": 0.597911227154047
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 12,
+              "predicted": 0.8221840019614431,
+              "observed": 0.75
+            }
+          ]
+        },
+        "negative-binomial": {
+          "n": 4128,
+          "brier": 0.21180467371290174,
+          "logLoss": 0.6147919114002902,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 917,
+              "predicted": 0.14050520033842895,
+              "observed": 0.19193020719738277
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 1739,
+              "predicted": 0.2940216095165086,
+              "observed": 0.30879815986198966
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 1099,
+              "predicted": 0.4898211433192987,
+              "observed": 0.5141037306642402
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 361,
+              "predicted": 0.6589950232056845,
+              "observed": 0.6038781163434903
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 12,
+              "predicted": 0.8211957594202475,
+              "observed": 0.75
+            }
+          ]
+        },
+        "empirical": {
+          "n": 4128,
+          "brier": 0.21176991123959588,
+          "logLoss": 0.6141247407486914,
+          "overCalibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "n": 830,
+              "predicted": 0.15029930954233992,
+              "observed": 0.1927710843373494
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "n": 1757,
+              "predicted": 0.2961338646151855,
+              "observed": 0.30051223676721683
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "n": 1120,
+              "predicted": 0.48787086414898184,
+              "observed": 0.49910714285714286
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "n": 412,
+              "predicted": 0.667526091099568,
+              "observed": 0.6116504854368932
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "n": 9,
+              "predicted": 0.8233397730579531,
+              "observed": 0.6666666666666666
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Reused retrospective development archive, not an untouched prospective holdout",
+    "Conditional on recorded positive-ice-time appearances; absent players not invented",
+    "Zero-point appearances retained; points checked against goals plus primary/secondary assists",
+    "At least 20 prior games; count-challenger-v2 uses prior-date history only, capped at 82",
+    "Empirical baseline uses the same prior-date targets and 82-game window",
+    "Historical publication and revision times unverified; outcomes assumed available next game date",
+    "Game-date resampling does not capture all player/team serial dependence or model-selection bias",
+    "Fixed 0.5-point research threshold; no historical sportsbook prices or profitability claim",
+    "No production promotion, authorized live feed integration, or live trial"
+  ],
+  "archiveSha256": "358d4fe42277ddbd7489152cb0f0d1033abf2a9df305b77ac65a9cffeedb62d1",
+  "sourceRows": 236060
+}

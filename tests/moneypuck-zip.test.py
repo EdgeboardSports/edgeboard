@@ -14,4 +14,17 @@ class ArchiveTest(unittest.TestCase):
             self.assertEqual(json.loads(valid.stdout)['rows'][0]['I_F_shotsOnGoal'], '0')
             for name, content in [('../2025.csv', header), ('2024.csv', header), ('2025.csv', 'other\n1\n'), ('2025.csv', header + 'short\n')]:
                 self.assertNotEqual(run(name, content).returncode, 0)
+    def test_points_mode_requires_components(self):
+        header = 'playerId,season,gameId,gameDate,playerTeam,opposingTeam,home_or_away,icetime,I_F_shotsOnGoal,I_F_points,I_F_goals,I_F_primaryAssists,I_F_secondaryAssists,situation\n'
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'fixture.zip'
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('2025.csv', header + '8470001,2025,2025020001,20251001,CAR,TOR,HOME,1200,0,0,0,0,0,all\n')
+            result = subprocess.run(['python3', str(HELPER), str(path), '2025', 'points'], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(json.loads(result.stdout)['rows'][0]['I_F_points'], '0')
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('2025.csv', 'missing\nvalue\n')
+            result = subprocess.run(['python3', str(HELPER), str(path), '2025', 'points'], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
 if __name__ == '__main__': unittest.main()

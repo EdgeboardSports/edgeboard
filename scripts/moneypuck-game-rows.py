@@ -1,9 +1,13 @@
 """Read the explicitly listed MoneyPuck skater ZIP; never extract archive paths."""
 import csv, hashlib, io, json, os, sys, zipfile
-path, season = sys.argv[1:]
+path, season, *options = sys.argv[1:]
+if options not in ([], ['points']):
+    raise ValueError('Unsupported game statistic')
 if not season.isdigit() or len(season) != 4 or os.path.getsize(path) > 64 * 1024 * 1024:
     raise ValueError('Invalid season or archive size')
 fields = ['playerId', 'season', 'gameId', 'gameDate', 'playerTeam', 'opposingTeam', 'home_or_away', 'icetime', 'I_F_shotsOnGoal']
+if options == ['points']:
+    fields += ['I_F_points', 'I_F_goals', 'I_F_primaryAssists', 'I_F_secondaryAssists']
 rows, count, other = [], 0, 0
 with zipfile.ZipFile(path) as archive:
     files = archive.infolist()
