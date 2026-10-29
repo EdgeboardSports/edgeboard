@@ -26,4 +26,13 @@ late=appendResearchEvent(late,{type:'prediction',data:prediction},{recordedAt:'2
 late=appendResearchEvent(late,{type:'quote',data:events[0].data},{recordedAt:'2026-01-01T18:01:00Z'});
 const lateReport=reportResearchLedger(late,{mode:'synthetic',asOf:'2026-01-02T00:00:00Z'});
 assert.equal(lateReport.counts.matched,0);
+assert.throws(()=>appendResearchEvent(events,{type:'settlement',data:{predictionId:'fake-pick-1',result:'win'}},{recordedAt:'2026-01-01T18:59:00Z'}),/timestamp/);
+let pregame=[];
+pregame=appendResearchEvent(pregame,{type:'prediction',data:events[1].data},{recordedAt:'2026-01-01T18:00:00Z'});
+pregame=appendResearchEvent(pregame,{type:'settlement',data:{predictionId:'fake-pick-1',result:'win'}},{recordedAt:'2026-01-01T18:30:00Z'});
+const earlyGrade=reportResearchLedger(pregame,{mode:'synthetic',asOf:'2026-01-02T00:00:00Z'});
+assert.equal(earlyGrade.ledger.rejected.unknownSettlements,1);
+assert.equal(earlyGrade.summary.unresolved,0); // no quote matched
+const altered=events.map((e,i)=>i===1?{...e,recordedAt:'2026-01-01T17:00:00Z'}:e);
+assert.throws(()=>verifyResearchChain(altered),/structure|digest/);
 console.log('Research odds ledger and dashboard: chain integrity, pre-prediction quote receipt, as-of settlement, tamper rejection, synthetic-only UI passed.');
