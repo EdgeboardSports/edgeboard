@@ -88,11 +88,12 @@ export function evaluateHistoricalOdds(input){
   if(!candidates.length){if(quotes.length&&quotes.some(q=>q.source!==(input.mode==='synthetic'?'synthetic-fixture':input.licenseReference)))rejected.invalidSource++;else if(quotes.length)rejected.stale++;else rejected.noQuote++;continue}
   // One quote per bookmaker: latest observed quote before the prediction.
   const byBook=new Map();
+  const conflictedBooks=new Set();
   for(const q of candidates){const prev=byBook.get(q.bookmaker);
    if(!prev||time(q.observedAt)>time(prev.observedAt))byBook.set(q.bookmaker,q);
-   else if(time(q.observedAt)===time(prev.observedAt)&&q.decimal!==prev.decimal)byBook.set(q.bookmaker,{...q,conflict:true});
+   else if(time(q.observedAt)===time(prev.observedAt)&&q.decimal!==prev.decimal)conflictedBooks.add(q.bookmaker);
   }
-  const options=[...byBook.values()].filter(q=>!q.conflict);
+  const options=[...byBook.values()].filter(q=>!conflictedBooks.has(q.bookmaker));
   if(!options.length){rejected.conflicting++;continue}
   options.sort((a,b)=>b.decimal-a.decimal||a.bookmaker.localeCompare(b.bookmaker));
   const chosen=options[0];
@@ -101,17 +102,17 @@ export function evaluateHistoricalOdds(input){
    .filter(q=>opposite&&q.bookmaker===chosen.bookmaker&&q.source===chosen.source
     &&time(q.observedAt)<=time(p.predictedAt)&&time(p.predictedAt)-time(q.observedAt)<=MAX_AGE)
    .sort((a,b)=>time(b.observedAt)-time(a.observedAt));
-  const noVig=counterpart.length?noVigPair(chosen.decimal,counterpart[0].decimal):null;
+  const noVig=counterpart.length&&p.market!=='h2h_3_way'?noVigPair(chosen.decimal,counterpart[0].decimal):null;
   accepted.push({id:p.id,market:p.market,bookmaker:chosen.bookmaker,eventId:p.eventId,subjectId:p.subjectId??null,
    line:p.line??null,side:p.side,probability:p.probability,decimal:chosen.decimal,implied:round(decimalToImplied(chosen.decimal)),
    noVigImplied:noVig?.sideA??null,overround:noVig?.overround??null,estimatedEV:round(expectedValue(p.probability,chosen.decimal)),
-   result:p.result,predictedAt:p.predictedAt,observedAt:chosen.observedAt});
+   result:p.result,edgeTier:expectedValue(p.probability,chosen.decimal)>=.05?'EV >= 5%':expectedValue(p.probability,chosen.decimal)>0?'EV 0-5%':'EV <= 0%',predictedAt:p.predictedAt,observedAt:chosen.observedAt});
  }
  return {mode:input.mode,licenseReference:input.mode==='licensed-historical'?input.licenseReference:null,
   selectionPolicy,oddsFreshnessMinutes:60,quotesAreHistorical:input.mode==='licensed-historical',
   dataIsSynthetic:input.mode==='synthetic',notRealizedProfit:input.mode==='synthetic',
   counts:{predictions:input.predictions.length,quoteRows:input.quotes.length,matched:accepted.length,rejected},
-  summary:metrics(accepted),byMarket:group(accepted,'market'),byBookmaker:group(accepted,'bookmaker'),
+  summary:metrics(accepted),byMarket:group(accepted,'market'),byBookmaker:group(accepted,'bookmaker'),byEstimatedEdge:group(accepted,'edgeTier'),
   records:accepted,
   caveats:['Synthetic mode is arithmetic testing only: ROI and EV are illustrative, not evidence.',
    'Historical prices require documented license and authentic timestamped pregame quotes; no backfilled prices treated as live.',
