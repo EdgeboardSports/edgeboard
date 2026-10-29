@@ -1,0 +1,57 @@
+name: MoneyPuck historical research trial (one-off)
+on:
+  push:
+    paths:
+      - .github/workflows/moneypuck-historical-trial.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download only explicitly published MoneyPuck historical skater archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 2 --connect-timeout 20 --max-time 180 \
+            --output /tmp/edgeboard-moneypuck-2025.zip \
+            'https://peter-tanner.com/moneypuck/downloads/seasonPlayersSummary/skaters/2025.zip'
+          test "$(stat -c%s /tmp/edgeboard-moneypuck-2025.zip)" -le 67108864
+          sha256sum /tmp/edgeboard-moneypuck-2025.zip > moneypuck-2025.sha256.txt
+      - name: Verify historical archive and run existing backtests (research only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/moneypuck-game-rows.py /tmp/edgeboard-moneypuck-2025.zip 2025 > /tmp/moneypuck-2025-schema.json
+          node scripts/moneypuck-backtest.mjs 2025 2026-07-01 /tmp/edgeboard-moneypuck-2025.zip > moneypuck-2025-shots.json
+          node scripts/points-backtest.mjs 2025 2026-07-01 /tmp/edgeboard-moneypuck-2025.zip > moneypuck-2025-points.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          shots=json.loads(Path('moneypuck-2025-shots.json').read_text())
+          points=json.loads(Path('moneypuck-2025-points.json').read_text())
+          summary={'season':'2025-26','researchOnly':True,'noHistoricalOdds':True,'shots':{k:shots.get(k) for k in ('forecasts','modelBrier','baselineBrier','pairedBrierImprovement','audit','firstTest','lastTest')},'points':{k:points.get(k) for k in ('forecasts','summary','robustness','audit','firstTest','lastTest')}}
+          Path('moneypuck-2025-summary.json').write_text(json.dumps(summary,indent=2))
+          print(json.dumps(summary,indent=2))
+          PY
+      - name: Upload aggregate research reports only, not source data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moneypuck-2025-research-report
+          path: |
+            moneypuck-2025.sha256.txt
+            moneypuck-2025-summary.json
+            moneypuck-2025-shots.json
+            moneypuck-2025-points.json
+          if-no-files-found: warn
+          retention-days: 7
