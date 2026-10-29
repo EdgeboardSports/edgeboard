@@ -44,6 +44,17 @@ jobs:
           Path('moneypuck-2025-summary.json').write_text(json.dumps(summary,indent=2))
           print(json.dumps(summary,indent=2))
           PY
+      - name: Diagnose fixed shots-v1 model without tuning or promoting
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/shots-diagnostic.mjs 2025 2026-07-01 /tmp/edgeboard-moneypuck-2025.zip > moneypuck-2025-shots-diagnostic.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('moneypuck-2025-shots-diagnostic.json').read_text())
+          print(json.dumps({k:x[k] for k in ('headline','dateClusterUncertainty','byMonth','byVenueFactor','byOpponentFactor','byIceTimeFactor','byDispersion')},indent=2))
+          PY
       - name: Upload aggregate research reports only, not source data
         if: always()
         uses: actions/upload-artifact@v4
@@ -54,5 +65,6 @@ jobs:
             moneypuck-2025-summary.json
             moneypuck-2025-shots.json
             moneypuck-2025-points.json
+            moneypuck-2025-shots-diagnostic.json
           if-no-files-found: warn
           retention-days: 7
