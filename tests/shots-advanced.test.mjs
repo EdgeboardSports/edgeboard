@@ -15,6 +15,8 @@ for(let i=0;i<90;i++){
   }
  }
 }
+import {normalizeGameRows} from '../scripts/moneypuck-backtest.mjs';
+for(const row of rows.filter(r=>r.situation==='all')){try{normalizeGameRows([row],{season:2024})}catch(e){console.error('Invalid synthetic test row:',JSON.stringify(row));throw e}}
 const report=advancedBacktest(rows,{season:2024,cutoff:'2025-07-01',developmentEnd:'2024-12-01'});
 assert.equal(report.checks.chronologyValid,true);
 assert(report.checks.development>0&&report.checks.later>0);
