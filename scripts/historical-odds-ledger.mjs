@@ -46,7 +46,7 @@ export function reportResearchLedger(events,{mode='synthetic',licenseReference,a
   if(e.type==='prediction'){
    if(predictions.has(e.data.id)){rejected.duplicatePredictions++;continue}
    predictions.set(e.data.id,{...e.data,result:'pending'});
-  }else if(e.type==='quote')quotes.push(e.data);
+  }else if(e.type==='quote')quotes.push({...e.data,receivedAt:e.recordedAt});
   else if(!predictions.has(e.data.predictionId))rejected.unknownSettlements++;
   else {
    const prev=settlements.get(e.data.predictionId);
@@ -54,7 +54,8 @@ export function reportResearchLedger(events,{mode='synthetic',licenseReference,a
   }
  }
  const ready=[...predictions.values()].map(p=>({...p,result:settlements.get(p.id)?.result??'pending'}));
- const evaluated=evaluateHistoricalOdds({mode,licenseReference,predictions:ready,quotes});
+ const availableQuotes=quotes.filter(q=>ready.some(p=>p.eventId===q.eventId&&Date.parse(q.receivedAt)<=Date.parse(p.predictedAt)));
+ const evaluated=evaluateHistoricalOdds({mode,licenseReference,predictions:ready,quotes:availableQuotes});
  return {...evaluated,ledger:{...verification,asOf,visibleEntries:entries.length,predictions:predictions.size,quotes:quotes.length,settlements:settlements.size,rejected},caveats:[...evaluated.caveats,
   'SHA-256 chain detects modifications relative to a trusted external head; it is not proof of timestamp authenticity or secure storage.',
   'Storage must be private, append-only, access-controlled and backed up before real licensed records are admitted.',
