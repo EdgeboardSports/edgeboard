@@ -17,6 +17,12 @@ jobs:
           node-version: '24'
       - name: Validate quote integrity, vig, EV and paper settlement
         run: node tests/historical-odds-evaluator.test.mjs
+      - name: Validate hash-chained research ledger and synthetic dashboard
+        run: node tests/historical-odds-ledger-dashboard.test.mjs
+      - name: Generate synthetic HTML dashboard for CI artifact only
+        run: |
+          node scripts/historical-odds-dashboard.mjs historical-odds-synthetic-dashboard.html
+          test -s historical-odds-synthetic-dashboard.html
       - name: Generate clearly labeled synthetic example report
         run: |
           node scripts/historical-odds-demo.mjs > historical-odds-synthetic-report.json
@@ -25,5 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: historical-odds-synthetic-audit
-          path: historical-odds-synthetic-report.json
+          path: |
+            historical-odds-synthetic-report.json
+            historical-odds-synthetic-dashboard.html
           retention-days: 7
