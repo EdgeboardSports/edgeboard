@@ -55,6 +55,18 @@ jobs:
           x=json.loads(Path('moneypuck-2025-shots-diagnostic.json').read_text())
           print(json.dumps({k:x[k] for k in ('headline','dateClusterUncertainty','byMonth','byVenueFactor','byOpponentFactor','byIceTimeFactor','byDispersion')},indent=2))
           PY
+      - name: Run five-model chronological comparison (research only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tests/shots-variants.test.mjs
+          node scripts/shots-variants.mjs 2025 2026-07-01 /tmp/edgeboard-moneypuck-2025.zip 2026-01-15 > moneypuck-2025-shots-variants.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('moneypuck-2025-shots-variants.json').read_text())
+          print(json.dumps({k:x[k] for k in ('checks','selectedOnDevelopment','development','laterEvaluation','selectedLaterVsBaseline','selectedLaterVsOriginal','selectedLaterUncertainty')},indent=2))
+          PY
       - name: Upload aggregate research reports only, not source data
         if: always()
         uses: actions/upload-artifact@v4
@@ -66,5 +78,6 @@ jobs:
             moneypuck-2025-shots.json
             moneypuck-2025-points.json
             moneypuck-2025-shots-diagnostic.json
+            moneypuck-2025-shots-variants.json
           if-no-files-found: warn
           retention-days: 7
