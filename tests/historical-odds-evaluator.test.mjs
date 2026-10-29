@@ -57,4 +57,9 @@ assert.throws(()=>evaluateHistoricalOdds({mode:'synthetic',predictions:[{...pred
 const duplicate=evaluateHistoricalOdds({mode:'synthetic',predictions:[predictions[0]],quotes:[quote('Over','bookA',2),quote('Over','bookA',2.5)]});
 assert.equal(duplicate.counts.matched,0);
 assert.equal(duplicate.counts.rejected.conflicting,1);
+const lateReceipt=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('late-receipt','Over',.5,'win')],quotes:[{...quote('Over','bookA',2),receivedAt:'2026-01-01T18:01:00Z'}]});
+assert.equal(lateReceipt.counts.matched,0);
+const timelyReceipt=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('timely','Over',.5,'win')],quotes:[{...quote('Over','bookA',2),receivedAt:'2026-01-01T17:59:00Z'}]});
+assert.equal(timelyReceipt.counts.matched,1);
+assert.throws(()=>evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('invalid','Over',.5,'win')],quotes:[{...quote('Over','bookA',2),receivedAt:'2026-01-01T17:00:00Z'}]}),/receipt/);
 console.log('Historical odds evaluator: American odds, vig, EV, timestamp cutoffs, best/fixed book, settlement, ROI, source provenance, conflict rejection and synthetic labeling passed.');
