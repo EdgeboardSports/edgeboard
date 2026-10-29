@@ -1,1 +1,10 @@
-export function renderResearchView(report){return JSON.stringify(report)}
+// Offline HTML view of historical odds research. No network or active wagers.
+const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(2)+'%':'N/A';
+export function renderResearchView(report){
+ if(!report?.evidence?.verified||!report.summary||!report.counts)throw Error('Verified report required');
+ const label=report.dataIsSynthetic?'SYNTHETIC DATA - NOT REAL BETTING RESULTS':'HISTORICAL RESEARCH - NOT VERIFIED PROFIT';
+ const cards=[['Matched',report.counts.matched],['Settled',report.summary.settled],['Win rate',pct(report.summary.winRate)],['Estimated EV',pct(report.summary.meanEstimatedEV)],['Paper ROI',pct(report.summary.paperROI)]];
+ const table=(title,groups)=>'<h2>'+esc(title)+'</h2><table><tr><th>Group</th><th>Count</th><th>EV</th><th>ROI</th></tr>'+Object.entries(groups).map(([key,x])=>'<tr><td>'+esc(key)+'</td><td>'+x.quotes+'</td><td>'+pct(x.meanEstimatedEV)+'</td><td>'+pct(x.paperROI)+'</td></tr>').join('')+'</table>';
+ return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Edgeboard Research</title><style>body{font:16px system-ui;background:#102035;color:white;padding:18px;max-width:900px;margin:auto}section{padding:12px;border:1px solid #657489;border-radius:12px;margin:12px 0}.banner{background:#564016;font-weight:bold}.grid{display:flex;flex-wrap:wrap;gap:12px}.grid section{min-width:130px}table{width:100%;border-collapse:collapse}td,th{padding:9px;border-bottom:1px solid #657489;text-align:left}</style><h1>Edgeboard - Odds Research</h1><section class="banner">'+esc(label)+'</section><div class="grid">'+cards.map(([key,value])=>'<section>'+esc(key)+'<h2>'+esc(value)+'</h2></section>').join('')+'</div><section><h2>Evidence integrity</h2>Verified chain: '+report.evidence.entries+' entries. Missing quotes: '+report.counts.rejected.noQuote+'. Stale quotes: '+report.counts.rejected.stale+'.</section><section>'+table('Markets',report.byMarket)+table('Books',report.byBookmaker)+table('Estimated edge',report.byEstimatedEdge)+'</section><section><h2>Limitations</h2>'+report.caveats.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section></html>';
+}
