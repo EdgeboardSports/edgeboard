@@ -17,7 +17,7 @@ function bootstrapByDate(rows,replicates=2000){
 }
 async function main(){
  const [seasonText,before,zipPath]=process.argv.slice(2);
- if(!/^\\d{4}$/.test(seasonText||'')||!/^\\d{4}-\\d{2}-\\d{2}$/.test(before||'')||!zipPath)throw Error('Usage: node scripts/shots-diagnostic.mjs SEASON BEFORE ZIP');
+ if(!/^\d{4}$/.test(seasonText||'')||!/^\d{4}-\d{2}-\d{2}$/.test(before||'')||!zipPath)throw Error('Usage: node scripts/shots-diagnostic.mjs SEASON BEFORE ZIP');
  const decoded=JSON.parse(execFileSync('python3',[fileURLToPath(new URL('./moneypuck-game-rows.py',import.meta.url)),zipPath,seasonText],{encoding:'utf8',maxBuffer:64*1024*1024,timeout:120000}));
  const imported=normalizeGameRows(decoded.rows,{season:Number(seasonText)});
  const report=moneyPuckShotBacktest(imported,{before,includeTests:true});
