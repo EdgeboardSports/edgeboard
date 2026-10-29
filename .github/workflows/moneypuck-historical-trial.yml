@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check advanced feature synthetic fixture before downloads
+        run: node tests/shots-advanced.test.mjs
       - name: Download only explicitly published MoneyPuck historical skater archive
         shell: bash
         run: |
