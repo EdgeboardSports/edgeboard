@@ -8,6 +8,7 @@ const types=new Set(['prediction','quote','settlement']);
 export function appendResearchEvent(events,input,{recordedAt}={}){
  if(!Array.isArray(events)||!types.has(input?.type)||typeof recordedAt!=='string'||!Number.isFinite(Date.parse(recordedAt)))throw Error('Invalid append input');
  verifyResearchChain(events);
+ if(events.length&&Date.parse(recordedAt)<Date.parse(events.at(-1).recordedAt))throw Error('Append timestamp must not precede prior event');
  const payload=canonical(input);
  if(!payload.data||typeof payload.data!=='object'||Array.isArray(payload.data))throw Error('Invalid event data');
  if(payload.type==='prediction'){
@@ -29,7 +30,7 @@ export function verifyResearchChain(events){
  let previous=null;
  for(let i=0;i<events.length;i++){
   const e=events[i];
-  if(e.sequence!==i+1||e.previous!==previous||!types.has(e.type)||!e.data||!Number.isFinite(Date.parse(e.recordedAt)))throw Error('Chain structure invalid');
+  if(e.sequence!==i+1||e.previous!==previous||!types.has(e.type)||!e.data||!Number.isFinite(Date.parse(e.recordedAt))||(i>0&&Date.parse(e.recordedAt)<Date.parse(events[i-1].recordedAt)))throw Error('Chain structure invalid');
   const {hash,...rest}=e;
   if(hash!==digest(rest))throw Error('Chain digest mismatch');
   previous=hash;
@@ -48,6 +49,7 @@ export function reportResearchLedger(events,{mode='synthetic',licenseReference,a
    predictions.set(e.data.id,{...e.data,result:'pending'});
   }else if(e.type==='quote')quotes.push({...e.data,receivedAt:e.recordedAt});
   else if(!predictions.has(e.data.predictionId))rejected.unknownSettlements++;
+  else if(Date.parse(e.recordedAt)<Date.parse(predictions.get(e.data.predictionId).startTime))rejected.unknownSettlements++;
   else {
    const prev=settlements.get(e.data.predictionId);
    if(!prev||Date.parse(e.recordedAt)>=Date.parse(prev.recordedAt))settlements.set(e.data.predictionId,{...e.data,recordedAt:e.recordedAt});
