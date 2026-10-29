@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {advancedBacktest} from '../scripts/shots-advanced.mjs';
 const rows=[];
 for(let i=0;i<90;i++){
- const date=new Date(Date.UTC(2024,9,i+1)).toISOString().slice(0,10).replaceAll('-');
+ const date=new Date(Date.UTC(2024,9,i+1)).toISOString().slice(0,10).replaceAll('-','');
  const gameId='202402'+String(i+1).padStart(4,'0');
  for(let team=0;team<2;team++){
   for(let p=0;p<3;p++){
