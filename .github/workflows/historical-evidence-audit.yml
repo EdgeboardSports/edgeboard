@@ -1,0 +1,29 @@
+name: Historical odds evidence and offline research view audit
+on:
+  push:
+    paths:
+      - .github/workflows/historical-evidence-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify existing odds evaluator
+        run: node tests/historical-odds-evaluator.test.mjs
+      - name: Verify append-only evidence and research view
+        run: node tests/historical-evidence-ledger.test.mjs
+      - name: Generate fabricated offline research view
+        run: node scripts/historical-research-fixture.mjs
+      - name: Upload synthetic-only research artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-historical-odds-view
+          path: research-output/
+          retention-days: 7
