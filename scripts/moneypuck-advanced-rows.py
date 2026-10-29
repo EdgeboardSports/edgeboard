@@ -10,7 +10,8 @@ fields=['playerId','season','gameId','gameDate','playerTeam','opposingTeam','hom
 rows=[]
 with zipfile.ZipFile(path) as archive:
     files=archive.infolist()
-    if len(files)!=1 or files[0].filename!=season+'.csv' or files[0].file_size>256*1024*1024 or files[0].flag_bits&1:
+    allowed={season+'.csv', 'my stuff/var/www/html/moneypuck/summaryData/seasonPlayersSummary/skaters/'+season+'.csv'}
+    if len(files)!=1 or files[0].filename not in allowed or files[0].file_size>256*1024*1024 or files[0].flag_bits&1:
         raise ValueError('Invalid archive structure: '+repr([(x.filename,x.file_size,x.flag_bits) for x in files[:8]]))
     with io.TextIOWrapper(archive.open(files[0]),encoding='utf-8-sig',newline='') as stream:
         reader=csv.DictReader(stream)
