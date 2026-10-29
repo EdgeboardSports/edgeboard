@@ -32,6 +32,7 @@ function assertQuote(q){
  if(q.line!==null&&q.line!==undefined&&!finite(q.line))throw Error('Invalid quote line');
  decimalToImplied(q.decimal);
  if(time(q.observedAt)===null)throw Error('Invalid quote time');
+ if(q.receivedAt!==undefined&&(time(q.receivedAt)===null||time(q.receivedAt)<time(q.observedAt)))throw Error('Invalid quote receipt time');
 }
 function assertPrediction(p){
  if(!p||typeof p!=='object')throw Error('Invalid prediction');
@@ -82,6 +83,7 @@ export function evaluateHistoricalOdds(input){
   const candidates=quotes.filter(q=>
    q.source===(input.mode==='synthetic'?'synthetic-fixture':input.licenseReference)
    &&(selectionPolicy!=='bookmaker-fixed'||q.bookmaker===input.bookmaker)
+   &&(q.receivedAt===undefined||time(q.receivedAt)<=time(p.predictedAt))
    &&time(q.observedAt)<=time(p.predictedAt)
    &&time(q.observedAt)<time(p.startTime)
    &&time(p.predictedAt)-time(q.observedAt)<=MAX_AGE);
@@ -100,6 +102,7 @@ export function evaluateHistoricalOdds(input){
   const opposite=opponentSide(p.side);
   const counterpart=(quoteGroups.get([p.eventId,p.market,p.subjectId??'',p.line??'',opposite].join('|'))??[])
    .filter(q=>opposite&&q.bookmaker===chosen.bookmaker&&q.source===chosen.source
+    &&(q.receivedAt===undefined||time(q.receivedAt)<=time(p.predictedAt))
     &&time(q.observedAt)<=time(p.predictedAt)&&time(p.predictedAt)-time(q.observedAt)<=MAX_AGE)
    .sort((a,b)=>time(b.observedAt)-time(a.observedAt));
   const noVig=counterpart.length&&p.market!=='h2h_3_way'?noVigPair(chosen.decimal,counterpart[0].decimal):null;
