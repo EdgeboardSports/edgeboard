@@ -1,0 +1,59 @@
+import assert from 'node:assert/strict';
+import {americanToDecimal,decimalToImplied,noVigPair,expectedValue,evaluateHistoricalOdds} from '../scripts/historical-odds-evaluator.mjs';
+const eq=(a,b)=>assert(Math.abs(a-b)<1e-9);
+eq(americanToDecimal(-150),1+100/150);
+eq(americanToDecimal(120),2.2);
+eq(decimalToImplied(2),.5);
+eq(expectedValue(.6,2),.2);
+eq(noVigPair(1.9,1.9).sideA,.5);
+assert.throws(()=>americanToDecimal(99));
+assert.throws(()=>americanToDecimal(0));
+assert.throws(()=>decimalToImplied(1));
+assert.throws(()=>expectedValue(1.1,2));
+assert.throws(()=>noVigPair(1.1,1.1));
+const prediction=(id,side,probability,result)=>({id,eventId:'nhl-game-11',market:'player_shots_on_goal',
+ subjectId:'player-7',line:2.5,side,probability,result,
+ predictedAt:'2026-01-01T18:00:00Z',startTime:'2026-01-01T19:00:00Z'});
+const quote=(side,bookmaker,decimal,observedAt='2026-01-01T17:50:00Z',source='synthetic-fixture')=>({
+ eventId:'nhl-game-11',market:'player_shots_on_goal',subjectId:'player-7',line:2.5,side,
+ bookmaker,decimal,observedAt,source});
+const predictions=[prediction('a','Over',.6,'win'),prediction('b','Under',.4,'loss')];
+const quotes=[quote('Over','bookA',1.9),quote('Under','bookA',1.9),quote('Over','bookB',2.1),
+ quote('Under','bookB',1.8),quote('Over','bookB',4,'2026-01-01T18:30:00Z')];
+const source=JSON.stringify({predictions,quotes});
+const result=evaluateHistoricalOdds({mode:'synthetic',predictions,quotes});
+assert.equal(result.counts.matched,2);
+assert.equal(result.records[0].bookmaker,'bookB');
+eq(result.records[0].decimal,2.1);
+eq(result.records[0].noVigImplied,Number(((1/2.1)/(1/2.1+1/1.8)).toFixed(6)));
+eq(result.summary.paperProfitUnits,.1);
+eq(result.summary.paperROI,.05);
+eq(result.summary.winRate,.5);
+assert.equal(result.summary.settled,2);
+assert.equal(result.dataIsSynthetic,true);
+assert.equal(result.notRealizedProfit,true);
+assert.equal(result.byBookmaker.bookB.quotes,2);
+assert.equal(JSON.stringify({predictions,quotes}),source);
+const fixed=evaluateHistoricalOdds({mode:'synthetic',predictions,quotes,selectionPolicy:'bookmaker-fixed',bookmaker:'bookA'});
+assert.equal(fixed.records[0].decimal,1.9);
+assert.equal(fixed.summary.paperProfitUnits,-.1);
+const pending=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('c','Over',.5,'pending')],quotes});
+assert.equal(pending.summary.paperROI,null);
+assert.equal(pending.summary.unresolved,1);
+const pushed=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('c','Over',.5,'push')],quotes});
+assert.equal(pushed.summary.paperROI,0);
+const voided=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('c','Over',.5,'void')],quotes});
+assert.equal(voided.summary.paperROI,null);
+const stale=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('c','Over',.5,'win')],quotes:[quote('Over','bookA',1.9,'2026-01-01T16:30:00Z')]});
+assert.equal(stale.counts.rejected.stale,1);
+const future=evaluateHistoricalOdds({mode:'synthetic',predictions:[prediction('c','Over',.5,'win')],quotes:[quote('Over','bookA',9,'2026-01-01T18:01:00Z')]});
+assert.equal(future.counts.matched,0);
+assert.throws(()=>evaluateHistoricalOdds({mode:'licensed-historical',predictions,quotes}));
+const wrongSource=evaluateHistoricalOdds({mode:'synthetic',predictions,quotes:[quote('Over','bookA',2,'2026-01-01T17:50:00Z','unknown')]});
+assert.equal(wrongSource.counts.rejected.invalidSource,1);
+assert.throws(()=>evaluateHistoricalOdds({mode:'synthetic',predictions:[predictions[0],predictions[0]],quotes}));
+assert.throws(()=>evaluateHistoricalOdds({mode:'synthetic',predictions:[{...predictions[0],predictedAt:predictions[0].startTime}],quotes}));
+const duplicate=evaluateHistoricalOdds({mode:'synthetic',predictions:[predictions[0]],quotes:[quote('Over','bookA',2),quote('Over','bookA',2.5)]});
+assert.equal(duplicate.counts.matched,0);
+assert.equal(duplicate.counts.rejected.conflicting,1);
+console.log('Historical odds evaluator: American odds, vig, EV, timestamp cutoffs, best/fixed book, settlement, ROI, source provenance, conflict rejection and synthetic labeling passed.');
