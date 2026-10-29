@@ -1,0 +1,29 @@
+name: Historical odds evaluator synthetic audit
+on:
+  push:
+    paths:
+      - .github/workflows/historical-odds-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  synthetic-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate quote integrity, vig, EV and paper settlement
+        run: node tests/historical-odds-evaluator.test.mjs
+      - name: Generate clearly labeled synthetic example report
+        run: |
+          node scripts/historical-odds-demo.mjs > historical-odds-synthetic-report.json
+          node -e "const x=require('./historical-odds-synthetic-report.json');if(!x.dataIsSynthetic||!x.notRealizedProfit||x.counts.matched!==4)process.exit(1);console.log(JSON.stringify({mode:x.mode,counts:x.counts,summary:x.summary,byEstimatedEdge:x.byEstimatedEdge},null,2))"
+      - name: Upload only fabricated synthetic example report
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-odds-synthetic-audit
+          path: historical-odds-synthetic-report.json
+          retention-days: 7
