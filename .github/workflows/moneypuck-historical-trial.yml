@@ -1,4 +1,5 @@
 name: MoneyPuck historical research trial (one-off)
+# Push-triggered execution request: 2026-10-28; historical research only.
 on:
   push:
     paths:
