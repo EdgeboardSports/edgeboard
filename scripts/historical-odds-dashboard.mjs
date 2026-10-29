@@ -20,8 +20,8 @@ export function fixtureLedger(){
  let events=[];
  const at='2026-01-01T18:00:00Z';
  const base={eventId:'fictional-event-1',market:'player_shots_on_goal',subjectId:'fictional-player-1',line:2.5,side:'Over'};
+ events=appendResearchEvent(events,{type:'quote',data:{...base,bookmaker:'fictional-book',decimal:2.1,observedAt:'2026-01-01T17:55:00Z',source:'synthetic-fixture'}},{recordedAt:'2026-01-01T17:56:00Z'});
  events=appendResearchEvent(events,{type:'prediction',data:{...base,id:'fake-pick-1',probability:.6,result:'pending',predictedAt:at,startTime:'2026-01-01T19:00:00Z'}},{recordedAt:at});
- events=appendResearchEvent(events,{type:'quote',data:{...base,bookmaker:'fictional-book',decimal:2.1,observedAt:'2026-01-01T17:55:00Z',source:'synthetic-fixture'}},{recordedAt:'2026-01-01T18:01:00Z'});
  events=appendResearchEvent(events,{type:'settlement',data:{predictionId:'fake-pick-1',result:'win'}},{recordedAt:'2026-01-01T22:00:00Z'});
  return events;
 }
