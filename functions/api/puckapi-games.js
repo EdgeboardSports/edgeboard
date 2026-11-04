@@ -4,8 +4,9 @@ const codes=new Set(['ANA','BOS','BUF','CGY','CAR','CHI','COL','CBJ','DAL','DET'
 const puckHash=async s=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(x=>x.toString(16).padStart(2,'0')).join('');
 const puckReply=(v,status=200)=>securityHeaders(Response.json(v,{status}));
 export function normalizePuckGames(raw){
- if(!Array.isArray(raw?.games)||raw.games.length>=500)throw Error('Complete bounded game list required');const seen=new Set();
- return raw.games.map(g=>{
+ const rows=Array.isArray(raw?.games)?raw.games:Array.isArray(raw?.data?.games)?raw.data.games:Array.isArray(raw?.data)?raw.data:null;
+ if(!rows||rows.length>=500)throw Error('Complete bounded game list required');const seen=new Set();
+ return rows.map(g=>{
   const id=String(g.id);if(!/^202602\d{4}$/.test(id)||seen.has(id)||String(g.season)!=='20262027'||g.gameType!=='regular'||!codes.has(g.homeTeam)||!codes.has(g.awayTeam)||g.homeTeam===g.awayTeam||!/^\d{4}-\d{2}-\d{2}$/.test(g.gameDate)||!Number.isFinite(Date.parse(g.gameDate))||!['FUT','PRE','LIVE','CRIT','FINAL','OFF'].includes(g.gameState))throw Error('Invalid game identity');seen.add(id);
   const final=['FINAL','OFF'].includes(g.gameState);if(final&&(!Number.isSafeInteger(g.homeScore)||!Number.isSafeInteger(g.awayScore)||g.homeScore<0||g.awayScore<0||g.homeScore>30||g.awayScore>30||g.homeScore===g.awayScore))throw Error('Unverified final score');
   const period=g.lastPeriodType||g.periodDescriptor?.periodType;
@@ -46,7 +47,7 @@ export async function onRequestGet(context){
    envelope={retrievedAt:new Date().toISOString(),sourceResponseSha256:await puckHash(text),raw:clean,credentialFieldsExcluded:true,providerRemainingCredits:balance!==null&&/^\d+$/.test(balance)?Number(balance):null};
    stage='response-persistence';const p=JSON.stringify(envelope);await db.prepare('INSERT INTO puckapi_evidence(id,captured_at,payload,digest) VALUES(?,?,?,?)').bind(rawId,envelope.retrievedAt,p,await puckHash(p)).run();
   }
-  const raw=envelope.raw;schema={topLevelFields:raw&&typeof raw==='object'?Object.keys(raw).slice(0,30):[],firstGameFields:Array.isArray(raw?.games)&&raw.games[0]?Object.keys(raw.games[0]).slice(0,60):[]};
+  const raw=envelope.raw;schema={topLevelFields:raw&&typeof raw==='object'?Object.keys(raw).slice(0,30):[],dataFields:raw?.data&&typeof raw.data==='object'?Object.keys(raw.data).slice(0,30):[],firstGameFields:(raw?.games?.[0]||raw?.data?.games?.[0]||raw?.data?.[0])?Object.keys(raw?.games?.[0]||raw?.data?.games?.[0]||raw?.data?.[0]).slice(0,60):[]};
   stage='game-schema';const games=normalizePuckGames(raw);if(games.some(g=>g.gameDate<since||g.gameDate>today))throw Error('Date range mismatch');
   const snapshot={retrievedAt:envelope.retrievedAt,dateFrom:since,dateTo:today,games,sourceResponseSha256:envelope.sourceResponseSha256,providerRemainingCredits:envelope.providerRemainingCredits,limitations:['Start-time timezone is unverified unless supplied separately by a verified event source','Missing period metadata remains unknown; regulation-dependent training and settlement must remain held','Current provider records may include corrections; this response receipt is preserved']};
   stage='snapshot-persistence';const payload=JSON.stringify(snapshot),digest=await puckHash(payload);await db.prepare('INSERT INTO puckapi_evidence(id,captured_at,payload,digest) VALUES(?,?,?,?)').bind(cacheId,snapshot.retrievedAt,payload,digest).run();const saved=await db.prepare('SELECT payload,digest FROM puckapi_evidence WHERE id=?').bind(cacheId).first();if(!saved||saved.payload!==payload||saved.digest!==digest)throw Error('Persistence');

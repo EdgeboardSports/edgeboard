@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {onRequestGet} from '../functions/api/puckapi-games.js';import {ACCESS_IDENTITY} from '../lib/access.js';
+import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {onRequestGet,normalizePuckGames} from '../functions/api/puckapi-games.js';import {ACCESS_IDENTITY} from '../lib/access.js';
 const sql=new DatabaseSync(':memory:');sql.exec('CREATE TABLE security_usage(bucket TEXT PRIMARY KEY,used INTEGER NOT NULL)');const DB={prepare(q){let a=[];return {bind(...v){a=v;return this},first:async()=>sql.prepare(q).get(...a),run:async()=>({meta:{changes:Number(sql.prepare(q).run(...a).changes)}})}}};
 const data={[ACCESS_IDENTITY]:{expires:Date.now()/1000+3600}},secret='test-only-not-a-real-key',env={PUCKAPI_API_KEY:secret,SECURITY_DB:DB};let calls=0;
 const old=globalThis.fetch;try{
@@ -6,5 +6,6 @@ const old=globalThis.fetch;try{
  const call=v=>onRequestGet({request:new Request('https://edgeboard-8fl.pages.dev/api/puckapi-games?view='+v),env,data});
  let r=await call('status');assert.equal(r.status,200);assert.equal(calls,0);r=await call('recent');assert.equal(r.status,200);let d=await r.json();assert(d.persisted&&d.readBack);assert.equal(d.creditsReserved,5);assert.equal(calls,1);assert.equal(d.snapshot.games[0].finalPeriodType,null);assert.equal(d.snapshot.games[0].startTimezoneVerified,false);assert(!JSON.stringify(d).includes(secret));
  r=await call('recent');d=await r.json();assert(d.cached);assert.equal(d.providerRequests,0);assert.equal(calls,1);assert.equal((await call('invalid')).status,400);assert.equal(calls,1);assert.throws(()=>sql.exec('DELETE FROM puckapi_evidence'),/append-only/);assert.throws(()=>sql.exec("UPDATE puckapi_evidence SET payload='{}'"),/append-only/);
+ assert.deepEqual(normalizePuckGames({data:{games:[]}}),[]);assert.deepEqual(normalizePuckGames({data:[]}),[]);assert.throws(()=>normalizePuckGames({data:'bad'}));
  console.log('PuckAPI source: fixed authenticated endpoint, zero-cost status/cache reads, atomic reservations, private readback, append-only receipts, key redaction and unknown period/timezone preservation passed.');
 }finally{globalThis.fetch=old;sql.close()}
