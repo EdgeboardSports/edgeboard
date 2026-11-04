@@ -1,6 +1,6 @@
 import {createHash} from 'node:crypto';
 import {normalizeEvidence} from './evidence-schema.mjs';
-const ORIGIN='https://edgeboard-research-preview.speedystone18.chatgpt.site';
+const ORIGIN='https://edgeboard-research-preview.criddle919.chatgpt.site';
 // The authenticated transport is injected by the private collector host, never saved in source.
 export function openHostedEvidenceStore({token,fetchImpl=fetch,synthetic=false}={}){
  if(typeof token!=='string'||!token.trim()||/[\r\n]/.test(token))throw Error('Private storage authentication required');

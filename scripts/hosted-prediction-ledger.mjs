@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {normalizeLedgerPrediction,normalizeLedgerGrade} from './prediction-ledger-schema.mjs';
 const ledgerDigest=value=>createHash('sha256').update(value).digest('hex');
-const ORIGIN='https://edgeboard-research-preview.speedystone18.chatgpt.site';
+const ORIGIN='https://edgeboard-research-preview.criddle919.chatgpt.site';
 export function openHostedPredictionLedger({token,synthetic=false,fetchImpl=fetch}={}){
  if(typeof token!=='string'||!token.trim()||/[\r\n]/.test(token))throw Error('Private ledger authentication required');
  const endpoint=ORIGIN+'/collector/api/prediction-ledger?scope='+(synthetic?'synthetic':'live');

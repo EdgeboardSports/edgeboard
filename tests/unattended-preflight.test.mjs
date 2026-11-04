@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 import {unattendedPreflight} from '../scripts/unattended-preflight.mjs';
 let posts=0,reads=0;
 const transport=async(url,options)=>{
- if(url.startsWith('https://edgeboard-research-preview.speedystone18.chatgpt.site/')){
+ if(url.startsWith('https://edgeboard-research-preview.criddle919.chatgpt.site/')){
   posts++;assert(url.endsWith('/synthetic-evidence'));assert.equal(options.headers['OAI-Sites-Authorization'],'Bearer test-only');
   return Response.json({persisted:true,readBack:true,duplicate:posts%2===0,digest:createHash('sha256').update(options.body).digest('hex')});
  }

@@ -1,5 +1,5 @@
 import {pathToFileURL} from 'node:url';
-const ORIGIN='https://edgeboard-research-preview.speedystone18.chatgpt.site';
+const ORIGIN='https://edgeboard-research-preview.criddle919.chatgpt.site';
 // Readiness is not an activation command. No provider requests or live writes.
 export async function trialReadiness({token,start,fetchImpl=fetch,clock=()=>Date.now(),scheduleVerified=false}={}){
  if(typeof token!=='string'||!token.trim()||/[\r\n]/.test(token))throw Error('Private service access required');

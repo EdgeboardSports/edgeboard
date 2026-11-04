@@ -3,7 +3,7 @@ import {normalizeClosingAttempt,normalizeClosingObservation} from './closing-obs
 const digest=value=>createHash('sha256').update(value).digest('hex');
 export function openHostedClosingStore({token,synthetic=false,fetchImpl=fetch}={}){
  if(typeof token!=='string'||!token.trim()||/[\r\n]/.test(token))throw Error('Private closing authentication required');
- const endpoint='https://edgeboard-research-preview.speedystone18.chatgpt.site/collector/api/closing-observations?scope='+(synthetic?'synthetic':'live');
+ const endpoint='https://edgeboard-research-preview.criddle919.chatgpt.site/collector/api/closing-observations?scope='+(synthetic?'synthetic':'live');
  const send=async(suffix='',body=null)=>{if(!token)throw Error('Closing store is closed');let response;try{response=await fetchImpl(endpoint+suffix,{method:body?'POST':'GET',headers:{Accept:'application/json','OAI-Sites-Authorization':'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body}:{}),redirect:'manual',signal:AbortSignal.timeout(15000)})}catch{throw Error('Closing transport unavailable')}if(!response.ok)throw Error('Closing store refused request (HTTP '+response.status+')');return response.json()};
  return {
   synthetic,

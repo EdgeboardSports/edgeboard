@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {normalizeTrialProtocol,normalizeTrialRun,trialSlotTimely} from './trial-schema.mjs';
 const trialDigest=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
-const trialOrigin='https://edgeboard-research-preview.speedystone18.chatgpt.site';
+const trialOrigin='https://edgeboard-research-preview.criddle919.chatgpt.site';
 export function openHostedTrialStore({token,synthetic=false,fetchImpl=fetch}={}){
  if(typeof token!=='string'||!token.trim()||/[\r\n]/.test(token))throw Error('Private trial authentication required');
  const endpoint=trialOrigin+'/collector/api/trial?scope='+(synthetic?'synthetic':'live'),protocols=new Map(),claims=new Map();

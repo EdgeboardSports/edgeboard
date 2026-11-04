@@ -8,7 +8,7 @@ const hash=x=>createHash('sha256').update(x).digest('hex'),fixture=ledgerFixture
 assert(!JSON.stringify(normalizeLedgerPrediction({...fixture,headers:{Authorization:'secret'},modelInputs:{...fixture.modelInputs,secret:'never-store'}})).includes('secret'));
 assert.throws(()=>openHostedPredictionLedger(),/authentication/);
 let record,posts=0;const transport=async(url,options)=>{
- assert.equal(new URL(url).origin,'https://edgeboard-research-preview.speedystone18.chatgpt.site');assert.equal(options.redirect,'manual');assert.equal(options.headers['OAI-Sites-Authorization'],'Bearer test-only');
+ assert.equal(new URL(url).origin,'https://edgeboard-research-preview.criddle919.chatgpt.site');assert.equal(options.redirect,'manual');assert.equal(options.headers['OAI-Sites-Authorization'],'Bearer test-only');
  if(options.method==='POST'){posts++;const envelope=JSON.parse(options.body),id=hash(envelope.snapshot.id),digest=hash(options.body);record={synthetic:true,id,snapshot:envelope.snapshot,digest,receivedAt:new Date().toISOString(),grades:[],head:null,result:{state:'pending'},resultHistory:[]};return Response.json({persisted:true,readBack:true,synthetic:true,id,digest})}
  return Response.json(new URL(url).searchParams.has('id')?record:{synthetic:true,items:[record],nextCursor:null});
 };

@@ -8,7 +8,7 @@ const client=(patch={},sourcePatch={})=>async(url,options)=>{calls.push({url,opt
 const options={token:'test-only-secret',start,clock:()=>now};
 const held=await trialReadiness({...options,fetchImpl:client()});
 assert.equal(held.trialStarted,false);assert.equal(held.readyForScheduledTrial,false);assert.equal(held.gates.authenticatedSources,true);assert.equal(held.gates.budget,true);assert(held.blockers.includes('feeds'));assert(held.blockers.includes('controlledCaptureVerified'));assert.equal(held.evidence.livePredictions,0);
-assert(!JSON.stringify(held).includes(options.token));assert(calls.every(c=>c.url.startsWith('https://edgeboard-research-preview.speedystone18.chatgpt.site/collector/api/')&&c.options.redirect==='manual'));assert.equal(calls.filter(c=>c.options.method==='POST').length,1);
+assert(!JSON.stringify(held).includes(options.token));assert(calls.every(c=>c.url.startsWith('https://edgeboard-research-preview.criddle919.chatgpt.site/collector/api/')&&c.options.redirect==='manual'));assert.equal(calls.filter(c=>c.options.method==='POST').length,1);
 for(const patch of [{synthetic:true},{audit:{integrityVerified:false}},{asOf:'2026-10-29T00:00:00Z'},{byCaptureDay:[{name:'2026-10-29',predictions:1}]}])await assert.rejects(trialReadiness({...options,fetchImpl:client(patch)}));
 const stale=await trialReadiness({...options,fetchImpl:client({},{checkedAt:'2026-10-27T12:00:00Z'})});assert.equal(stale.gates.authenticatedSources,false);
 await assert.rejects(trialReadiness({...options,fetchImpl:async()=>new Response('',{status:302})}));
