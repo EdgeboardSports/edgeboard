@@ -8,7 +8,7 @@ export async function onRequest(context){
  if(path.includes('..')||path.includes('\\')||path.includes('//'))return denied('Not found.',404);
  const login=await passwordRoute(context.request,context.env);if(login)return login;
  const name=path.replace(/^\//,'').replace(/\.html$/,'').replace(/\/$/,'');
- const allowed=pages.has(name)||modules.has(path.slice(1))||/^\/assets\/(ui\.(js|css)|best-picks\.js)$/.test(path)||/^\/api\/[a-z-]+$/.test(path);
+ const allowed=pages.has(name)||modules.has(path.slice(1))||/^\/assets\/(ui\.(js|css)|best-picks\.js|premium-dashboard\.css|edgeboard-approved\.webp)$/.test(path)||/^\/api\/[a-z-]+$/.test(path);
  if(!allowed)return denied('Not found.',404);
  const auth=await authenticate(context.request,context.env);if(auth.response)return auth.response;
  context.data[ACCESS_IDENTITY]=auth.identity;
