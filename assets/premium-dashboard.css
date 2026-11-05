@@ -1,0 +1,24 @@
+/* Premium Edgeboard UI: presentation-only overrides. */
+:root{--bg:#050b13;--panel:#0c1b2a;--panel-raised:#10273a;--line:#23435c;--ink:#f4f9ff;--muted:#9ab3c9;--accent:#17c9fa;--blue:#38c6ff;--radius:16px}
+body{background:radial-gradient(ellipse at top,#102c45 0%,#050b13 60%) fixed}
+.app-sidebar,.app-topbar{background:#071522;border-color:#1b4059}
+.brand{font-style:italic;font-weight:800}.brand-mark{background:linear-gradient(140deg,#fff,#8da6bb 48%,#e9f5ff);color:#092238;transform:skew(-10deg);border-radius:4px;box-shadow:3px 3px #098bca,0 0 18px #0bbdff44}
+.brand span:last-child{background:linear-gradient(90deg,#f5f9ff 25%,#26c9ff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.nav-link[aria-current=page]{background:#103a5b;border-color:#137aab;color:#e7faff;box-shadow:inset 0 -2px #0ec9fa}.nav-link:hover{background:#15334c}
+.eyebrow,.text-link{color:#51d8ff}.page-header{padding-top:34px}.page-header h1{font-size:clamp(30px,4vw,44px)}
+.page-header .chip{background:#0b2e48;border-color:#196b9b;color:#88dfff}
+.card,.metric-tile{background:linear-gradient(150deg,#102437,#091724);border-color:#22475e;box-shadow:0 12px 28px #0003}
+.metric-tile{border-left:3px solid #0aaee6}.metric-tile strong{font-size:29px}
+.hero-strip{background:linear-gradient(115deg,#0c3658,#0b2035 75%);border-color:#147caa}.hero-strip h2{font-size:23px;color:#fff}
+.button.primary{background:linear-gradient(120deg,#10c9ff,#1577c9);color:#fff;border-color:#18bff3}
+.button.subtle,button{background:#112d44;border-color:#2a5872;color:#e2f6ff}
+.game-card{border-color:#24516e;transition:border-color .15s,transform .15s}.game-card:hover{border-color:#1bbaf2;transform:translateY(-2px)}
+.game-meta{border-bottom:1px solid #24455d;padding-bottom:10px}.saved-candidate .quote{color:#7ff0bc}
+.chip.mint{background:#0b3028;color:#86f1c4;border-color:#27765d}
+.premium-intro{display:flex;gap:10px;align-items:center;margin-bottom:12px}.premium-intro span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9cbfd5}.premium-intro b{background:#0b352f;color:#8af3c2;border:1px solid #23765b;border-radius:6px;padding:5px 8px;font-size:10px}
+@media(max-width:760px){.page-header{padding:19px 16px 6px}.page-header h1{font-size:30px}.page-header p{font-size:12px}body.app-shell>main{padding:14px 15px 90px}.metric-grid{gap:8px}.metric-tile{padding:13px 10px}.metric-tile strong{font-size:23px}.metric-tile small,.metric-tile>span{font-size:10px}.hero-strip{grid-template-columns:1fr;gap:12px}.hero-strip .button{width:100%}.slate-grid,.candidate-grid{grid-template-columns:1fr}.mobile-nav{background:#071522;border-color:#1b4059}}
+.approved-brand{display:block;width:100%;max-width:222px;height:auto;object-fit:contain}
+.brand{width:min(222px,100%)}
+.app-topbar .brand{width:min(180px,60vw)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #63d5ff;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.game-card{transition:none}.game-card:hover{transform:none}}
