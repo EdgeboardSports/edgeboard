@@ -17,3 +17,8 @@ body{background:radial-gradient(ellipse at top,#102c45 0%,#050b13 60%) fixed}
 .chip.mint{background:#0b3028;color:#86f1c4;border-color:#27765d}
 .premium-intro{display:flex;gap:10px;align-items:center;margin-bottom:12px}.premium-intro span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9cbfd5}.premium-intro b{background:#0b352f;color:#8af3c2;border:1px solid #23765b;border-radius:6px;padding:5px 8px;font-size:10px}
 @media(max-width:760px){.page-header{padding:19px 16px 6px}.page-header h1{font-size:30px}.page-header p{font-size:12px}body.app-shell>main{padding:14px 15px 90px}.metric-grid{gap:8px}.metric-tile{padding:13px 10px}.metric-tile strong{font-size:23px}.metric-tile small,.metric-tile>span{font-size:10px}.hero-strip{grid-template-columns:1fr;gap:12px}.hero-strip .button{width:100%}.slate-grid,.candidate-grid{grid-template-columns:1fr}.mobile-nav{background:#071522;border-color:#1b4059}}
+.approved-brand{display:block;width:100%;max-width:222px;height:auto;object-fit:contain}
+.brand{width:min(222px,100%)}
+.app-topbar .brand{width:min(180px,60vw)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #63d5ff;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.game-card{transition:none}.game-card:hover{transform:none}}
