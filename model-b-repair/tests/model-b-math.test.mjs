@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {buildModelBFactors} from '../worker/model-b-factors.js';
+import {modelBQualifies,modelBEquivalent,modelBEvaluate} from '../worker/model-b-selection.js';
+import {modelBRankings} from '../worker/model-b-rankings.js';
+import {poissonScoreGrid} from '../worker/experimental-model.js';
+const now=Date.parse('2026-11-07T21:00:00Z'),game={eventId:'fixture',home:'Carolina Hurricanes',away:'New York Rangers',startAt:'2026-11-08T00:00:00Z',priceStartAt:'2026-11-08T00:00:00Z',modelInputs:{homeLambda:3,awayLambda:3}};
+const stats=JSON.parse(readFileSync('data/moneypuck-team-goalies-2026.json'));
+for(const t of stats.teams.records)for(const a of Object.values(t.situations))if(a){a.expectedGoalsFor=30;a.expectedGoalsAgainst=30;a.iceTimeSeconds=36000;a.gamesPlayed=10;}
+const context={stats,puck:{games:[]},claims:[],players:null,snapshot:null};
+const f=buildModelBFactors(game,context,now);assert.deepEqual(f.holds,[]);assert.equal(f.goalies.length,2);assert(f.goalies.every(g=>!g.effectApplied));
+for(const t of stats.teams.records)delete t.situations['5on4'];
+const fallback=buildModelBFactors(game,context,now);assert.deepEqual(fallback.adjustedLambdas,{home:3,away:3});assert(fallback.warnings.includes('situational_inputs_unavailable_using_baseline'));assert.deepEqual(fallback.holds,[]);
+context.claims=[{...game,team:'CAR',kind:'goalie_confirmed',playerId:'missing',sourcePublishedAt:new Date(now).toISOString(),capturedAt:new Date(now).toISOString(),sourceHtmlSha256:'a'.repeat(64)}];stats.goalies=null;
+assert.equal(buildModelBFactors(game,context,now).goalies[0].status,'statistics_held');
+assert(modelBQualifies([],.52,2,.02,.03,.00001));assert(!modelBQualifies([],.52,2,.019999,.03,.01));assert(!modelBQualifies([],.52,2,.02,.029999,.01));assert(!modelBQualifies([],.52,2,.02,.03,0));assert(!modelBQualifies(['stale'],.6,2,.1,.2,.1));assert(!modelBQualifies([],NaN,2,.1,.2,.1));
+assert(modelBEquivalent({p:.3},{p:.3+1e-16}));assert(!modelBEquivalent({p:.3},{p:.30001}));assert(!modelBEquivalent({side:'home'},{side:'away'}));
+const grid=poissonScoreGrid(3,3);assert(Math.abs(grid.regulation.home+grid.regulation.draw/2-.5)<1e-12);assert(Math.abs(Object.values(grid.regulation).reduce((a,b)=>a+b,0)-1)<1e-12);
+const board={checkedAt:new Date(now).toISOString(),evaluations:['home','away'].map(side=>({...game,date:'2026-11-07',selection:side,decimal:2,american:100,quoteAt:new Date(now).toISOString(),modelProbability:.5,holds:[]}))};
+const odds={events:[{id:'fixture',books:[{key:'draftkings',markets:[{key:'h2h',outcomes:[{},{}]}]}]}]};
+const result=modelBEvaluate(board,odds,'2026-11-07',context);assert(Math.abs(result[0].choices.reduce((s,c)=>s+c.probability,0)-1)<1e-12);assert.equal(result[0].selection,null);assert.equal(modelBRankings(result,board.checkedAt).topThree.length,1);
+assert(result[0].choices.every(c=>Math.abs(c.expectedReturn-(c.probability*c.decimal-1))<1e-12));
+console.log('Model B math: normalized probabilities, exact thresholds, optional fallbacks, missing goalie stats and safe numeric replay passed');
